@@ -1,5 +1,6 @@
 package com.example.ass2note.location;
 
+// Solveig was here
 import java.util.List;
 
 import android.app.Activity;
