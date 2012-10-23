@@ -1,0 +1,10 @@
+Log
+Fredag 21.09:
+Møttes og diskuterte hvilket sensorer vi kunne tenke oss og bruke, samt litt om hvordan app. Ble enige om å møtes igjen over helga og ha noen forslag klare.
+Mandag 24.09:
+Satt oss ned og kom fram til å lage en notatblokk med en lokasjonspåminder, slik at når man er på det bestemte stedet blir man påminnet om sitt notat.
+Vi skisserte også hvordan appen i grove trekk skulle se ut. Til slutt satte vi opp git og fikk alle til å koble seg opp på den.
+Tirsdag 25.09:
+Vi startet og lage appens basisfunksjoner, som det å se sine notater og lage og endre dem. 
+Onsdag 26.09
+Det ble mye jobbing med å få git til å fungere, det var mye conficts, og filer som ikke kunne commites, og andre ukjente feil. Videre så begynte vi med å integrere kart inn i appen, og å hente gps funksjoner.

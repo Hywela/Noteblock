@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent" >
+
+
+    <com.google.android.maps.MapView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/mapView"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/mapButtons"
+        android:layout_below="@+id/mapsInformation"
+        android:apiKey="0AOQioPq-xvAjjO260CxuMwqHDpWQ2ZEKKUUKiQ"
+        android:clickable="true" >
+
+    </com.google.android.maps.MapView>
+
+    <RelativeLayout
+        android:id="@+id/mapButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/notepad_light"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/cancelMapsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel" 
+         android:layout_alignParentLeft="true"
+         android:onClick="cancelMaps"/>
+
+        <Button
+            android:id="@+id/confirmMapsButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+         android:layout_alignParentRight="true"
+            android:text="@string/confirm" 
+            android:onClick="confirmMaps"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/mapsInformation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:ems="10"
+        android:text="@string/googleMapsInformation" >
+    </TextView>
+
+</RelativeLayout>

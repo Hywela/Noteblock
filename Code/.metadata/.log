@@ -1,0 +1,20 @@
+!SESSION 2012-09-24 13:05:45.385 -----------------------------------------------
+eclipse.buildId=I20120608-1400
+java.version=1.7.0_07
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.jee.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.jee.product
+
+!ENTRY com.android.ide.eclipse.adt 4 0 2012-09-24 13:10:08.805
+!MESSAGE Failed to load properties file for project 'Ass2Note'
+!SESSION 2012-09-24 13:50:42.747 -----------------------------------------------
+eclipse.buildId=I20120608-1400
+java.version=1.7.0_07
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Framework arguments:  -product org.eclipse.epp.package.jee.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.jee.product
+
+!ENTRY org.eclipse.core.resources 2 10035 2012-09-24 13:50:45.946
+!MESSAGE The workspace exited with unsaved changes in the previous session; refreshing workspace to recover changes.

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="div_h">1dp</dimen>
+    <dimen name="tendpi">20dp</dimen>
+    <dimen name="Divfivedpi">1dp</dimen>
+    <dimen name="Tekst_view_list">25dp</dimen>
+    <dimen name="Tekst_view_padding_left">20dp</dimen>
+</resources>

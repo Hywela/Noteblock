@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+   <string name="app_name">NoteBlock</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">NoteBlock</string>
+    <string name="title_activity_note">NoteBlock</string>
+    <string name="no_notes">No Notes Yet</string>
+    <string name="menu_insert">Add Note</string>
+    <string name="menu_delete">Delete Note</string>
+	<string name="title">Title</string>
+	<string name="body">Body</string>
+	<string name="confirm">Confirm</string> 
+	<string name="cancel">Cancel</string>
+ 	<string name="edit_note">Edit Note</string>
+ 	<string name="time">Time </string>
+	<string name="date">Date </string>
+	<string name="position">Position</string> 
+	<string name="new_button">New </string> 
+	<string name="googleMapsInformation">Please put the marker where you wish to be reminded</string>
+	<string name="menu_gps">Find Cordinates</string>
+</resources>
