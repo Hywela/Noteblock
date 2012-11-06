@@ -26,6 +26,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".notepad.NoteEdit" >
+            <intent-filter>
+                <action android:name="android.intent.action.M" />
+
+            </intent-filter>
         </activity>
         <activity
             android:name=".location.GoogleMapsActivity"
@@ -34,6 +38,10 @@
         <activity android:name=".location.UseGps" >
 
         </activity>
+        <service android:name=".notepad.BrodcastService">
+            
+        </service>
+        <service android:name=".location.TimeAndDate"></service>
     </application>
 
 </manifest>

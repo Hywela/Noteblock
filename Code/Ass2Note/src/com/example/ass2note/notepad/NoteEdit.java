@@ -17,13 +17,17 @@
 package com.example.ass2note.notepad;
 
 
-
+import com.example.ass2note.location.TimeAndDate;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,18 +37,20 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.example.ass2note.R;
 import com.example.ass2note.location.GoogleMapsActivity;
 
 public class NoteEdit extends Activity  {
 	private static final int MAPSINTENT_ID = 1;
-	
+
+				
 	private TextView mydateview;
 	private TextView mytimeview;
     private EditText mTitleText;
     private EditText mBodyText;
-    				
+    private ArrayList time = new ArrayList();				
     private String lati = "lat";
     private String longi = "long";
     
@@ -88,7 +94,7 @@ private void updateTime(int h, int m){
         super.onCreate(savedInstanceState);
         mDbHelper = new NotesDbAdapter(this);
         mDbHelper.open();
-
+        
         setContentView(R.layout.note_edit);
         setTitle(R.string.edit_note);
 
@@ -103,7 +109,7 @@ private void updateTime(int h, int m){
         Button confirmButton = (Button) findViewById(R.id.confirm);
        
         
-        mRowId = (savedInstanceState == null) ? null :
+        	mRowId = (savedInstanceState == null) ? null :
             (Long) savedInstanceState.getSerializable(NotesDbAdapter.KEY_ROWID);
 		if (mRowId == null) {
 			Bundle extras = getIntent().getExtras();
@@ -156,7 +162,8 @@ private void updateTime(int h, int m){
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DAY)));
             mytimeview.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME)));
-           // 
+            
+           
         }
     }
 
@@ -171,12 +178,17 @@ private void updateTime(int h, int m){
     protected void onPause() {
         super.onPause();
         saveState();
+      
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         populateFields();
+        
+        
+       
+       
     }
     			// Saves the values to the database
     private void saveState() {
@@ -186,7 +198,8 @@ private void updateTime(int h, int m){
         String time = mytimeview.getText().toString();
         String latitude = lati;
         String longitude = longi;
-        
+        if (time == null){time = "0";}
+        if (day == null){day = "0";}
         if (mRowId == null) {
             long id = mDbHelper.createNote(title, body, day, time, longitude, latitude);
             if (id > 0) {
@@ -227,8 +240,10 @@ private void updateTime(int h, int m){
      
     }
     
-    
-    
-   
+    public void timeCheck(){
+    	if (mRowId != null) {
+            Cursor note = mDbHelper.fetchNote(mRowId);
+          
+    }}
     
 }

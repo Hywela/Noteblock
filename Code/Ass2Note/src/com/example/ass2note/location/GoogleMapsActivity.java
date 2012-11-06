@@ -69,7 +69,7 @@ public class GoogleMapsActivity extends MapActivity implements LocationListener{
        longitude = (int)(location.getLongitude() * 1000000);
        addOverlay(latitude, longitude);
        mapController.animateTo(point);
-    mLocationManager.removeUpdates(this); 
+       mLocationManager.removeUpdates(this); 
         }
                
        }

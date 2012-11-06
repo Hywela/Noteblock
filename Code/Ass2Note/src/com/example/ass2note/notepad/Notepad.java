@@ -18,15 +18,19 @@ package com.example.ass2note.notepad;
 
 
 import java.security.acl.LastOwnerException;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import com.example.ass2note.R;
 import com.example.ass2note.R.id;
 import com.example.ass2note.R.layout;
 import com.example.ass2note.R.string;
+import com.example.ass2note.location.TimeAndDate;
 import com.example.ass2note.location.UseGps;
 
 
 import android.app.ListActivity;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -42,15 +46,18 @@ import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class Notepad extends ListActivity {
+	
     private static final int ACTIVITY_CREATE=0;
     private static final int ACTIVITY_EDIT=1;
     private static final int ACTIVITY_GPS=2;
     private static final int INSERT_ID = Menu.FIRST;
     private static final int INSERT_GPS = Menu.CATEGORY_SECONDARY;
     private static final int DELETE_ID = Menu.FIRST + 1;
-    
+    private ArrayList times = new ArrayList();
+    private ArrayList rowid = new ArrayList();
     private NotesDbAdapter mDbHelper;
-
+    
+    
     double lati = 0;
     double longi = 0;
     
@@ -65,7 +72,10 @@ public class Notepad extends ListActivity {
         registerForContextMenu(getListView());
         onButtonClick();
        
-       
+        Intent i = new Intent(this, TimeAndDate.class);
+        i.putExtra("RowID", rowid);
+        i.putExtra("Time", times);
+        startService(i);
       
     }
 
@@ -73,16 +83,32 @@ public class Notepad extends ListActivity {
         Cursor notesCursor = mDbHelper.fetchAllNotes();
         startManagingCursor(notesCursor);
 
+        
+        // SAVES TIME INTO AN ARRAY LIST
+        if(notesCursor != null){
+        		   while(notesCursor.moveToNext()){
+        		    times.add(  notesCursor.getString(4));
+        		    rowid.add(  notesCursor.getString(0));
+        		   }
+        		}
         // Create an array to specify the fields we want to display in the list (only TITLE)
         String[] from = new String[]{NotesDbAdapter.KEY_TITLE};
-
+        
+        String[] time = new String[]{NotesDbAdapter.KEY_TIME};
+       
+     
+        
+       
+       
         // and an array of the fields we want to bind those fields to (in this case just text1)
         int[] to = new int[]{R.id.text1};
-
+        int[] too = new int[]{};
         // Now create a simple cursor adapter and set it to display
         SimpleCursorAdapter notes = 
             new SimpleCursorAdapter(this, R.layout.list_row, notesCursor, from, to);
         setListAdapter(notes);
+        
+       
     }
 
     @Override
@@ -138,6 +164,8 @@ public class Notepad extends ListActivity {
         Intent i = new Intent(this, NoteEdit.class);
         i.putExtra(NotesDbAdapter.KEY_ROWID, id);
         startActivityForResult(i, ACTIVITY_EDIT);
+    
+        
     }
 
     @Override
