@@ -125,7 +125,7 @@ public class NotesDbAdapter {
      * @param body the body of the note
      * @return rowId or -1 if failed
      */		// Puts the intial values into the database
-    public long createNote(String title, String body, String day, String time, String latitude, String longitude) {
+    public long createNote(String title, String body, String day, String time, String longitude, String latitude) {
         ContentValues initialValues = new ContentValues();
         initialValues.put(KEY_TITLE, title);
         initialValues.put(KEY_BODY, body);
@@ -189,14 +189,14 @@ public class NotesDbAdapter {
      * @param body value to set note body to
      * @return true if the note was successfully updated, false otherwise
      */				// Updates the note with the values
-    public boolean updateNote(long rowId, String title, String body, String day, String time ,String longitude, String latitude) {
+    public boolean updateNote(long rowId, String title, String body, String day, String time ,String latitude, String longitude) {
         ContentValues args = new ContentValues();
         args.put(KEY_TITLE, title);
         args.put(KEY_BODY, body);
         args.put(KEY_DAY, day);
         args.put(KEY_TIME, time);
         args.put(KEY_LATI, latitude);
-        args.put(KEY_LONG,latitude );
+        args.put(KEY_LONG,longitude );
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
    

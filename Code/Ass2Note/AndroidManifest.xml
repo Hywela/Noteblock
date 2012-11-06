@@ -42,6 +42,17 @@
             
         </service>
         <service android:name=".location.TimeAndDate"></service>
+        
+        <service
+            android:name=".location.FindPositionService"
+            android:process=":my_process" >
+            <intent-filter>
+                <action android:name="location.FindPositionService.BIND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+        
     </application>
 
 </manifest>

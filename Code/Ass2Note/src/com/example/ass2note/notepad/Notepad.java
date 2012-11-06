@@ -72,10 +72,10 @@ public class Notepad extends ListActivity {
         registerForContextMenu(getListView());
         onButtonClick();
        
-        Intent i = new Intent(this, TimeAndDate.class);
-        i.putExtra("RowID", rowid);
-        i.putExtra("Time", times);
-        startService(i);
+       // Intent i = new Intent(this, TimeAndDate.class);
+        //i.putExtra("RowID", rowid);
+        //i.putExtra("Time", times);
+        //startService(i);
       
     }
 

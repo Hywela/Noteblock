@@ -163,7 +163,9 @@ private void updateTime(int h, int m){
             mytimeview.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME)));
             
-           
+            
+            lati = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_LATI));
+            longi = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_LONG));
         }
     }
 
@@ -231,9 +233,11 @@ private void updateTime(int h, int m){
              System.out.println("latitude is: "+data.getStringExtra("latitude"));
              lati = data.getStringExtra("latitude");
              longi = data.getStringExtra("longitude");
+             saveState();
         break;
         }
     case Activity.RESULT_CANCELED:{
+    	
      break;
     }
      }
