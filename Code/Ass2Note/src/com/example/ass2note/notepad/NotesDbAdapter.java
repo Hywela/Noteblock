@@ -16,6 +16,11 @@
 
 package com.example.ass2note.notepad;
 
+
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -35,10 +40,9 @@ import android.util.Log;
  * recommended).
  */
 public class NotesDbAdapter {
-
+	public static final String KEY_TEST = "date_created";
     public static final String KEY_TITLE = "title";
     public static final String KEY_BODY = "body";
-    public static final String KEY_DAY = "day";
     public static final String KEY_TIME = "time";
     public static final String KEY_LATI = "latitude";
     public static final String KEY_LONG = "longitude";
@@ -54,9 +58,9 @@ public class NotesDbAdapter {
      * Database creation sql statement
      */	//String, String ,String, String, String
     private static final String DATABASE_CREATE =
-        "create table notes (_id integer primary key autoincrement, "
-        + "title text not null, body text not null, day text not null," 
-        		+ " time text not null, latitude text not null, longitude text not null);" ;
+        "create table notes (_id integer primary key autoincrement, date_created TIMESTAMP NOT NULL DEFAULT current_timestamp, "
+        + "title text not null, body text not null," 
+        		+ " time INTEGER not null, latitude text not null, longitude text not null);" ;
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "notes";
@@ -81,7 +85,7 @@ public class NotesDbAdapter {
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                     + newVersion + ", which will destroy all old data");
-            db.execSQL("DROP TABLE IF EXISTS notes");
+            db.execSQL("DROP TABLE IF EXISTS notes" + "datetime('now')");
             onCreate(db);
         }
     }
@@ -125,12 +129,15 @@ public class NotesDbAdapter {
      * @param body the body of the note
      * @return rowId or -1 if failed
      */		// Puts the intial values into the database
-    public long createNote(String title, String body, String day, String time, String longitude, String latitude) {
+    public long createNote(String title, String body,  long time, String longitude, String latitude) {
         ContentValues initialValues = new ContentValues();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        initialValues.put(KEY_TIME, dateFormat.format(time));
+        
+     //   initialValues.put(KEY_TEST, );
         initialValues.put(KEY_TITLE, title);
         initialValues.put(KEY_BODY, body);
-        initialValues.put(KEY_DAY,day);
-        initialValues.put(KEY_TIME,time);
+        initialValues.put(KEY_TIME, "0");
         initialValues.put(KEY_LATI,latitude);
         initialValues.put(KEY_LONG,longitude);
         return mDb.insert(DATABASE_TABLE, null, initialValues);
@@ -154,10 +161,10 @@ public class NotesDbAdapter {
      */
     public Cursor fetchAllNotes() {
 
-        return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID, KEY_TITLE,
-                KEY_BODY,KEY_DAY, KEY_TIME , KEY_LATI, KEY_LONG}, null, null, null, null, null);
+        return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID,KEY_TEST, KEY_TITLE,
+                KEY_BODY, KEY_TIME , KEY_LATI, KEY_LONG}, null, null, null, null, null);
     }
-
+   
     /**
      * Return a Cursor positioned at the note that matches the given rowId
      * 
@@ -169,16 +176,17 @@ public class NotesDbAdapter {
 
         Cursor mCursor =
 
-            mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,
-                    KEY_TITLE, KEY_BODY, KEY_DAY, KEY_TIME ,KEY_LATI , KEY_LONG }, KEY_ROWID + "=" + rowId, null,
+            mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,KEY_TEST,
+                    KEY_TITLE, KEY_BODY,  KEY_TIME ,KEY_LATI , KEY_LONG }, KEY_ROWID + "=" + rowId, null,
                     null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
         }
         return mCursor;
-
+        
     }
 
+   
     /**
      * Update the note using the details provided. The note to be updated is
      * specified using the rowId, and it is altered to use the title and body
@@ -189,16 +197,25 @@ public class NotesDbAdapter {
      * @param body value to set note body to
      * @return true if the note was successfully updated, false otherwise
      */				// Updates the note with the values
-    public boolean updateNote(long rowId, String title, String body, String day, String time ,String latitude, String longitude) {
+    public boolean updateNote(long rowId, String title, String body, String latitude, String longitude) {
         ContentValues args = new ContentValues();
-        args.put(KEY_TITLE, title);
-        args.put(KEY_BODY, body);
-        args.put(KEY_DAY, day);
-        args.put(KEY_TIME, time);
+      SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    // if (time != null) { args.put(KEY_TIME, dateFormat.format(time));}
+      	
+      	args.put(KEY_TITLE, title);
+        args.put(KEY_BODY, body); 
         args.put(KEY_LATI, latitude);
         args.put(KEY_LONG,longitude );
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
-   
     
+    // Updates time
+    public boolean updateTime(long rowId, long time) {
+        ContentValues args = new ContentValues();
+      args.put(KEY_TIME, time);
+        
+        return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
+    }
+    
+  
 }

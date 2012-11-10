@@ -17,12 +17,17 @@
 package com.example.ass2note.notepad;
 
 
-import com.example.ass2note.location.TimeAndDate;
+
+import android.os.SystemClock;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-
+import java.util.Date;
+	
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -30,6 +35,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -45,7 +51,7 @@ import com.example.ass2note.location.GoogleMapsActivity;
 public class NoteEdit extends Activity  {
 	private static final int MAPSINTENT_ID = 1;
 
-				
+			
 	private TextView mydateview;
 	private TextView mytimeview;
     private EditText mTitleText;
@@ -53,15 +59,15 @@ public class NoteEdit extends Activity  {
     private ArrayList time = new ArrayList();				
     private String lati = "lat";
     private String longi = "long";
-    
+   
     private Long mRowId;
     private NotesDbAdapter mDbHelper;
     
     private int day = 1;
 public String date = " HELLO";
     
-//Date
-//private DateFormat fmtDate = DateFormat.getDateInstance();
+
+
 Calendar myCalendar = Calendar.getInstance();
 
 DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
@@ -71,24 +77,46 @@ myCalendar.set(Calendar.YEAR, year);
 myCalendar.set(Calendar.MONTH, monthOfYear);
 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-updateLabel( year, monthOfYear,  dayOfMonth);
+new TimePickerDialog(NoteEdit.this, t, myCalendar
+		.get(Calendar.HOUR_OF_DAY), myCalendar
+		.get(Calendar.MINUTE), true).show();
+
+
 
 }
+
 };
 
 TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
 	public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+		
 		myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
 		myCalendar.set(Calendar.MINUTE, minute);
-		updateTime(hourOfDay, minute);
+		Date	dat = myCalendar.getTime();
+		SimpleDateFormat ss = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		long da = myCalendar.getTimeInMillis();
+		
+		
+		updateTime(da);
+	
 	}
+	
 };
-private void updateLabel(int year, int monthOfYear, int dayOfMonth) {
-	mydateview.setText(dayOfMonth+"/"+monthOfYear+"/"+year); 
+
+private void updateTime( long da){
+	//SimpleDateFormat ss = new SimpleDateFormat("YYYY-MM-DD HH:mm:SS");
+	SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	
+	mydateview.setText( dateFormat.format(da));
+	saveTime(da);
+
+
+
 }
-private void updateTime(int h, int m){
-	mytimeview.setText(h+":"+m);
-}
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -118,7 +146,9 @@ private void updateTime(int h, int m){
 		}
 
 		populateFields();
-		// on clik Time
+		
+		// TO SELF MAKE TEXT FIELDS EDDITABLE SO WHEN CLICKED DATE AND TIME INPUT SHOULD BE TRIGGERED
+		// TOOO BE DELETED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! or chanced
 	timebutton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				new TimePickerDialog(NoteEdit.this, t, myCalendar
@@ -133,6 +163,7 @@ private void updateTime(int h, int m){
 				new DatePickerDialog(NoteEdit.this, d, myCalendar
 						.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
 						myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+				
 			}
 		});
 	
@@ -141,6 +172,7 @@ private void updateTime(int h, int m){
 				// ON click CONFIRM
         public void onClick(View view) {
             setResult(RESULT_OK);
+            
             finish();
         }
 
@@ -152,18 +184,26 @@ private void updateTime(int h, int m){
     // Gets the values from the database
     private void populateFields() {
         if (mRowId != null) {
+        	
             Cursor note = mDbHelper.fetchNote(mRowId);
             startManagingCursor(note);
             mTitleText.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
             mBodyText.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
-            mydateview.setText(note.getString(
-                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_DAY)));
-            mytimeview.setText(note.getString(
-                    note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME)));
             
+          //  Toast.makeText(this, note.getString( note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TEST)) , Toast.LENGTH_SHORT).show();
+
+            long temp = note.getLong(
+              note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME));
+           
+           
+           // View the Date set in the format .....
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        	mydateview.setText( dateFormat.format(temp));
+       
             
+           
             lati = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_LATI));
             longi = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_LONG));
         }
@@ -192,23 +232,34 @@ private void updateTime(int h, int m){
        
        
     }
+   private void saveTime(long time){
+    	if (mRowId == null) {
+          
+        } else {
+            mDbHelper.updateTime(mRowId,time);
+            
+        }
+    }
+
     			// Saves the values to the database
     private void saveState() {
         String title = mTitleText.getText().toString();
         String body = mBodyText.getText().toString();
-        String day = mydateview.getText().toString();
-        String time = mytimeview.getText().toString();
+        
+        
+       
         String latitude = lati;
         String longitude = longi;
-        if (time == null){time = "0";}
-        if (day == null){day = "0";}
+        
+        
         if (mRowId == null) {
-            long id = mDbHelper.createNote(title, body, day, time, longitude, latitude);
+            long id = mDbHelper.createNote(title, body,  myCalendar.getTimeInMillis(), longitude, latitude);
             if (id > 0) {
                 mRowId = id;
             }
         } else {
-            mDbHelper.updateNote(mRowId, title, body, day, time, longitude, latitude);
+            mDbHelper.updateNote(mRowId, title, body, longitude, latitude);
+            
         }
     }
    
@@ -244,10 +295,6 @@ private void updateTime(int h, int m){
      
     }
     
-    public void timeCheck(){
-    	if (mRowId != null) {
-            Cursor note = mDbHelper.fetchNote(mRowId);
-          
-    }}
+  
     
 }

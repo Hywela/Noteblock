@@ -18,8 +18,12 @@ package com.example.ass2note.notepad;
 
 
 import java.security.acl.LastOwnerException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.TimeZone;
 
 import com.example.ass2note.R;
 import com.example.ass2note.R.id;
@@ -29,11 +33,19 @@ import com.example.ass2note.location.TimeAndDate;
 import com.example.ass2note.location.UseGps;
 
 
+import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.ParseException;
 import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.text.format.Time;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,7 +58,7 @@ import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class Notepad extends ListActivity {
-	
+	private PendingIntent pendingIntent;	
     private static final int ACTIVITY_CREATE=0;
     private static final int ACTIVITY_EDIT=1;
     private static final int ACTIVITY_GPS=2;
@@ -57,7 +69,7 @@ public class Notepad extends ListActivity {
     private ArrayList rowid = new ArrayList();
     private NotesDbAdapter mDbHelper;
     
-    
+    int aa = 0;
     double lati = 0;
     double longi = 0;
     
@@ -72,37 +84,48 @@ public class Notepad extends ListActivity {
         registerForContextMenu(getListView());
         onButtonClick();
        
-       // Intent i = new Intent(this, TimeAndDate.class);
-        //i.putExtra("RowID", rowid);
-        //i.putExtra("Time", times);
-        //startService(i);
+      
       
     }
+    private long time() {
+        Cursor notesCursor = mDbHelper.fetchAllNotes();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        
+    	Date dd = new Date();
+        long dat = dd.getTime();
+        
+        while (notesCursor.moveToNext()) 
+        {
+        	long sjekkDate =  notesCursor.getLong( notesCursor.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME));
+     
+            if(sjekkDate >= dat){
+            	dat = sjekkDate;
 
+            }// - End if()
+            
+        } //- End while()
+        
+        Toast.makeText(this, dateFormat.format(dat) , Toast.LENGTH_SHORT).show();
+     return dat;
+    		 
+  
+    }// -End time();
+
+    
     private void fillData() {
         Cursor notesCursor = mDbHelper.fetchAllNotes();
         startManagingCursor(notesCursor);
-
+        	
+        
         
         // SAVES TIME INTO AN ARRAY LIST
-        if(notesCursor != null){
-        		   while(notesCursor.moveToNext()){
-        		    times.add(  notesCursor.getString(4));
-        		    rowid.add(  notesCursor.getString(0));
-        		   }
-        		}
+      
         // Create an array to specify the fields we want to display in the list (only TITLE)
         String[] from = new String[]{NotesDbAdapter.KEY_TITLE};
-        
-        String[] time = new String[]{NotesDbAdapter.KEY_TIME};
-       
      
-        
-       
-       
         // and an array of the fields we want to bind those fields to (in this case just text1)
         int[] to = new int[]{R.id.text1};
-        int[] too = new int[]{};
+        
         // Now create a simple cursor adapter and set it to display
         SimpleCursorAdapter notes = 
             new SimpleCursorAdapter(this, R.layout.list_row, notesCursor, from, to);
@@ -126,8 +149,8 @@ public class Notepad extends ListActivity {
                 createNote();
                 
             case INSERT_GPS:
-            	 findGps();
-            	 
+            	// TEST CASES
+            	setRecurringAlarm(Notepad.this);
                 return true;
         }
 
@@ -200,7 +223,29 @@ public class Notepad extends ListActivity {
         
     }
 
+  
+    private void setRecurringAlarm(Context context) {
+        // we know mobiletuts updates at right around 1130 GMT.
+        // let's grab new stuff at around 11:45 GMT, inexactly
+    	Calendar calendar = Calendar.getInstance();
 
+        calendar.setTimeInMillis(time());
 
-
+        
+        Intent myIntent = new Intent(context, AlarmReceiver.class);
+        
+        PendingIntent pendingintent = PendingIntent.getBroadcast(this, 0, myIntent, 0);
+     
+        AlarmManager alarms = (AlarmManager) context.getSystemService(
+                Context.ALARM_SERVICE);
+        alarms.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1, pendingintent);
+        
+    }
+    
+    
+ 
+    
+ 
+    
+    
 }
