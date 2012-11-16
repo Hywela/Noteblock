@@ -74,12 +74,6 @@ public class FindPositionService extends Service {
     	extras = intent.getExtras();
         messenger=(Messenger)extras.get(EXTRA_MESSENGER);
         
-        Intent i = new Intent("com.example.ass2note.location.GoogleMapsActivity.positionServiceReceiver");
-        Bundle extras = new Bundle();  
-        extras.putString("send_data", "test");  
-        intent.putExtras(extras);  
-        sendBroadcast(i);
-        
     	findUsersLocation();
     	return super.onStartCommand(intent, flags, startId);
     }
