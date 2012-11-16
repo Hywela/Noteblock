@@ -21,9 +21,9 @@ public class AlarmReceiver extends BroadcastReceiver {
 		
     
         
-       // Intent alarm = new Intent(context, MyAlarmService.class);
-        //alarm.putExtra("RowID", rowid);
-        //alarm.putExtra("Time", time);
-      //  context.startService(alarm);
+       Intent alarm = new Intent(context, MyAlarmService.class);
+       
+       context.startService(alarm);
+       context.stopService(alarm);
     }
 }

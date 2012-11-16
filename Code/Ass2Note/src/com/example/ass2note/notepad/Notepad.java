@@ -105,7 +105,7 @@ public class Notepad extends ListActivity {
             
         } //- End while()
         
-        Toast.makeText(this, dateFormat.format(dat) , Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, dateFormat.format(dat) , Toast.LENGTH_SHORT).show();
      return dat;
     		 
   
@@ -147,6 +147,7 @@ public class Notepad extends ListActivity {
         switch(item.getItemId()) {
             case INSERT_ID:
                 createNote();
+                
                 
             case INSERT_GPS:
             	// TEST CASES
@@ -232,14 +233,15 @@ public class Notepad extends ListActivity {
         calendar.setTimeInMillis(time());
 
         
-        Intent myIntent = new Intent(context, AlarmReceiver.class);
+        Intent myIntent = new Intent(this, AlarmReceiver.class);
         
-        PendingIntent pendingintent = PendingIntent.getBroadcast(this, 0, myIntent, 0);
+        PendingIntent pendingintent = PendingIntent.getBroadcast(context, 0, myIntent , 0);
      
-        AlarmManager alarms = (AlarmManager) context.getSystemService(
+        /*AlarmManager alarms = (AlarmManager) context.getSystemService(
                 Context.ALARM_SERVICE);
-        alarms.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1, pendingintent);
-        
+        alarms.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingintent);*/
+       pendingintent.cancel();
+       
     }
     
     
