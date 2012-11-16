@@ -48,6 +48,7 @@ import android.widget.Toast;
 import com.example.ass2note.R;
 import com.example.ass2note.location.GoogleMapsActivity;
 
+
 public class NoteEdit extends Activity  {
 	private static final int MAPSINTENT_ID = 1;
 
@@ -59,6 +60,7 @@ public class NoteEdit extends Activity  {
     private ArrayList time = new ArrayList();				
     private String lati = "lat";
     private String longi = "long";
+    private String positionReminder = "false";
    
     private Long mRowId;
     private NotesDbAdapter mDbHelper;
@@ -191,6 +193,8 @@ private void updateTime( long da){
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
             mBodyText.setText(note.getString(
                     note.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
+            positionReminder = note.getString(note.
+					getColumnIndexOrThrow(NotesDbAdapter.KEY_POSITION_REMINDER));
             
           //  Toast.makeText(this, note.getString( note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TEST)) , Toast.LENGTH_SHORT).show();
 
@@ -253,19 +257,21 @@ private void updateTime( long da){
         
         
         if (mRowId == null) {
-            long id = mDbHelper.createNote(title, body,  myCalendar.getTimeInMillis(), longitude, latitude);
+            long id = mDbHelper.createNote(title, body,  myCalendar.getTimeInMillis(), longitude, latitude, positionReminder);
             if (id > 0) {
                 mRowId = id;
             }
         } else {
-            mDbHelper.updateNote(mRowId, title, body, longitude, latitude);
+            mDbHelper.updateNote(mRowId, title, body, longitude, latitude, positionReminder);
             
         }
     }
    
     public void startGoogleMaps(View view){
-        Intent i = new Intent(NoteEdit.this, GoogleMapsActivity.class);
-        startActivityForResult(i, MAPSINTENT_ID);
+    	Intent i = new Intent(NoteEdit.this, GoogleMapsActivity.class);
+		i.putExtra("LATITUDE", lati);
+		i.putExtra("LONGITUDE", longi);
+		startActivityForResult(i, MAPSINTENT_ID);
        }
     
     /**
@@ -278,23 +284,20 @@ private void updateTime( long da){
      super.onActivityResult(requestCode, resultCode, data);
     
      Log.i("onActivityResult", "Result fetched");
-     if(requestCode==MAPSINTENT_ID)
-     switch(resultCode){
-       case Activity.RESULT_OK:{
-             System.out.println("latitude is: "+data.getStringExtra("latitude"));
-             lati = data.getStringExtra("latitude");
-             longi = data.getStringExtra("longitude");
-             saveState();
-        break;
-        }
-    case Activity.RESULT_CANCELED:{
-    	
-     break;
-    }
-     }
-     
-    }
-    
-  
-    
+  // The result came from GoogleMapsActivity:
+  		if (requestCode == MAPSINTENT_ID)
+  			switch (resultCode) {
+  			case Activity.RESULT_OK: { // Location was selected:
+  				lati = data.getStringExtra("latitude");
+  				longi = data.getStringExtra("longitude");
+  				positionReminder = "true";
+  				saveState();
+  				break;
+  			}
+  			case Activity.RESULT_CANCELED: {
+  				break;
+  			}
+  		}
+
+  	}
 }

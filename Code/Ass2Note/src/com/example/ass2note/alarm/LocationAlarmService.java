@@ -17,7 +17,7 @@ import android.os.Messenger;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.example.ass2note.R;
+
 import com.example.ass2note.location.FindPositionService;
 import com.example.ass2note.notepad.Notepad;
 import com.example.ass2note.notepad.NotesDbAdapter;

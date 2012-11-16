@@ -17,45 +17,32 @@
 package com.example.ass2note.notepad;
 
 
-import java.security.acl.LastOwnerException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.TimeZone;
 
-import com.example.ass2note.R;
-import com.example.ass2note.R.id;
-import com.example.ass2note.R.layout;
-import com.example.ass2note.R.string;
-import com.example.ass2note.location.TimeAndDate;
-import com.example.ass2note.location.UseGps;
-
-
-import android.app.AlarmManager;
-import android.app.Dialog;
 import android.app.ListActivity;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TimePickerDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.ParseException;
 import android.os.Bundle;
-import android.text.format.DateFormat;
-import android.text.format.Time;
+import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
-import android.widget.AdapterView.AdapterContextMenuInfo;
+
+import com.example.ass2note.R;
+import com.example.ass2note.alarm.AlarmManagerService;
+import com.example.ass2note.location.UseGps;
 
 public class Notepad extends ListActivity {
 	private PendingIntent pendingIntent;	
@@ -83,10 +70,20 @@ public class Notepad extends ListActivity {
         fillData();
         registerForContextMenu(getListView());
         onButtonClick();
-       
+    	// If the user pressed the notification-panel, display the proper note:
+		Intent u = getIntent();
+		if(u.hasExtra("notificationSuccess")){ //TODO: Make sure the key is the correct one
+			Long key = Long.parseLong(u.getStringExtra("notificationSuccess"));
+			startNoteEdit(key);
+		}
       
       
     }
+    private void startNoteEdit(Long key){
+		Intent i = new Intent(this, NoteEdit.class);
+		i.putExtra(NotesDbAdapter.KEY_ROWID, key);
+		startActivityForResult(i, ACTIVITY_EDIT);
+	}
     private long time() {
         Cursor notesCursor = mDbHelper.fetchAllNotes();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
@@ -167,15 +164,25 @@ public class Notepad extends ListActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case DELETE_ID:
-                AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-                mDbHelper.deleteNote(info.id);
-                fillData();
-                return true;
-        }
-        return super.onContextItemSelected(item);
-    }
+    	switch (item.getItemId()) {
+		case DELETE_ID:
+			AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+					.getMenuInfo();
+			mDbHelper.deleteNote(info.id);
+			cancelNotification(info.id); // If the note is still on the panel, remove it.
+			
+			// If no more valid notes exists in the DB, stop the alarm:
+			if(!validNotes()){
+				Intent i = new Intent(Notepad.this, AlarmManagerService.class);
+				i.putExtra("COMMAND", "Stop Alarm");
+				startService(i);
+			}
+			
+			fillData();
+			return true;
+		}
+		return super.onContextItemSelected(item);
+	}
 
     private void createNote() {
         Intent i = new Intent(this, NoteEdit.class);
@@ -185,9 +192,8 @@ public class Notepad extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        Intent i = new Intent(this, NoteEdit.class);
-        i.putExtra(NotesDbAdapter.KEY_ROWID, id);
-        startActivityForResult(i, ACTIVITY_EDIT);
+        
+        startNoteEdit(id);
     
         
     }
@@ -198,15 +204,21 @@ public class Notepad extends ListActivity {
        
         
         
-        if (resultCode == RESULT_OK && requestCode == ACTIVITY_GPS) {
-            if (intent.hasExtra("longitud")) {
-            longi = intent.getExtras().getDouble("longitude");}
-            if (intent.hasExtra("latitude")) {
-                lati = intent.getExtras().getDouble("latitude");}
-   
-            } else
-            	  	fillData();
-    }
+
+		Log.i("Notepad", "onActivityresult");
+		startAlarmManagerService();
+
+		if (resultCode == RESULT_OK && requestCode == ACTIVITY_GPS) {
+			if (intent.hasExtra("longitud")) {
+				longi = intent.getExtras().getDouble("longitude");
+			}
+			if (intent.hasExtra("latitude")) {
+				lati = intent.getExtras().getDouble("latitude");
+			}
+
+		} else
+			fillData();
+	}
     
     protected void onButtonClick(){
     	Button onButtonClick = (Button) findViewById(R.id.button_new_note);
@@ -243,10 +255,36 @@ public class Notepad extends ListActivity {
        pendingintent.cancel();
        
     }
-    
-    
+    public void startAlarmManagerService(){
+		Log.i("Notepad", "starting AlarmManagerservice");
+		if(validNotes()){
+			Intent i = new Intent(Notepad.this, AlarmManagerService.class);
+			i.putExtra("COMMAND", "Start Alarm");
+			startService(i);
+		}else{
+			Log.i("Notepad", "startAlarmManagerService: No valid notes");
+		}
+	}
+	 
+    private boolean validNotes(){
+		Cursor allNotes = mDbHelper.fetchAllNotes();
+		if(allNotes!=null){
+			ArrayList validNotes = new ArrayList();
+			while(allNotes.moveToNext())
+				validNotes.add(allNotes.getString(7));	// enableNotification
+			if(validNotes.contains("true")) 
+				return true;
+		}
+		return false;
+	} 
  
-    
+   
+    private void cancelNotification(Long id){
+    	  Log.i("Notepad", "cancelNotification: removing notification from panel");
+    	  int noteId = Integer.parseInt(String.valueOf(id));
+    	  NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    	  mNotificationManager.cancel(noteId); 
+    	 }
  
     
     
