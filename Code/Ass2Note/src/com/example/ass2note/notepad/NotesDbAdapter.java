@@ -137,7 +137,7 @@ public class NotesDbAdapter {
      //   initialValues.put(KEY_TEST, );
         initialValues.put(KEY_TITLE, title);
         initialValues.put(KEY_BODY, body);
-        initialValues.put(KEY_TIME, "0");
+        initialValues.put(KEY_TIME, time);
         initialValues.put(KEY_LATI,latitude);
         initialValues.put(KEY_LONG,longitude);
         initialValues.put(KEY_POSITION_REMINDER,positionReminder);

@@ -96,23 +96,30 @@ public class Notepad extends ListActivity {
 		Cursor notesCursor = mDbHelper.fetchAllNotes();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 
-		Date dd = new Date();
-		long dat = dd.getTime();
 
-		while (notesCursor.moveToNext()) {
-			long sjekkDate = notesCursor.getLong(notesCursor
-					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME));
-
-			if (sjekkDate >= dat) {
-				dat = sjekkDate;
-
-			}// - End if()
-
-		} // - End while()
-
-		// Toast.makeText(this, dateFormat.format(dat) ,
-		// Toast.LENGTH_SHORT).show();
-		return dat;
+    	Date dd = new Date();
+        long dat = dd.getTime();
+        long temp = 0;
+        while (notesCursor.moveToNext()) 
+        {
+        	long sjekkDate =  notesCursor.getLong( notesCursor.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME));
+    
+            if(sjekkDate >= dat){
+            	
+            	
+            	if ( sjekkDate <= temp)
+            	temp = sjekkDate;
+            	
+            	
+            }
+            if(temp == 0) {
+            		temp = sjekkDate;}
+            
+            
+        } //- End while()
+        
+        Toast.makeText(this, dateFormat.format(temp) , Toast.LENGTH_SHORT).show();
+     return temp;
 
 	}// -End time();
 

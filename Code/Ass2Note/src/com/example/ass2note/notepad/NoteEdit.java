@@ -58,8 +58,8 @@ public class NoteEdit extends Activity {
 	private String positionReminder = "false";
 	private Long mRowId;
 	private NotesDbAdapter mDbHelper;
-	private int day = 1;
-	public String date = " HELLO";
+	long da;
+	
 
 	Calendar myCalendar = Calendar.getInstance();
 
@@ -84,7 +84,7 @@ public class NoteEdit extends Activity {
 			Date dat = myCalendar.getTime();
 			SimpleDateFormat ss = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-			long da = myCalendar.getTimeInMillis();
+			da = myCalendar.getTimeInMillis();
 
 			updateTime(da);
 
@@ -110,7 +110,7 @@ public class NoteEdit extends Activity {
 
 		setContentView(R.layout.note_edit);
 		setTitle(R.string.edit_note);
-
+		da = myCalendar.getTimeInMillis();
 		mTitleText = (EditText) findViewById(R.id.title);
 		mBodyText = (EditText) findViewById(R.id.body);
 		mydateview = (TextView) findViewById(R.id.date);
@@ -230,7 +230,7 @@ public class NoteEdit extends Activity {
 
 		if (mRowId == null) {
 			long id = mDbHelper.createNote(title, body,
-					myCalendar.getTimeInMillis(), longitude, latitude,
+					da , longitude, latitude,
 					positionReminder);
 			if (id > 0) {
 				mRowId = id;
