@@ -6,19 +6,20 @@ import android.content.Intent;
 import android.util.Log;
 
 public class LocationAlarmReceiver extends BroadcastReceiver {
-	private Intent alarmServiceIntent;
-	
 
 	public LocationAlarmReceiver() {
 		Log.i("LocationAlarmReceiver","created receiver");
 	}
 
-	// TODO: This method is called when the BroadcastReceiver is receiving
-	// an Intent broadcast.
+	/**
+	 * This method is called when the BroadcastReceiver is receiving an Intent 
+	 * broadcast from an alarm from AlarmManagerService. It calls 
+	 * LocationAlarmService.
+	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Log.i("LocationAlarmReceiver", "onReceive is called");
-		alarmServiceIntent = new Intent(context, LocationAlarmService.class);
+		Intent alarmServiceIntent = new Intent(context, LocationAlarmService.class);
 		context.startService(alarmServiceIntent);
 	}
 	

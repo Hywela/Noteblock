@@ -21,15 +21,11 @@
             android:label="@string/title_activity_note" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".notepad.NoteEdit" >
-            <intent-filter>
-                <action android:name="android.intent.action.M" />
-
-            </intent-filter>
+        <activity android:name=".notepad.NoteEdit" 
+            android:parentActivityName=".notepad.Notepad">
         </activity>
         <activity
             android:name=".location.GoogleMapsActivity"
@@ -52,8 +48,25 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
+        <receiver android:name=".notepad.AlarmReceiver"></receiver>
+        
         <receiver
-    android:name=".notepad.AlarmReceiver"></receiver>
+            android:name=".alarm.LocationAlarmReceiver"
+            android:enabled="true"
+            android:exported="true" >
+        </receiver>
+
+        <service
+            android:name=".alarm.LocationAlarmService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        <service
+            android:name=".alarm.AlarmManagerService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        
     </application>
 
 </manifest>

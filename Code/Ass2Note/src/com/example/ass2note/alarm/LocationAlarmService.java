@@ -8,31 +8,33 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.drm.DrmStore.Action;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-
+import com.example.ass2note.R;
 import com.example.ass2note.location.FindPositionService;
 import com.example.ass2note.notepad.Notepad;
 import com.example.ass2note.notepad.NotesDbAdapter;
 
 public class LocationAlarmService extends Service {
-	private static final int NOTIFICATION_DISTANCE = 100;
-	private Intent positionServiceIntent; // Intent for starting FindPositionService
-	private double userLatitude; // The user's latitude position.
-	private double userLongitude; // The user's longitude position.
-	private ArrayList<String> noteLatitudeList; // All latitudes stored in the DB.
-	private ArrayList<String> noteLongitudeList; // All longitudes stored in the DB.
-	private ArrayList<String> noteKeyList;
-	private ArrayList<String> titleList;
-	private ArrayList<String> enablePositionList;
-	private NotesDbAdapter mDbHelper;
+	private static final int NOTIFICATION_DISTANCE = 100;	// MAX distance in meters to when the user will be notified.
+	private Intent positionServiceIntent; 					// Intent for starting FindPositionService
+	private double userLatitude; 						// The user's latitude position.
+	private double userLongitude; 						// The user's longitude position.
+	private ArrayList<String> noteLatitudeList; 	// All latitudes stored in the DB.
+	private ArrayList<String> noteLongitudeList; 	// All longitudes stored in the DB.
+	private ArrayList<String> noteKeyList;			// All ID's of the notes stored in the DB.
+	private ArrayList<String> titleList;			// All titles of the notes stored in the DB.
+	private ArrayList<String> enablePositionList;	// A list of validations for checking if the notes can be notified.
+	private NotesDbAdapter mDbHelper;			// The database-class.
 	
 
 	/**
@@ -43,18 +45,22 @@ public class LocationAlarmService extends Service {
 		Log.i("LocationAlarmService", "created service");
 	}
 
+	/**
+	 * When the service is created, it opens a database connection, fetches
+	 * the necessary data from the DB and calls FindPositionService.
+	 */
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		mDbHelper = new NotesDbAdapter(this);
-		mDbHelper.open();
+		mDbHelper = new NotesDbAdapter(this);	// Create a new instance of DB.
+		mDbHelper.open();						// Open the DB.
 
 		// Create new lists for carrying the locations:
-		noteLatitudeList = new ArrayList();
-		noteLongitudeList = new ArrayList();
-		noteKeyList = new ArrayList();
-		titleList = new ArrayList();
-		enablePositionList = new ArrayList();
+		noteLatitudeList = new ArrayList<String>();
+		noteLongitudeList = new ArrayList<String>();
+		noteKeyList = new ArrayList<String>();
+		titleList = new ArrayList<String>();
+		enablePositionList = new ArrayList<String>();
 
 		// Put data inside the lists.
 		fetchAllLocations();
@@ -64,10 +70,7 @@ public class LocationAlarmService extends Service {
 	}
 
 	/**
-	 * This onStart saves the latitudes and longitudes to their respective
-	 * ArrayLists, and calls FindPositionservice for fetching the User's current
-	 * position.
-	 * 
+	 * This onStart is for now not implemented.
 	 * @param intent
 	 * @param flags
 	 * @param startId
@@ -78,11 +81,20 @@ public class LocationAlarmService extends Service {
 		return super.onStartCommand(intent, flags, startId);
 	}
 
+	/**
+	 * onBind will not bind to any Activity, so it returns null.
+	 */
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
 
+	/**
+	 * Method for creating an intent to start FindPositionService. A Message is
+	 * sent to FindPositionService so is can return data to this service's 
+	 * handler, which is called handy. The data which will be returned is the
+	 * user's current position or null.
+	 */
 	private void startFindPositionService() {
 		// Call FindPositionService for fetching the user's current position:
 		positionServiceIntent = new Intent(LocationAlarmService.this, FindPositionService.class);
@@ -91,16 +103,16 @@ public class LocationAlarmService extends Service {
 	}
 
 	/**
-	 * Handler for receiving latitude and longitude position of the user from
-	 * FindPositionService. After fetching the position, compare the user's
-	 * position with all the notes position, and stop this service.
+	 * Handler for receiving the current latitude and longitude position of the
+	 * user from FindPositionService. After fetching the position, compare the 
+	 * user's position with all the notes position, and stop this service.
 	 */
 	private Handler handy = new Handler() {
 		public void handleMessage(Message message) {
 			Log.i("LocationAlarmService", "Handler handy called");
 			Bundle data = message.getData();
 
-			// If information was successfully sent:
+			// If new location is sent:
 			if (data != null) {
 				userLatitude = data.getDouble("LATITUDE") / 1E6;
 				userLongitude = data.getDouble("LONGITUDE") / 1E6;
@@ -112,10 +124,17 @@ public class LocationAlarmService extends Service {
 		}
 	};
 
+	/**
+	 * Method for closing the database and killing this LocationAlarmService.
+	 */
 	private void stopMe() {
 		Log.i("LocationAlarmService", "stopService");
-		mDbHelper.close();
-		stopSelf();
+		
+		// If no more valid notes exist, tell the alarm to stop.
+		if(!doesValidLocationExist()) stopAlarmManager();
+		
+		mDbHelper.close();	// Close the database connection.
+		stopSelf();			// Stop this service.
 	}
 
 	/**
@@ -153,8 +172,8 @@ public class LocationAlarmService extends Service {
 				// If the distance is less than 100 meters, alert user:
 				if (results[0] <= NOTIFICATION_DISTANCE) {
 					System.out.println("NOOOOTIFICATION ALERT!!");
-					notifyDatabase(number);
-					notifyUser(number);
+					notifyDatabase(number);			// Update the DB.
+					notifyUser(number);				// Notify the user.
 				} else
 					Log.i("LocationAlarmService", "user is still too far away");
 			} else
@@ -163,18 +182,33 @@ public class LocationAlarmService extends Service {
 		} // End for
 	}
 
+	/**
+	 * Method for 
+	 * @param number
+	 */
 	public void notifyDatabase(int number) {
 		Log.i("LocationAlarmService", "trying to notify database");
+		
+		// Get the ID of the note that will be changed.
 		Long key = Long.parseLong(noteKeyList.get(number).toString());
-		disableNotificationDb(key);
+		
+		// Set the value of "positionNotification" to false.
+		mDbHelper.updatePositionNotification(key, "false");
+		
+		// Update the current lists:
 		fetchAllLocations();
 		
-		if(!doesValidLocationExist());{
-			notifyAlarmManager();
-		}
+		/*// If no more valid notes exist, tell the alarm to stop.
+		if(!doesValidLocationExist())
+			stopAlarmManager();*/
 	}
 	
-	private void notifyAlarmManager(){
+	/**
+	 * Method for starting AlarmManagerService so it will stop the alarm 
+	 * associated with location.
+	 */
+	private void stopAlarmManager(){
+		Log.i("LocationAlarmService", "stopAlarmManager stopping alarm");
 		Intent i = new Intent(LocationAlarmService.this, AlarmManagerService.class);
 		i.putExtra("COMMAND", "Stop Alarm");
 		startService(i);
@@ -182,17 +216,18 @@ public class LocationAlarmService extends Service {
 
 	/**
 	 * Method for notifying the user with (lights, vibration, sound and) a
-	 * note on the panel. 
+	 * note on the panel. TODO: Add lights, vibration, sound?
 	 */
 	public void notifyUser(int number) {
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-				this)
+		NotificationCompat.Builder mBuilder = 
+				new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle("NoteBlock Reminder!")
 				.setContentText("You have been reminded of: "
 						+ titleList.get(number).toString());
-
-		// Remove the notification on the panel.
+		
+		/* Set the notification on the panel to remove itself when the user 
+		   presses it.*/
 		mBuilder.setAutoCancel(true);
 		// mBuilder.setOnlyAlertOnce(true);
 
@@ -216,51 +251,50 @@ public class LocationAlarmService extends Service {
 		 */
 
 		Intent notifyIntent = new Intent(this, Notepad.class);
-		notifyIntent.putExtra("notificationSuccess", noteKeyList.get(number) //TODO: Make sure Notepad get this key
-				.toString());
-		notifyIntent.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT);
-
-		PendingIntent intent = PendingIntent.getActivity(this, 0, notifyIntent,
-				0);
+		notifyIntent.setAction(String.valueOf(number));
+		notifyIntent.putExtra("notificationSuccess", noteKeyList.get(number).toString());
+		PendingIntent intent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
 		mBuilder.setContentIntent(intent);
 
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.notify(
-				Integer.parseInt(noteKeyList.get(number).toString()),
-				mBuilder.build());
+		mNotificationManager.notify(Integer.parseInt(noteKeyList.get(number).toString()),mBuilder.build());
 	}
 
-	private void disableNotificationDb(Long key) {
-		Log.i("LocationAlarmService","disableNotificationDb, setting note to false");
-		mDbHelper.updatePositionNotification(key, "false");
-	}
-
-	// TODO: Make this better
+	/**
+	 * Method for deciding if a valid location exist in the database. By valid,
+	 * it means that the latitude and longitude values contain a double number,
+	 * and that the note's respective positionNotification value is "true".
+	 * @return true when a valid location does exist, false otherwise.
+	 */
 	public boolean doesValidLocationExist() {
-		Log.i("LocationAlarmService", "isLocationEmpty");
-		//fetchAllLocations();
-		if (noteLatitudeList.isEmpty() || noteLongitudeList.isEmpty())
-			return false;
-		else {
-			for (int i = 0; i < noteLatitudeList.size(); i++) {
-				if (!noteLatitudeList.get(i).toString().contains("lat")
-						&& !noteLongitudeList.get(i).toString()
-								.contains("long")
-						&& enablePositionList.get(i).toString()
-								.contains("true")) {
-					return true;
-				}
-			}
+		Log.i("LocationAlarmService", "doesValidLocationExist");
+		
+		if(enablePositionList.contains("true")) {
+			Log.i("LocationAlarmService", "contained true");
+			return true;
 		}
 		return false;
 	}
 
+	/**
+	 * Method for fetching all notes from the database, and put the necessary
+	 * information inside their own lists for other methods to use.
+	 */
 	public void fetchAllLocations() {
 		Log.i("LocationAlarmService", "fetchAllLocations");
+		
+		// Empty the lists so they contain only the most recent values:
+		if(!noteKeyList.isEmpty()){
+			noteLatitudeList.clear();
+			noteLongitudeList.clear();
+			noteKeyList.clear();
+			titleList.clear();
+			enablePositionList.clear();
+		}
 
 		// Fetch the notes from the Database.
 		Cursor allNotes = mDbHelper.fetchAllNotes();
-
+		
 		// If there are notes in the database:
 		if (allNotes != null) {
 			while (allNotes.moveToNext()) {
@@ -268,7 +302,7 @@ public class LocationAlarmService extends Service {
 				noteLatitudeList.add(allNotes.getString(5));
 				noteLongitudeList.add(allNotes.getString(6));
 				noteKeyList.add(allNotes.getString(0));
-				titleList.add(allNotes.getString(1));
+				titleList.add(allNotes.getString(2));
 				enablePositionList.add(allNotes.getString(7));
 			}
 		}

@@ -59,7 +59,7 @@ public class NotesDbAdapter {
     private static final String DATABASE_CREATE =
         "create table notes (_id integer primary key autoincrement, date_created TIMESTAMP NOT NULL DEFAULT current_timestamp, "
         + "title text not null, body text not null," 
-        		+ " time INTEGER not null, latitude text not null, longitude text not null " 
+        		+ " time INTEGER not null, latitude text not null, longitude text not null, " 
         		+ " positionReminder text not null);" ;
 
     private static final String DATABASE_NAME = "data";
@@ -198,7 +198,7 @@ public class NotesDbAdapter {
      * @param body value to set note body to
      * @return true if the note was successfully updated, false otherwise
      */				// Updates the note with the values
-    public boolean updateNote(long rowId, String title, String body, String latitude, String longitude, String positionReminder) {
+    public boolean updateNote(long rowId, String title, String body, String longitude, String latitude, String positionReminder) {
         ContentValues args = new ContentValues();
       SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     // if (time != null) { args.put(KEY_TIME, dateFormat.format(time));}
