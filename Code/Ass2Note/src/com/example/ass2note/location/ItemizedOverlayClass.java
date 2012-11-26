@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
@@ -70,9 +69,15 @@ public class ItemizedOverlayClass extends ItemizedOverlay <OverlayItem>{
 	 */
 	@Override
 	protected boolean onTap(int index) {
-		Toast.makeText(context, itemList.get(index).getTitle() + " \n" 
+		/*Toast.makeText(context, itemList.get(index).getTitle() + " \n" 
 			+ itemList.get(index).getSnippet(), Toast.LENGTH_LONG).show();
-		return true;
+		return true;*/
+		OverlayItem item = itemList.get(index);
+		  AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+		  dialog.setTitle(item.getTitle());
+		  dialog.setMessage(item.getSnippet());
+		  dialog.show();
+		  return true;
 	}
 	
 	@Override
@@ -155,9 +160,9 @@ public class ItemizedOverlayClass extends ItemizedOverlay <OverlayItem>{
 	 * @param latitude2
 	 * @param longitude2
 	 */
-	public void setPosition(String latitude2, String longitude2) {
-		latitude = Double.parseDouble(latitude2);
-		longitude = Double.parseDouble(longitude2);
+	public void setPosition(double latitude2, double longitude2) {
+		latitude = latitude2;
+		longitude = longitude2;
 	}
 	
 	/**

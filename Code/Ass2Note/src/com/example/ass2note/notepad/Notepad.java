@@ -38,10 +38,11 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import com.example.ass2note.R;
 import com.example.ass2note.alarm.AlarmManagerService;
-import com.example.ass2note.location.UseGps;
+import com.example.ass2note.alarm.AlarmReceiver;
 
 public class Notepad extends ListActivity {
 	private PendingIntent pendingIntent;
@@ -160,7 +161,7 @@ public class Notepad extends ListActivity {
 
 		case INSERT_GPS:
 			// TEST CASES
-			setRecurringAlarm(Notepad.this);
+			startTimeAlarm();
 			return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
@@ -215,7 +216,7 @@ public class Notepad extends ListActivity {
 		Log.i("Notepad", "onActivityresult");
 		
 		// TODO: This can be called elsewhere.
-		startAlarmManagerService();
+		startLocationAlarm();
 
 		if (resultCode == RESULT_OK && requestCode == ACTIVITY_GPS) {
 			if (intent.hasExtra("longitud")) {
@@ -238,44 +239,26 @@ public class Notepad extends ListActivity {
 		});
 	}
 
-	protected void findGps() {
-		Intent i = new Intent(this, UseGps.class);
-		i.putExtra("Value1", lati);
-		i.putExtra("Value2", longi);
-		startActivityForResult(i, ACTIVITY_GPS);
-
-	}
-
-	private void setRecurringAlarm(Context context) {
-		// we know mobiletuts updates at right around 1130 GMT.
-		// let's grab new stuff at around 11:45 GMT, inexactly
-		Calendar calendar = Calendar.getInstance();
-
-		calendar.setTimeInMillis(time());
-
-		Intent myIntent = new Intent(this, AlarmReceiver.class);
-
-		PendingIntent pendingintent = PendingIntent.getBroadcast(context, 0,
-				myIntent, 0);
-
-		/*
-		 * AlarmManager alarms = (AlarmManager) context.getSystemService(
-		 * Context.ALARM_SERVICE); alarms.set(AlarmManager.RTC_WAKEUP,
-		 * calendar.getTimeInMillis(), pendingintent);
-		 */
-		pendingintent.cancel();
+	private void startTimeAlarm() {
+		long closestTime = time();
+		Intent i = new Intent(Notepad.this, AlarmManagerService.class);
+		i.putExtra("alarmType", "time");
+		i.putExtra("time", closestTime);
+		i.putExtra("COMMAND", "Start Alarm");
+		startService(i);
 	}
 
 	/**
 	 * Method for starting AlarmManagerService. The service will only be 
 	 * started if there exist at least one valid note in the DB.
 	 */
-	public void startAlarmManagerService() {
+	public void startLocationAlarm() {
 		Log.i("Notepad", "starting AlarmManagerservice");
-		
+		// TODO: Rename validNotes..
 		// If there exist at least one valid note in the database:
 		if (validNotes()) {
 			Intent i = new Intent(Notepad.this, AlarmManagerService.class);
+			i.putExtra("alarmType", "position");
 			i.putExtra("COMMAND", "Start Alarm");
 			startService(i);
 		} else {

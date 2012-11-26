@@ -15,7 +15,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
 
 
 /*
@@ -42,6 +41,7 @@ public class FindPositionService extends Service {
 	private LocationManager mLocationManager;
 	private Bundle extras;
 	private Messenger messenger;
+	private LocationListener networkListener;
     
 	
 	public FindPositionService(){
@@ -63,6 +63,9 @@ public class FindPositionService extends Service {
     @Override
     public void onDestroy(){
     	Log.i("FindPositionService","destroyed service");
+    	boolean providerEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    	if(providerEnabled)  mLocationManager.removeUpdates(networkListener);
+    		
     	super.onDestroy();
     	// Code to execute when the service is shutting down
     }
@@ -74,118 +77,58 @@ public class FindPositionService extends Service {
     	extras = intent.getExtras();
         messenger=(Messenger)extras.get(EXTRA_MESSENGER);
         
-    	findUsersLocation();
+        if(extras.containsKey("gpsEnabled")){
+        	boolean gpsEnabled = extras.getBoolean("gpsEnabled");
+        	boolean networkEnabled = extras.getBoolean("networkEnabled");
+        	
+       // 	if(networkEnabled)
+        }
+        
+    	findNetworkLocation();
     	return super.onStartCommand(intent, flags, startId);
     }
 	
-	public void findUsersLocation(){
-		// Get the user's last known location
-		/*Location location = mLocationManager
-				.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		return location;*/
-		
+	public void findNetworkLocation(){
 		// Acquire a reference to the system Location Manager
 		mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 		
 		// Define a listener that responds to location updates.
     	// It is called when a new location is found by the network location provider.
-		LocationListener locationListener = new LocationListener() {
+		networkListener = new LocationListener() {
 		    public void onLocationChanged(Location location) {
 		    	Log.i("FindPositionService", "LocationListener registered position on onLocationChanged");
-		    	System.out.println("tida lokasjonen vart funne: "+location.getTime());
-		    	double latitude = (int) (location.getLatitude() * 1000000);
-				double longitude = (int) (location.getLongitude() * 1000000);
-				
-		    	Bundle bundle = new Bundle();
-		    	bundle.putDouble("LATITUDE", latitude);
-		    	bundle.putDouble("LONGITUDE", longitude);
-		        
-		    	Message msg=Message.obtain();
-		    	msg.setData(bundle);
-		    	try {
-		    		messenger.send(msg);
-		        }
-		        catch (android.os.RemoteException e1) {
-		        	Log.w(getClass().getName(), "Exception sending message", e1);
-		        }
+		    	sendLocationMessage(location.getLatitude() * 1000000, location.getLongitude() * 1000000);
 				
 				mLocationManager.removeUpdates(this);
 		    }
 
-		    public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-		    public void onProviderEnabled(String provider) {}
-
-		    public void onProviderDisabled(String provider) {}
+		    public void onStatusChanged(String provider, int status, Bundle extras) {System.out.println("status changed");}
+		    public void onProviderEnabled(String provider) { System.out.println(" provider enabled");}
+		    public void onProviderDisabled(String provider) {System.out.println("provider disabled");}
 		  };
 
 		// Register the listener with the Location Manager to receive location updates
-		mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+		mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkListener);
 		  
-		//  isGPSEnabled();
-	//	mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+	//	isGPSEnabled();
+	//	mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);	
+	}
+	
+	private void sendLocationMessage(double latitude, double longitude){
+		Log.i("FindPositionService", "LocationListener registered position on onLocationChanged");
 		
-	}
-	
-	
-	private void isGPSEnabled() {
-		// This verification should be done during onStart() because the system
-		// calls
-		// this method when the user returns to the activity, which ensures the
-		// desired
-		// location provider is enabled each time the activity resumes from the
-		// stopped state.
-		final boolean gpsEnabled = mLocationManager
-				.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-		if (!gpsEnabled) {
-			// Show an alert dialog that requests that the user enable
-			// the location services, then when the user clicks the "OK" button,
-			// enableLocationSettings() is called
-			AlertDialog.Builder altDialog = new AlertDialog.Builder(this);
-			altDialog.setMessage("Please start your GPS");
-			altDialog.setNeutralButton("OK",
-					new DialogInterface.OnClickListener() {
-
-						// @Override
-						public void onClick(DialogInterface dialog, int which) {
-							enableLocationSettings();
-						}
-					});
-			altDialog.show();
-
-		}
-	}
-	
-	private void enableLocationSettings() {
-		Intent settingsIntent = new Intent(
-				Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-		startActivity(settingsIntent);
-
-		// Exit Google Maps so it will be properly updated the next time.
-		//GoogleMapsActivity.finish();
-	}
-	
-	
-	private boolean isWiFiEnabled() {
-		ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-		// For 3G check
-		/*boolean is3g = manager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)
-				.isConnectedOrConnecting();*/
-		// For WiFi Check
-		boolean isWifi = manager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
-				.isConnectedOrConnecting();
-
-	/*	System.out.println(is3g + " net " + isWifi);
-
-		if (!is3g && !isWifi) {
-			Toast.makeText(getApplicationContext(),
-					"Please make sure your Network Connection is ON ",
-					Toast.LENGTH_LONG).show();
-		} else {
-			
-		}*/
-		return (isWifi);
+    	Bundle bundle = new Bundle();
+    	bundle.putDouble("LATITUDE", latitude);
+    	bundle.putDouble("LONGITUDE", longitude);
+        
+    	Message msg=Message.obtain();
+    	msg.setData(bundle);
+    	try {
+    		messenger.send(msg);
+        }
+        catch (android.os.RemoteException e1) {
+        	Log.w(getClass().getName(), "Exception sending message", e1);
+        }
 	}
 	
 	private static final int TWO_MINUTES = 1000 * 60 * 2;
@@ -226,13 +169,11 @@ public class FindPositionService extends Service {
 	            currentBestLocation.getProvider());
 
 	    // Determine location quality using a combination of timeliness and accuracy
-	    if (isMoreAccurate) {
-	        return true;
-	    } else if (isNewer && !isLessAccurate) {
-	        return true;
-	    } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
-	        return true;
-	    }
+	    if (isMoreAccurate) return true;
+	    else if (isNewer && !isLessAccurate) return true;
+	    else if (isNewer && !isSignificantlyLessAccurate 
+	    		&& isFromSameProvider) return true;
+	    
 	    return false;
 	}
 

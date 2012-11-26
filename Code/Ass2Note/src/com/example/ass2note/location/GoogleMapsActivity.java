@@ -37,6 +37,9 @@ public class GoogleMapsActivity extends MapActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_google_maps);
+		
+		View bottomLevelLayout = findViewById(R.id.waitMapsLayout);
+		bottomLevelLayout.setVisibility(View.INVISIBLE);
 
 		// Get the position values from the database:
 		Intent NoteEditIntent = getIntent();
@@ -68,7 +71,7 @@ public class GoogleMapsActivity extends MapActivity {
 		&& !latitude.contains("lat") && !longitude.contains("long")) {
 			
 			// Send the latitude and longitude values to ItemizedOverlayClass.
-			itemizedoverlay.setPosition(latitude, longitude);
+			itemizedoverlay.setPosition(Double.parseDouble(latitude), Double.parseDouble(longitude));
 			
 			// Add the old position values to the map. 
 			itemizedoverlay.addNewGeoPoint(mapView, Double.parseDouble(latitude), Double.parseDouble(longitude));
@@ -77,6 +80,13 @@ public class GoogleMapsActivity extends MapActivity {
 			mapController.animateTo(itemizedoverlay.getUserPosition());
 		} // End if.
 	}
+	
+	// TODO: Will this class die if onstop is called?
+/*	@Override
+	protected void onStop() {
+		super.onStop();
+		finish();
+	}*/
 
 	/**
 	 * Method for starting FindPositionService to find the user's current 
@@ -90,6 +100,11 @@ public class GoogleMapsActivity extends MapActivity {
 		// If the user's preferred notification position was not stored in the DB:
 		if (latitude == null     	|| longitude == null 
 		 || latitude.matches("lat")	|| longitude.matches("long")) {
+			
+			View topLevelLayout = findViewById(R.id.mapButtons);
+			View bottomLevelLayout = findViewById(R.id.waitMapsLayout);
+			topLevelLayout.setVisibility(View.INVISIBLE);
+			bottomLevelLayout.setVisibility(View.VISIBLE);
 			
 			/* Call FindPositionService and send this activity's handler with a
 			 * messenger to the service: */
@@ -156,9 +171,18 @@ public class GoogleMapsActivity extends MapActivity {
 
 			// If the user's position was found:
 			if (data != null) {
+				View topLevelLayout = findViewById(R.id.mapButtons);
+				View bottomLevelLayout = findViewById(R.id.waitMapsLayout);
+				topLevelLayout.setVisibility(View.VISIBLE);
+				bottomLevelLayout.setVisibility(View.INVISIBLE);
+				
+				double lati = data.getDouble("LATITUDE");
+				double longi = data.getDouble("LONGITUDE");
+				
+				itemizedoverlay.setPosition(lati, longi);
+				
 				// Add the user's position to the map.
-				itemizedoverlay.addNewGeoPoint(mapView, data.getDouble
-							("LATITUDE"),data.getDouble("LONGITUDE"));
+				itemizedoverlay.addNewGeoPoint(mapView, lati, longi);
 				
 				// Move the map to the user's position.
 				mapController.animateTo(itemizedoverlay.getUserPosition());
@@ -166,8 +190,11 @@ public class GoogleMapsActivity extends MapActivity {
 				// Stop FindPositionService.
 				stopService(findPositionServiceIntent);
 			}
-			
 		} // end handlerMessage
 	}; // End Handler handler.
 	
+	public void stopFindPositionService(View view){
+		stopService(findPositionServiceIntent);
+		finish();
+	}
 }

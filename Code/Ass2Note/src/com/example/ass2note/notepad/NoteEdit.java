@@ -16,8 +16,6 @@
 
 package com.example.ass2note.notepad;
 
-import android.os.SystemClock;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,7 +23,7 @@ import java.util.Date;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.PendingIntent;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -33,7 +31,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -44,12 +41,13 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.ass2note.R;
+import com.example.ass2note.location.ConnectionService;
 import com.example.ass2note.location.GoogleMapsActivity;
 
 public class NoteEdit extends Activity {
 	private static final int MAPSINTENT_ID = 1;
-	private TextView mydateview;
-	private TextView mytimeview;
+	//private TextView mydateview;
+	//private TextView mytimeview;
 	private EditText mTitleText;
 	private EditText mBodyText;
 	private ArrayList time = new ArrayList();
@@ -58,6 +56,8 @@ public class NoteEdit extends Activity {
 	private String positionReminder = "false";
 	private Long mRowId;
 	private NotesDbAdapter mDbHelper;
+	private IntentFilter intentFilter;
+	private boolean gpsEnabled=false, networkEnabled=false;
 	long da;
 	
 
@@ -97,7 +97,7 @@ public class NoteEdit extends Activity {
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				"dd-MM-yyyy HH:mm:ss");
 
-		mydateview.setText(dateFormat.format(da));
+	//	mydateview.setText(dateFormat.format(da));
 		saveTime(da);
 
 	}
@@ -107,18 +107,19 @@ public class NoteEdit extends Activity {
 		super.onCreate(savedInstanceState);
 		mDbHelper = new NotesDbAdapter(this);
 		mDbHelper.open();
-
 		setContentView(R.layout.note_edit);
 		setTitle(R.string.edit_note);
+		
+		intentFilter = new IntentFilter("com.example.ass2note.notepad.NoteEdit.connectionReceiver");
+		
 		da = myCalendar.getTimeInMillis();
 		mTitleText = (EditText) findViewById(R.id.title);
 		mBodyText = (EditText) findViewById(R.id.body);
-		mydateview = (TextView) findViewById(R.id.date);
-		mytimeview = (TextView) findViewById(R.id.time);
+	//	mydateview = (TextView) findViewById(R.id.date);
+	//	mytimeview = (TextView) findViewById(R.id.time);
 
-		Button datebutton = (Button) findViewById(R.id.dateButton);
-		Button timebutton = (Button) findViewById(R.id.timeButton);
 		Button confirmButton = (Button) findViewById(R.id.confirm);
+		Button alarmButton = (Button) findViewById(R.id.newNoteAlarm);
 
 		mRowId = (savedInstanceState == null) ? null : (Long) 
 				savedInstanceState.getSerializable(NotesDbAdapter.KEY_ROWID);
@@ -135,23 +136,8 @@ public class NoteEdit extends Activity {
 		// TOOO BE DELETED
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		// or chanced
-		timebutton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				new TimePickerDialog(NoteEdit.this, t, myCalendar
-						.get(Calendar.HOUR_OF_DAY), myCalendar
-						.get(Calendar.MINUTE), true).show();
-
-			}
-		});
-		// ON click DATE
-		datebutton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				new DatePickerDialog(NoteEdit.this, d, myCalendar
-						.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-						myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-			}
-		});
-
+		
+		
 		confirmButton.setOnClickListener(new View.OnClickListener() {
 			// ON click CONFIRM
 			public void onClick(View view) {
@@ -160,6 +146,52 @@ public class NoteEdit extends Activity {
 			}
 		});
 
+		alarmButton.setOnClickListener(new View.OnClickListener() {
+			// ON click ALARM
+			public void onClick(View v) {
+				
+				final Dialog dialog = new Dialog(NoteEdit.this);
+			    // Set the dialog title
+				dialog.setTitle("Remind me.");
+				dialog.setContentView(R.layout.alert_dialog);
+				dialog.show();
+				
+
+				TextView positionButton = (TextView) dialog.findViewById(R.id.positionButton);
+				TextView timeButton = (TextView) dialog.findViewById(R.id.timeButton);
+				
+				timeButton.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						new TimePickerDialog(NoteEdit.this, t, myCalendar
+								.get(Calendar.HOUR_OF_DAY), myCalendar
+								.get(Calendar.MINUTE), true).show();
+
+						new DatePickerDialog(NoteEdit.this, d, myCalendar
+								.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+								myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+						
+						dialog.dismiss();
+					}
+				});
+				
+				positionButton.setOnClickListener(new View.OnClickListener() {
+					public void onClick(View v) {
+						startGoogleMaps(v);
+						dialog.dismiss();
+					}
+				});
+			}
+		});
+	}
+	
+	public void startTimePicker(View view){
+		new TimePickerDialog(NoteEdit.this, t, myCalendar
+				.get(Calendar.HOUR_OF_DAY), myCalendar
+				.get(Calendar.MINUTE), true).show();
+
+		new DatePickerDialog(NoteEdit.this, d, myCalendar
+				.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+				myCalendar.get(Calendar.DAY_OF_MONTH)).show();
 	}
 
 	// Gets the values from the database
@@ -186,7 +218,7 @@ public class NoteEdit extends Activity {
 			// View the Date set in the format .....
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
 					"dd-MM-yyyy HH:mm");
-			mydateview.setText(dateFormat.format(temp));
+//			mydateview.setText(dateFormat.format(temp));
 
 			// Fetch the position values from the database:
 			lati = note.getString(note
@@ -206,12 +238,14 @@ public class NoteEdit extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		unregisterReceiver(connectionReceiver);
 		saveState();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
+		registerReceiver(connectionReceiver, intentFilter);
 		populateFields();
 	}
 
@@ -243,19 +277,6 @@ public class NoteEdit extends Activity {
 	}
 
 	/**
-	 * Method for starting GoogleMapsActivity. The latitude and longitude 
-	 * values in the database for this note is sent to the activity, and the
-	 * activity is started with startActivityForResult.
-	 * @param view
-	 */
-	public void startGoogleMaps(View view) {
-		Intent i = new Intent(NoteEdit.this, GoogleMapsActivity.class);
-		i.putExtra("LATITUDE", lati);
-		i.putExtra("LONGITUDE", longi);
-		startActivityForResult(i, MAPSINTENT_ID);
-	}
-
-	/**
 	 * Function. Receives information from GoogleMapsActivity when the activity
 	 * finishes. Both latitude and longitude from the preferred position from 
 	 * the user is available here.
@@ -263,7 +284,7 @@ public class NoteEdit extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		Log.i("onActivityResult", "Result fetched");
+		Log.i("NoteEdit", "onActivityResult");
 		
 		// The result came from GoogleMapsActivity:
 		if (requestCode == MAPSINTENT_ID)
@@ -286,4 +307,72 @@ public class NoteEdit extends Activity {
 			} // end switch
 	} // end onActivityResult
 	
+	
+	
+	/**
+	 * Method for starting GoogleMapsActivity. The latitude and longitude 
+	 * values in the database for this note is sent to the activity, and the
+	 * activity is started with startActivityForResult.
+	 * @param view
+	 */
+	public void startGoogleMaps(View view) {
+		/*Intent i = new Intent(NoteEdit.this, GoogleMapsActivity.class);
+		i.putExtra("LATITUDE", lati);
+		i.putExtra("LONGITUDE", longi);
+		startActivityForResult(i, MAPSINTENT_ID);
+	*/
+		checkConnection();
+		}
+	
+	private void checkConnection(){
+		Intent intent = new Intent(NoteEdit.this, ConnectionService.class);
+		intent.putExtra("fromActivity", "NoteEdit");
+		startService(intent);
+	}
+
+	// TODO: Tell the user how this function works:
+	private BroadcastReceiver connectionReceiver = new BroadcastReceiver(){
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			gpsEnabled = intent.getBooleanExtra("gpsEnabled", false);
+			networkEnabled = intent.getBooleanExtra("networkEnabled", false);
+				
+			if(networkEnabled){
+				Intent i = new Intent(NoteEdit.this, GoogleMapsActivity.class);
+				i.putExtra("LATITUDE", lati);
+				i.putExtra("LONGITUDE", longi);
+				startActivityForResult(i, MAPSINTENT_ID);
+			}else
+				alertToast("Please make sure your Network Connection is ON");
+			
+		}	
+	};
+	
+	private void alertToast(String message){
+		Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+	}
+	
+	/*private void alertGPSConnection(){
+		AlertDialog.Builder altDialog = new AlertDialog.Builder(this);
+		altDialog.setMessage("Please start your GPS and try again. The GPS " +
+				"needs to be ON all the time for this function to work.");
+		altDialog.setNeutralButton("OK",
+				new DialogInterface.OnClickListener() {
+					// @Override
+					public void onClick(DialogInterface dialog, int which) {
+			//			enableLocationSettings();
+					}
+				});
+		altDialog.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+		altDialog.show();
+	}*/
+	
+	/*private void enableLocationSettings() {
+		Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+		startActivity(settingsIntent);
+	}*/
 }

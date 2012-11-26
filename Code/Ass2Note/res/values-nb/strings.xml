@@ -11,7 +11,7 @@
     <string name="menu_delete">Slett Notat</string>
 	<string name="title">Tittel</string>
  	<string name="body">Notat</string>
-	<string name="confirm">Lagre</string> 
+	<string name="save">Lagre</string> 
 	<string name="cancel">Avbryt</string>
  	<string name="edit_note">Endre Notat</string>
  	<string name="time">Tid </string>
@@ -20,4 +20,5 @@
 	<string name="new_button">Ny </string> 
 	<string name="googleMapsInformation">Vennligst plasser markøren der du vil bli påminnet</string>	
 	<string name="menu_gps">Finn Kordinater</string>
+	<string name="alarm">Alarm</string>
 </resources>

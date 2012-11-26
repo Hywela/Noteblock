@@ -5,21 +5,22 @@ import java.util.ArrayList;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
-import android.drm.DrmStore.Action;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.example.ass2note.R;
+import com.example.ass2note.location.ConnectionService;
 import com.example.ass2note.location.FindPositionService;
 import com.example.ass2note.notepad.Notepad;
 import com.example.ass2note.notepad.NotesDbAdapter;
@@ -35,6 +36,7 @@ public class LocationAlarmService extends Service {
 	private ArrayList<String> titleList;			// All titles of the notes stored in the DB.
 	private ArrayList<String> enablePositionList;	// A list of validations for checking if the notes can be notified.
 	private NotesDbAdapter mDbHelper;			// The database-class.
+	private IntentFilter intentFilter;
 	
 
 	/**
@@ -52,6 +54,10 @@ public class LocationAlarmService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
+		intentFilter = new IntentFilter("com.example.ass2note.alarm.LocationAlarmService.LASReceiver");
+		registerReceiver(LASReceiver, intentFilter);
+		
 		mDbHelper = new NotesDbAdapter(this);	// Create a new instance of DB.
 		mDbHelper.open();						// Open the DB.
 
@@ -65,8 +71,7 @@ public class LocationAlarmService extends Service {
 		// Put data inside the lists.
 		fetchAllLocations();
 		
-		// Start service to find the user's current position.
-		startFindPositionService();
+		connectionEnabled();
 	}
 
 	/**
@@ -79,6 +84,12 @@ public class LocationAlarmService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i("LocationAlarmService", "onstart called");
 		return super.onStartCommand(intent, flags, startId);
+	}
+	
+	@Override
+	public void onDestroy() {
+		unregisterReceiver(LASReceiver);
+		super.onDestroy();
 	}
 
 	/**
@@ -95,10 +106,12 @@ public class LocationAlarmService extends Service {
 	 * handler, which is called handy. The data which will be returned is the
 	 * user's current position or null.
 	 */
-	private void startFindPositionService() {
+	private void startFindPositionService(boolean gpsEnabled, boolean networkEnabled) {
 		// Call FindPositionService for fetching the user's current position:
 		positionServiceIntent = new Intent(LocationAlarmService.this, FindPositionService.class);
 		positionServiceIntent.putExtra(FindPositionService.EXTRA_MESSENGER,	new Messenger(handy));
+		positionServiceIntent.putExtra("gpsEnabled", gpsEnabled);
+		positionServiceIntent.putExtra("networkEnabled", networkEnabled);
 		startService(positionServiceIntent);
 	}
 
@@ -198,6 +211,7 @@ public class LocationAlarmService extends Service {
 		// Update the current lists:
 		fetchAllLocations();
 		
+		// TODO. find out why this is commented out:
 		/*// If no more valid notes exist, tell the alarm to stop.
 		if(!doesValidLocationExist())
 			stopAlarmManager();*/
@@ -307,5 +321,25 @@ public class LocationAlarmService extends Service {
 			}
 		}
 	}
+	
+	private void connectionEnabled(){
+		Log.i("LAS", "connectionEnabled");
+		Intent intent = new Intent(LocationAlarmService.this, ConnectionService.class);
+		intent.putExtra("fromActivity", "LocationAlarmService");
+		startService(intent);
+	}
+	
+	BroadcastReceiver LASReceiver = new BroadcastReceiver(){
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.i("LAS", "receiver called");
+			boolean gpsEnabled = intent.getBooleanExtra("gpsEnabled", false);
+			boolean networkEnabled = intent.getBooleanExtra("networkEnabled", false);
+			
+			// Start service to find the user's current position.
+			startFindPositionService(gpsEnabled, networkEnabled);
+		}
+		
+	};
 
 }

@@ -1,5 +1,7 @@
 package com.example.ass2note.alarm;
 
+import java.util.Calendar;
+
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -12,15 +14,28 @@ import android.util.Log;
 
 public class AlarmManagerService extends Service {
 	private static final int MINUTE_IN_MILLIS = 60000;	// Interval between position reminder checks.
+	private static final int LOCATION_REQUEST_CODE = 10;
+	private static final int TIME_REQUEST_CODE = 11;
+	private Context context;
+	private AlarmManager alarmManager;
+	private Intent alarmReceiverIntent;
+	
 	
 	public AlarmManagerService() {
-		// TODO Auto-generated constructor stub
 	}
 	
     @Override
     public void onCreate() {
     	super.onCreate();
     	Log.i("AlarmManagerService", "onCreate");
+    	
+    	// Get the main activity context.
+		context = this.getApplicationContext();
+
+		// Manager for starting and stopping the alarm connected to LocationAlarmReceiver.
+		alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		
+		alarmReceiverIntent = new Intent(context, AlarmReceiver.class);
     }
 
 
@@ -30,75 +45,123 @@ public class AlarmManagerService extends Service {
     }
     
     /**
-     * AlarmManagerService's onStartCommand. It receives a command from the 
-     * caller class, and executes the proper methods based on that command.
-     * It may start or stop the alarm as appropriate. After the command has
-     * been executed, it kills/stops the service/itself. 
+     * AlarmManagerService's onStartCommand.TODO: update this
      */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i("AlarmManagerService", "onStart");
 		
-		// Fetch the command from the caller class.
+		// Get the sent information:
+		String alarmType = intent.getStringExtra("alarmType");
 		String command = intent.getStringExtra("COMMAND");
+		long time = intent.getLongExtra("time", 0);
 		
-		if(command.contains("Start Alarm")){
-			Log.i("AlarmManagerService", "Starting Alarm Command");
-			startAlarm();
-		}else if(command.contains("Stop Alarm")){
-			Log.i("AlarmManagerService", "Stopping Alarm Command");
-			stopAlarm();
-		}else{
-			Log.e("AlarmManagerService", "Command contained unknown value");
-		}
+		// Choose to start alarm by time or position:
+		if		(alarmType.contains("time")) 	 timeAlarm(command, time);
+		else if	(alarmType.contains("position")) positionAlarm(command);
+		else Log.i("AlarmManagerService", "alarmType contained unknown value");
 		
 		Log.i("AlarmManagerService", "Stopping self");
 		stopSelf();
 		return super.onStartCommand(intent, flags, startId);
 	}
 	
-    /**
-     * Method for fetching the alarm associated with location, and stop that
-     * alarm. 
-     */
-    private void stopAlarm(){
-    	Log.i("AlarmManagerService", "stopAlarm");
-		Context context = this.getApplicationContext();
+	
+	private void timeAlarm(String command, long time){
+		if		(command.contains("Start Alarm")) startTimeAlarm(time);
+		else if	(command.contains("Stop Alarm"))  stopTimeAlarm();
+		else Log.e("AlarmManagerService", "Command contained unknown value");
+	}
+	
+	private void positionAlarm(String command){
+		if		(command.contains("Start Alarm")) startLocationAlarm();
+		else if	(command.contains("Stop Alarm"))  stopLocationAlarm();
+		else Log.e("AlarmManagerService", "Command contained unknown value");
+	}
+	
+	
+	// ********************************************************************* \\
+	// **************************** Time Alarm ***************************** \\
+	// ********************************************************************* \\
+	
+	private void startTimeAlarm(long closestTime){
+		Log.i("AlarmManagerService", "Starting a new timeAlarm loop. time is: " + closestTime);
 		
-		// Fetch the current alarm.
-		AlarmManager a =  (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		// Intent for calling the correct receiver.
+		alarmReceiverIntent.putExtra("alarmType", "time");
+    	
+    	// we know mobiletuts updates at right around 1130 GMT.
+    	// let's grab new stuff at around 11:45 GMT, inexactly
+    	Calendar calendar = Calendar.getInstance();
+
+    	calendar.setTimeInMillis(closestTime);
+
+		// PendingIntent for making broadcast available.
+		PendingIntent pi = PendingIntent.getBroadcast(context, 
+				TIME_REQUEST_CODE, alarmReceiverIntent, 
+				PendingIntent.FLAG_UPDATE_CURRENT);
 		
-		// Create an Intent similar to the intent in the current alarm.
-    	Intent myIntent = new Intent(context, LocationAlarmReceiver.class);
+    	alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pi);
+	}
+	
+	
+	private void stopTimeAlarm(){
+		Log.i("AlarmManagerService", "Stopping time alarm");
+		
+		// Let the receiver know that its a time-alarm.
+		alarmReceiverIntent.putExtra("alarmType", "time");
     	
     	// Create a PendingIntent similar to the pendingIntent in the current alarm.
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 
+				TIME_REQUEST_CODE, alarmReceiverIntent, 
+				PendingIntent.FLAG_UPDATE_CURRENT);
 		
-   	 	pendingIntent.cancel();		// Cancel the pendingIntent.
-   	 	a.cancel(pendingIntent);	// Cancel the alarm.
-    }
-    
-    /**
+   	 	pendingIntent.cancel();				// Cancel the pendingIntent.
+   	 	alarmManager.cancel(pendingIntent);	// Cancel the alarm.
+	}
+	
+	
+	// ********************************************************************* \\
+	// ************************** Position Alarm *************************** \\
+	// ********************************************************************* \\
+	
+	 /**
      * Method for starting a new alarm-loop. The alarm is set repeating every
      * five minutes.
      */
-    private void startAlarm() {
-		Log.i("AlarmManagerService", "Starting a new alarm-loop");
+    private void startLocationAlarm() {
+		Log.i("AlarmManagerService", "Starting a new locationAlarm-loop");
 		
-		Context context = this.getApplicationContext();
-		
-		// Manager for starting and stopping the alarm connected to LocationAlarmReceiver.
-		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		
-		// Intent for calling the correct receiver.S
-		Intent i = new Intent(context, LocationAlarmReceiver.class);
+		// Let the receiver know its a position-alarm.
+		alarmReceiverIntent.putExtra("alarmType", "position");
 		
 		// PendingIntent for making broadcast available.
-		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pi = PendingIntent.getBroadcast(context, 
+				LOCATION_REQUEST_CODE, alarmReceiverIntent, 
+				PendingIntent.FLAG_UPDATE_CURRENT);
 		
 		// Start the alarm now, and start it again every 5 minutes:
 		alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
 				SystemClock.elapsedRealtime(), MINUTE_IN_MILLIS, pi);
 	}
+    
+    /**
+     * Method for fetching the alarm associated with location, and stop that
+     * alarm. 
+     */
+    private void stopLocationAlarm(){
+    	Log.i("AlarmManagerService", "stopLocationAlarm");
+		
+		// Create an Intent similar to the intent in the current alarm.
+    	alarmReceiverIntent.putExtra("alarmType", "position");
+    	
+    	// Create a PendingIntent similar to the pendingIntent in the current alarm.
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 
+				LOCATION_REQUEST_CODE, alarmReceiverIntent, 
+				PendingIntent.FLAG_UPDATE_CURRENT);
+		
+   	 	pendingIntent.cancel();				// Cancel the pendingIntent.
+   	 	alarmManager.cancel(pendingIntent);	// Cancel the alarm.
+    }
     
 }
