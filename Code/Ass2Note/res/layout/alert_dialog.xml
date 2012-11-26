@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/alarmBtnLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <TextView
+        android:id="@+id/timeButton"
+        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_weight="0.50"
+        android:layout_height="wrap_content"
+        android:drawableBottom="@drawable/time_icon"
+        android:text="@string/time" 
+        android:clickable="true"/>
+
+    <TextView
+        android:id="@+id/positionButton"
+        android:gravity="center"
+        android:layout_width="0dp"
+        android:layout_weight="0.50"
+        android:layout_height="wrap_content"
+        android:drawableBottom="@drawable/google_maps_icon_tiny"
+        android:text="@string/position" 
+        android:clickable="true"/>
+
+</LinearLayout>
