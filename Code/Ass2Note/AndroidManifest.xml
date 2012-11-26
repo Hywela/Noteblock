@@ -8,6 +8,7 @@
         android:targetSdkVersion="15" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
@@ -21,24 +22,23 @@
             android:label="@string/title_activity_note" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".notepad.NoteEdit" 
-            android:parentActivityName=".notepad.Notepad">
+        <activity
+            android:name=".notepad.NoteEdit"
+            android:parentActivityName=".notepad.Notepad" >
         </activity>
         <activity
             android:name=".location.GoogleMapsActivity"
             android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity android:name=".location.UseGps" >
-
         </activity>
-        <service android:name=".notepad.MyAlarmService">
-            
+
+        <service android:name=".location.TimeAndDate" >
         </service>
-        <service android:name=".location.TimeAndDate"></service>
-        
         <service
             android:name=".location.FindPositionService"
             android:process=":my_process" >
@@ -48,12 +48,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </service>
-        <receiver android:name=".notepad.AlarmReceiver"></receiver>
-        
-        <receiver
-            android:name=".alarm.LocationAlarmReceiver"
-            android:enabled="true"
-            android:exported="true" >
+
+        <receiver android:name=".alarm.AlarmReceiver" >
         </receiver>
 
         <service
@@ -66,7 +62,18 @@
             android:enabled="true"
             android:exported="true" >
         </service>
-        
+        <service
+            android:name=".location.ConnectionService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        <service
+            android:name=".alarm.TimeAlarmService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
+      
     </application>
 
 </manifest>
