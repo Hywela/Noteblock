@@ -26,8 +26,8 @@ public class TimeAlarmService extends Service {
     public void onCreate() {
     	super.onCreate();
     	
-    	Context c = getApplicationContext();
-    	Toast.makeText(c, "Inside TimeAlarmService!", Toast.LENGTH_LONG).show();
+    //	Context c = getApplicationContext();
+    //	Toast.makeText(c, "Inside TimeAlarmService!", Toast.LENGTH_LONG).show();
     	stopSelf();
     }
 }

@@ -150,6 +150,7 @@ public class GoogleMapsActivity extends MapActivity {
 		// Put the position values inside the intent:
 		i.putExtra("latitude", String.valueOf(itemizedoverlay.getLatitude()));
 		i.putExtra("longitude", String.valueOf(itemizedoverlay.getLongitude()));
+		i.putExtra("snippet", itemizedoverlay.getSnippet());
 		
 		// Put the intent to setResult, and call finish:
 		setResult(Activity.RESULT_OK, i);

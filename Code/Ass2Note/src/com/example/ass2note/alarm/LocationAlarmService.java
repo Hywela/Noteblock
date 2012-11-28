@@ -71,7 +71,9 @@ public class LocationAlarmService extends Service {
 		// Put data inside the lists.
 		fetchAllLocations();
 		
-		connectionEnabled();
+		
+		if(doesValidLocationExist()) connectionEnabled();
+		else stopMe();
 	}
 
 	/**
@@ -236,34 +238,13 @@ public class LocationAlarmService extends Service {
 		NotificationCompat.Builder mBuilder = 
 				new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle("NoteBlock Reminder!")
-				.setContentText("You have been reminded of: "
+				.setContentTitle(R.string.notification_title + "")
+				.setContentText((R.string.notification_content)
 						+ titleList.get(number).toString());
 		
 		/* Set the notification on the panel to remove itself when the user 
 		   presses it.*/
 		mBuilder.setAutoCancel(true);
-		// mBuilder.setOnlyAlertOnce(true);
-
-		// Creates an explicit intent for an Activity in your app
-		// Intent resultIntent = new Intent(this, Notepad.class);
-
-		// The stack builder object will contain an artificial back stack for
-		// the
-		// started Activity.
-		// This ensures that navigating backward from the Activity leads out of
-		// your application to the Home screen.
-		/*
-		 * TaskStackBuilder stackBuilder = TaskStackBuilder.create(this); //
-		 * Adds the back stack for the Intent (but not the Intent itself)
-		 * stackBuilder.addParentStack(NoteEdit.class); // Adds the Intent that
-		 * starts the Activity to the top of the stack
-		 * stackBuilder.addNextIntent(resultIntent); PendingIntent
-		 * resultPendingIntent = stackBuilder.getPendingIntent( 0,
-		 * PendingIntent.FLAG_UPDATE_CURRENT );
-		 * mBuilder.setContentIntent(resultPendingIntent);
-		 */
-
 		Intent notifyIntent = new Intent(this, Notepad.class);
 		notifyIntent.setAction(String.valueOf(number));
 		notifyIntent.putExtra("notificationSuccess", noteKeyList.get(number).toString());
@@ -332,7 +313,7 @@ public class LocationAlarmService extends Service {
 	BroadcastReceiver LASReceiver = new BroadcastReceiver(){
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.i("LAS", "receiver called");
+			Log.i("LocationAlarmService", "receiver called");
 			boolean gpsEnabled = intent.getBooleanExtra("gpsEnabled", false);
 			boolean networkEnabled = intent.getBooleanExtra("networkEnabled", false);
 			

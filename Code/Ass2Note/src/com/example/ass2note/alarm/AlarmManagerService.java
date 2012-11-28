@@ -142,7 +142,7 @@ public class AlarmManagerService extends Service {
 		
 		// Start the alarm now, and start it again every 5 minutes:
 		alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-				SystemClock.elapsedRealtime(), MINUTE_IN_MILLIS, pi);
+				SystemClock.elapsedRealtime(), MINUTE_IN_MILLIS*5, pi);
 	}
     
     /**

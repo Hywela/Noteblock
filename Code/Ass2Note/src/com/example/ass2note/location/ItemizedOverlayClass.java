@@ -12,6 +12,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.util.Log;
 
+import com.example.ass2note.R;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;
@@ -21,7 +22,7 @@ public class ItemizedOverlayClass extends ItemizedOverlay <OverlayItem>{
 	private ArrayList<OverlayItem> itemList = new ArrayList<OverlayItem>();
 	private GeoPoint userPosition;
 	private Context context;
-	private String title = "Do you want to be reminded close to this location?", snippet = "";
+	private String title = R.string.pin_title+"", snippet = "";
 	private double latitude = 0, longitude = 0;
 	
 	
@@ -216,6 +217,10 @@ public class ItemizedOverlayClass extends ItemizedOverlay <OverlayItem>{
             e.printStackTrace(); // getFromLocation() may sometimes fail
             snippet = "";		// Set default value to snippet.
         }
+	}
+	
+	public String getSnippet(){
+		return snippet;
 	}
 	
 }

@@ -28,7 +28,7 @@ public class ConnectionService extends IntentService {
 		String fromActivity = intent.getStringExtra("fromActivity");
 		if (fromActivity.contains("NoteEdit")) 
 			sendBroadcastTo("com.example.ass2note.notepad.NoteEdit.connectionReceiver");
-		else if(fromActivity.contains("LocationAlarmReceiver"))
+		else if(fromActivity.contains("LocationAlarmService"))
 			sendBroadcastTo("com.example.ass2note.alarm.LocationAlarmService.LASReceiver");
 	}
 

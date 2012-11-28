@@ -2,26 +2,51 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/alarmBtnLayout"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="wrap_content"
+    android:baselineAligned="false">
 
-    <TextView
-        android:id="@+id/timeButton"
-        android:gravity="center"
+    <LinearLayout
+        android:id="@+id/positionLayout"
         android:layout_width="0dp"
-        android:layout_weight="0.50"
         android:layout_height="wrap_content"
-        android:drawableBottom="@drawable/time_icon"
-        android:text="@string/time" 
-        android:clickable="true"/>
+        android:layout_weight="1"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/positionButton"
-        android:gravity="center"
+        <TextView
+            android:id="@+id/positionView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/position" />
+
+        <ImageButton
+            android:id="@+id/positionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/google_maps" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/timeLayout"
         android:layout_width="0dp"
-        android:layout_weight="0.50"
         android:layout_height="wrap_content"
-        android:drawableBottom="@drawable/google_maps_icon_tiny"
-        android:text="@string/position" 
-        android:clickable="true"/>
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/timeView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/time_date" />
+
+        <ImageButton
+            android:id="@+id/timeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:src="@drawable/alarm_time" />
+    </LinearLayout>
 
 </LinearLayout>

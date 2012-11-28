@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">NoteBlock</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Instillinger</string>
@@ -16,9 +15,19 @@
  	<string name="edit_note">Endre Notat</string>
  	<string name="time">Tid </string>
 	<string name="date">Dato </string>
+	<string name="time_date">Tid og Dato</string>
 	<string name="position">Posisjon</string>
 	<string name="new_button">Ny </string> 
 	<string name="googleMapsInformation">Vennligst plasser markøren der du vil bli påminnet</string>	
 	<string name="menu_gps">Finn Kordinater</string>
 	<string name="alarm">Alarm</string>
+	<string name="wait">Vennligst vent &#8230;</string>
+	<string name="insert_title">Skriv tittelen her.</string>
+	<string name="insert_body">Skriv notatet her.</string>
+	<string name="no_time_alarm">Ingen tidsbasert alarm ennå.</string>
+	<string name="no_position_alarm">Ingen posisjonsbasert alarm ennå.</string>
+    <string name="notification_title">NoteBlock Alarm!</string>
+    <string name="notification_content">Du har blitt påminnet av: </string>
+    <string name="pin_title">Vil du bli påminnet i nærheten av denne lokasjonen?</string>
+    <string name="network_alert">Vennligst sjekk nettverkstilgangen.</string>
 </resources>

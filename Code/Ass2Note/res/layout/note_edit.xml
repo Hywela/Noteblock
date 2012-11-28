@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RequestFocusLayout"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/notepad_light"
     android:orientation="vertical" >
-
+
     <LinearLayout
         android:id="@+id/titleLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/showAlarmNoteInfo"
         android:orientation="horizontal" >
 
         <TextView
@@ -21,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Write the title here." />
+            android:hint="@string/insert_title" />
     </LinearLayout>
 
     <LinearLayout
@@ -45,7 +49,7 @@
             android:layout_weight="1"
             android:ems="10"
             android:gravity="top"
-            android:hint="Write your note here."
+            android:hint="@string/insert_body"
             android:scrollbars="vertical" >
         </EditText>
     </LinearLayout>
@@ -72,5 +76,64 @@
             android:layout_weight="0.50"
             android:text="@string/alarm" />
     </LinearLayout>
-
+
+    
+    <ToggleButton
+        android:id="@+id/showAlarmNoteInfo"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/alarmInfo"
+        android:textOn="Alarm" 
+        android:textOff="Alarm"
+        android:onClick="showAlarmInfo"
+	    android:visibility="gone"/>
+
+	<LinearLayout
+	    android:id="@+id/alarmInfo"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentRight="true"
+	    android:layout_alignParentTop="true"
+	    android:orientation="vertical" 
+	    android:visibility="gone">
+        
+	    <LinearLayout
+	        android:id="@+id/alarmTimeLayout"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal">
+	        
+	        <ToggleButton
+        		android:id="@+id/toggleAlarmTime"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:onClick="changeTimeStatus"/>
+	        
+	        <TextView 
+	            android:id="@+id/alarmTimeInfo"
+	            android:layout_width="fill_parent"
+	            android:layout_height="fill_parent"
+	            android:hint="@string/no_time_alarm"/>
+	    </LinearLayout>
+	    <LinearLayout
+	        android:id="@+id/alarmPositionLayout"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal">
+	        
+	        <ToggleButton
+        		android:id="@+id/toggleAlarmPosition"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:onClick="changePositionStatus"/>
+	        
+	        <TextView 
+	            android:id="@+id/alarmPositionInfo"
+	            android:layout_width="fill_parent"
+	            android:layout_height="fill_parent"
+	            android:hint="@string/no_position_alarm"/>
+	    </LinearLayout>
+	</LinearLayout>
+    
 </RelativeLayout>

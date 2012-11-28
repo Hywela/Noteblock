@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">NoteBlock</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
@@ -16,10 +15,19 @@
     <string name="edit_note">Edit Note</string>
     <string name="time">Time </string>
     <string name="date">Date </string>
+    <string name="time_date">Time and Date</string>
     <string name="position">Position</string>
     <string name="new_button">New </string>
     <string name="googleMapsInformation">Please put the marker where you wish to be reminded</string>
     <string name="menu_gps">Find Cordinates</string>
     <string name="alarm">Alarm</string>
-
+    <string name="wait">Please wait &#8230;</string>
+    <string name="insert_title">Write the title here.</string>
+    <string name="insert_body">Write the note here.</string>
+    <string name="no_time_alarm">No time-alarm yet.</string>
+    <string name="no_position_alarm">No position-alarm yet.</string>
+    <string name="notification_title">NoteBlock Alarm!</string>
+    <string name="notification_content">You have been reminded of: </string>
+    <string name="pin_title">Do you want to be reminded close to this location?</string>
+    <string name="network_alert">Please make sure your Network Connection is ON</string>
 </resources>

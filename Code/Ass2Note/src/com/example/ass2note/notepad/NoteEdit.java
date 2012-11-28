@@ -17,16 +17,17 @@
 package com.example.ass2note.notepad;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -36,9 +37,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.example.ass2note.R;
 import com.example.ass2note.location.ConnectionService;
@@ -46,19 +50,17 @@ import com.example.ass2note.location.GoogleMapsActivity;
 
 public class NoteEdit extends Activity {
 	private static final int MAPSINTENT_ID = 1;
-	//private TextView mydateview;
-	//private TextView mytimeview;
 	private EditText mTitleText;
 	private EditText mBodyText;
-	private ArrayList time = new ArrayList();
 	private String lati = "lat";
 	private String longi = "long";
-	private String positionReminder = "false";
+	private long time = 0;
+	private String positionReminder = "false", snippet="";
 	private Long mRowId;
 	private NotesDbAdapter mDbHelper;
 	private IntentFilter intentFilter;
 	private boolean gpsEnabled=false, networkEnabled=false;
-	long da;
+	long da =0;
 	
 
 	Calendar myCalendar = Calendar.getInstance();
@@ -115,11 +117,7 @@ public class NoteEdit extends Activity {
 		da = myCalendar.getTimeInMillis();
 		mTitleText = (EditText) findViewById(R.id.title);
 		mBodyText = (EditText) findViewById(R.id.body);
-	//	mydateview = (TextView) findViewById(R.id.date);
-	//	mytimeview = (TextView) findViewById(R.id.time);
 
-		Button confirmButton = (Button) findViewById(R.id.confirm);
-		Button alarmButton = (Button) findViewById(R.id.newNoteAlarm);
 
 		mRowId = (savedInstanceState == null) ? null : (Long) 
 				savedInstanceState.getSerializable(NotesDbAdapter.KEY_ROWID);
@@ -130,12 +128,28 @@ public class NoteEdit extends Activity {
 		}
 
 		populateFields();
+		
+		// Set onClickListeners on buttons.
+		initiateButtons();
+		
+		isAlarmSet();
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		RelativeLayout focuslayout = (RelativeLayout) findViewById(R.id.RequestFocusLayout);
+		focuslayout.requestFocus();
+	}
 
-		// TO SELF MAKE TEXT FIELDS EDDITABLE SO WHEN CLICKED DATE AND TIME
-		// INPUT SHOULD BE TRIGGERED
-		// TOOO BE DELETED
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// or chanced
+	// TO SELF MAKE TEXT FIELDS EDDITABLE SO WHEN CLICKED DATE AND TIME
+	// INPUT SHOULD BE TRIGGERED
+	// TOOO BE DELETED
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// or chanced
+	private void initiateButtons(){
+		Button confirmButton = (Button) findViewById(R.id.confirm);
+		Button alarmButton = (Button) findViewById(R.id.newNoteAlarm);
 		
 		
 		confirmButton.setOnClickListener(new View.OnClickListener() {
@@ -145,21 +159,21 @@ public class NoteEdit extends Activity {
 				finish();
 			}
 		});
-
+		
 		alarmButton.setOnClickListener(new View.OnClickListener() {
 			// ON click ALARM
 			public void onClick(View v) {
 				
 				final Dialog dialog = new Dialog(NoteEdit.this);
 			    // Set the dialog title
-				dialog.setTitle("Remind me.");
+				dialog.setTitle(R.string.alarm);
+				//dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 				dialog.setContentView(R.layout.alert_dialog);
 				dialog.show();
-				
+			    
 
-				TextView positionButton = (TextView) dialog.findViewById(R.id.positionButton);
-				TextView timeButton = (TextView) dialog.findViewById(R.id.timeButton);
-				
+				ImageButton positionButton = (ImageButton) dialog.findViewById(R.id.positionButton);
+				ImageButton timeButton = (ImageButton) dialog.findViewById(R.id.timeButton);
 				timeButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
 						new TimePickerDialog(NoteEdit.this, t, myCalendar
@@ -204,16 +218,12 @@ public class NoteEdit extends Activity {
 					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
 			mBodyText.setText(note.getString(note
 					.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
-			positionReminder = note
-					.getString(note
-							.getColumnIndexOrThrow(NotesDbAdapter.KEY_POSITION_REMINDER));
+			positionReminder = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_POSITION_REMINDER));
 
 			// Toast.makeText(this, note.getString(
 			// note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TEST)) ,
 			// Toast.LENGTH_SHORT).show();
-
-			long temp = note.getLong(note
-					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME));
+			time = note.getLong(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME));
 
 			// View the Date set in the format .....
 			SimpleDateFormat dateFormat = new SimpleDateFormat(
@@ -225,6 +235,7 @@ public class NoteEdit extends Activity {
 					.getColumnIndexOrThrow(NotesDbAdapter.KEY_LATI));
 			longi = note.getString(note
 					.getColumnIndexOrThrow(NotesDbAdapter.KEY_LONG));
+			snippet = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_SNIPPET));
 		}
 	}
 
@@ -265,13 +276,13 @@ public class NoteEdit extends Activity {
 		if (mRowId == null) {
 			long id = mDbHelper.createNote(title, body,
 					da , longitude, latitude,
-					positionReminder);
+					positionReminder, snippet);
 			if (id > 0) {
 				mRowId = id;
 			}
 		} else {
 			mDbHelper.updateNote(mRowId, title, body, longitude, latitude,
-					positionReminder);
+					positionReminder, snippet);
 
 		}
 	}
@@ -294,10 +305,12 @@ public class NoteEdit extends Activity {
 				// Fetch the new data:
 				lati = data.getStringExtra("latitude");
 				longi = data.getStringExtra("longitude");
+				snippet = data.getStringExtra("snippet");
 				positionReminder = "true";
 				
 				// Save the data in the database.
 				saveState();
+				isAlarmSet();
 				break;
 			}
 			// Unexpected occurrence happened or no new location was selected: 
@@ -343,7 +356,7 @@ public class NoteEdit extends Activity {
 				i.putExtra("LONGITUDE", longi);
 				startActivityForResult(i, MAPSINTENT_ID);
 			}else
-				alertToast("Please make sure your Network Connection is ON");
+				alertToast(R.string.network_alert+"");
 			
 		}	
 	};
@@ -375,4 +388,76 @@ public class NoteEdit extends Activity {
 		Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 		startActivity(settingsIntent);
 	}*/
+	
+	public void showAlarmInfo(View view){
+    	View v = (View)findViewById(R.id.alarmInfo);
+	    boolean on = ((ToggleButton) view).isChecked();
+	    if(on) v.setVisibility(View.VISIBLE);
+	    else v.setVisibility(View.GONE);
+	}
+	
+	public void changePositionStatus(View view){
+		boolean on = ((ToggleButton) view).isChecked();
+		
+		// If the toggle was set to "on":
+		if(on) { 
+			mDbHelper.updatePositionNotification(mRowId, "true");
+			
+			// If the note was previously initiated with latitude and longitude:
+			if(!longi.contains("long")) setPositionInfo(true, snippet);
+			
+			// If the note does not have valid latitude and longitude stored:
+			else{
+				System.out.println("not valid lati");
+				setPositionInfo(false, "");
+				
+				
+				 // Use the Builder class for convenient dialog construction
+		        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		        builder.setMessage("Would you like to be reminded by position?")
+		               .setPositiveButton("Start Google Maps!", new DialogInterface.OnClickListener() {
+		                   public void onClick(DialogInterface dialog, int id) {
+		                       // FIRE ZE MISSILES!
+		                   }
+		               })
+		               .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		                   public void onClick(DialogInterface dialog, int id) {
+		                       // User cancelled the dialog
+		                   }
+		               });
+		        // Create the AlertDialog object and return it
+		        builder.show();
+			}
+		}
+		// If the toggle was set to off:
+		else {
+			mDbHelper.updatePositionNotification(mRowId, "false");
+			setPositionInfo(false, snippet);
+		}
+	}
+	
+	// TODO: Finish this
+	public void changeTimeStatus(View view){
+		//boolean on = ((ToggleButton) view).isChecked();
+	}
+	
+	// TODO: add time check here
+	private void isAlarmSet(){
+		ToggleButton showAlarmInfo = (ToggleButton)findViewById(R.id.showAlarmNoteInfo);
+		
+		if(!longi.contains("long")){
+			showAlarmInfo.setVisibility(View.VISIBLE);
+			
+			if(positionReminder.contains("true")) setPositionInfo(true, snippet);
+			else setPositionInfo(false, snippet);
+		}
+	}
+	
+	private void setPositionInfo(boolean checked, String text){
+		ToggleButton alarmPosition = (ToggleButton)findViewById(R.id.toggleAlarmPosition);
+		TextView alarmPositionInfo = (TextView)findViewById(R.id.alarmPositionInfo);
+		
+		alarmPosition.setChecked(checked);
+		alarmPositionInfo.setText(text);
+	}
 }
