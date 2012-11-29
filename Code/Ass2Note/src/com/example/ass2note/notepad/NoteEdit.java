@@ -179,10 +179,6 @@ public class NoteEdit extends Activity {
 				ImageButton timeButton = (ImageButton) dialog.findViewById(R.id.timeButton);
 				timeButton.setOnClickListener(new View.OnClickListener() {
 					public void onClick(View v) {
-						new TimePickerDialog(NoteEdit.this, t, myCalendar
-								.get(Calendar.HOUR_OF_DAY), myCalendar
-								.get(Calendar.MINUTE), true).show();
-
 						new DatePickerDialog(NoteEdit.this, d, myCalendar
 								.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
 								myCalendar.get(Calendar.DAY_OF_MONTH)).show();
@@ -201,15 +197,7 @@ public class NoteEdit extends Activity {
 		});
 	}
 	
-	public void startTimePicker(View view){
-		new TimePickerDialog(NoteEdit.this, t, myCalendar
-				.get(Calendar.HOUR_OF_DAY), myCalendar
-				.get(Calendar.MINUTE), true).show();
-
-		new DatePickerDialog(NoteEdit.this, d, myCalendar
-				.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-				myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-	}
+	
 
 	// Gets the values from the database
 	private void populateFields() {
