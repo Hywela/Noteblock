@@ -86,7 +86,8 @@
         android:textOn="Alarm" 
         android:textOff="Alarm"
         android:onClick="showAlarmInfo"
-	    android:visibility="gone"/>
+	    android:visibility="gone"
+	    android:checked="false"/>
 
 	<LinearLayout
 	    android:id="@+id/alarmInfo"

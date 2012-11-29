@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -22,7 +23,8 @@ public class ItemizedOverlayClass extends ItemizedOverlay <OverlayItem>{
 	private ArrayList<OverlayItem> itemList = new ArrayList<OverlayItem>();
 	private GeoPoint userPosition;
 	private Context context;
-	private String title = R.string.pin_title+"", snippet = "";
+	private Resources res;
+	private String title, snippet="";
 	private double latitude = 0, longitude = 0;
 	
 	
@@ -41,6 +43,8 @@ public class ItemizedOverlayClass extends ItemizedOverlay <OverlayItem>{
 		//super(defaultMarker);
 		populate();
 		context = c;
+		res = context.getResources();
+		title = res.getString(R.string.pin_title);
 	}
 
 	/**

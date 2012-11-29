@@ -111,6 +111,9 @@ public class NoteEdit extends Activity {
 		mDbHelper.open();
 		setContentView(R.layout.note_edit);
 		setTitle(R.string.edit_note);
+
+		ToggleButton positionToggle = (ToggleButton) findViewById(R.id.showAlarmNoteInfo);
+		positionToggle.setSaveEnabled(false);
 		
 		intentFilter = new IntentFilter("com.example.ass2note.notepad.NoteEdit.connectionReceiver");
 		
@@ -404,7 +407,10 @@ public class NoteEdit extends Activity {
 			mDbHelper.updatePositionNotification(mRowId, "true");
 			
 			// If the note was previously initiated with latitude and longitude:
-			if(!longi.contains("long")) setPositionInfo(true, snippet);
+			if(!longi.contains("long")) {
+				setPositionInfo(true, snippet);
+				positionReminder = "true";
+			}
 			
 			// If the note does not have valid latitude and longitude stored:
 			else{
@@ -432,6 +438,7 @@ public class NoteEdit extends Activity {
 		// If the toggle was set to off:
 		else {
 			mDbHelper.updatePositionNotification(mRowId, "false");
+			positionReminder = "false";
 			setPositionInfo(false, snippet);
 		}
 	}

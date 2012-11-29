@@ -104,7 +104,7 @@ public class AlarmManagerService extends Service {
     	alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pi);
 	}
 	
-	
+	// TODO: Tweek this. The alarm WILL stop. Check if its ok to do so.
 	private void stopTimeAlarm(){
 		Log.i("AlarmManagerService", "Stopping time alarm");
 		

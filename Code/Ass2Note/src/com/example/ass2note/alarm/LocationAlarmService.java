@@ -9,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
@@ -37,6 +38,8 @@ public class LocationAlarmService extends Service {
 	private ArrayList<String> enablePositionList;	// A list of validations for checking if the notes can be notified.
 	private NotesDbAdapter mDbHelper;			// The database-class.
 	private IntentFilter intentFilter;
+	private Context context;
+	private Resources res;
 	
 
 	/**
@@ -54,6 +57,9 @@ public class LocationAlarmService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+		context = getApplicationContext();
+		res = context.getResources();
 		
 		intentFilter = new IntentFilter("com.example.ass2note.alarm.LocationAlarmService.LASReceiver");
 		registerReceiver(LASReceiver, intentFilter);
@@ -227,6 +233,7 @@ public class LocationAlarmService extends Service {
 		Log.i("LocationAlarmService", "stopAlarmManager stopping alarm");
 		Intent i = new Intent(LocationAlarmService.this, AlarmManagerService.class);
 		i.putExtra("COMMAND", "Stop Alarm");
+		i.putExtra("alarmType", "position");
 		startService(i);
 	}
 
@@ -238,8 +245,8 @@ public class LocationAlarmService extends Service {
 		NotificationCompat.Builder mBuilder = 
 				new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle(R.string.notification_title + "")
-				.setContentText((R.string.notification_content)
+				.setContentTitle(res.getString(R.string.notification_title))
+				.setContentText((res.getString(R.string.notification_content))
 						+ titleList.get(number).toString());
 		
 		/* Set the notification on the panel to remove itself when the user 
