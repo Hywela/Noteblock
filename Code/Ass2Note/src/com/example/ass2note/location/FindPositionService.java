@@ -1,19 +1,16 @@
 package com.example.ass2note.location;
 
-import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
-import android.provider.Settings;
 import android.util.Log;
 
 
@@ -41,7 +38,7 @@ public class FindPositionService extends Service {
 	private LocationManager mLocationManager;
 	private Bundle extras;
 	private Messenger messenger;
-	private LocationListener networkListener;
+	private LocationListener networkListener, gpsListener, bestListener;
     
 	
 	public FindPositionService(){
@@ -57,14 +54,17 @@ public class FindPositionService extends Service {
     @Override
     public void onCreate() {
         super.onCreate(); 
+        Log.i("FindPositionService", "oncreate");
         // Code to execute when the service is first created
     }
     
     @Override
     public void onDestroy(){
     	Log.i("FindPositionService","destroyed service");
-    	boolean providerEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-    	if(providerEnabled)  mLocationManager.removeUpdates(networkListener);
+    	boolean networkProviderEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    	boolean gpsProviderEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    	if(networkProviderEnabled)  mLocationManager.removeUpdates(networkListener);
+    	if(gpsProviderEnabled) mLocationManager.removeUpdates(gpsListener);
     		
     	super.onDestroy();
     	// Code to execute when the service is shutting down
@@ -73,7 +73,7 @@ public class FindPositionService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
     	// Code to execute when the service is starting up 
-
+    	System.out.println("onstart");
     	extras = intent.getExtras();
         messenger=(Messenger)extras.get(EXTRA_MESSENGER);
         
@@ -83,7 +83,7 @@ public class FindPositionService extends Service {
         	
        // 	if(networkEnabled)
         }
-        
+       // findGPSLocation();
     	findNetworkLocation();
     	return super.onStartCommand(intent, flags, startId);
     }
@@ -96,15 +96,14 @@ public class FindPositionService extends Service {
     	// It is called when a new location is found by the network location provider.
 		networkListener = new LocationListener() {
 		    public void onLocationChanged(Location location) {
-		    	Log.i("FindPositionService", "LocationListener registered position on onLocationChanged");
-		    	sendLocationMessage(location.getLatitude() * 1000000, location.getLongitude() * 1000000);
-				
+		    	Log.i("FindPositionService", "networkListener registered position on onLocationChanged");
 				mLocationManager.removeUpdates(this);
+		    	sendLocationMessage(location.getLatitude() * 1000000, location.getLongitude() * 1000000);
 		    }
 
-		    public void onStatusChanged(String provider, int status, Bundle extras) {System.out.println("status changed");}
-		    public void onProviderEnabled(String provider) { System.out.println(" provider enabled");}
-		    public void onProviderDisabled(String provider) {System.out.println("provider disabled");}
+		    public void onStatusChanged(String provider, int status, Bundle extras) {System.out.println("network status changed");}
+		    public void onProviderEnabled(String provider) { System.out.println("network provider enabled");}
+		    public void onProviderDisabled(String provider) {System.out.println("network provider disabled");}
 		  };
 
 		// Register the listener with the Location Manager to receive location updates
@@ -114,9 +113,56 @@ public class FindPositionService extends Service {
 	//	mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);	
 	}
 	
-	private void sendLocationMessage(double latitude, double longitude){
-		Log.i("FindPositionService", "LocationListener registered position on onLocationChanged");
+	public void findGPSLocation(){
+		Log.i("FindPositionService","findGPSLocation");
 		
+		// Acquire a reference to the system Location Manager
+		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		
+		// Define a listener that responds to location updates.
+    	// It is called when a new location is found by the network location provider.
+		gpsListener = new LocationListener() {
+		    public void onLocationChanged(Location location) {
+		    	Log.i("FindPositionService", "GpsListener registered position on onLocationChanged");
+				mLocationManager.removeUpdates(this);
+		    	sendLocationMessage(location.getLatitude() * 1000000, location.getLongitude() * 1000000);
+		    }
+
+		    public void onStatusChanged(String provider, int status, Bundle extras) {System.out.println("gps status changed");}
+		    public void onProviderEnabled(String provider) { System.out.println("gps provider enabled");}
+		    public void onProviderDisabled(String provider) {System.out.println("gps provider disabled");}
+		  };
+		  
+		// Register the listener with the Location Manager to receive location updates
+		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
+		  
+	//	isGPSEnabled();
+	
+	}
+	
+	private void findBestLocation(){
+			mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		
+		   bestListener = new LocationListener() {
+			    public void onLocationChanged(Location location) {
+			    	Log.i("FindPositionService", "LocationListener registered position on onLocationChanged");
+					mLocationManager.removeUpdates(this);
+			    	sendLocationMessage(location.getLatitude() * 1000000, location.getLongitude() * 1000000);
+			    }
+
+			    public void onStatusChanged(String provider, int status, Bundle extras) {System.out.println("best status changed");}
+			    public void onProviderEnabled(String provider) { System.out.println("best provider enabled");}
+			    public void onProviderDisabled(String provider) {System.out.println("best provider disabled");}
+			  };
+			  
+			  Criteria c = new Criteria();
+			   c.setAccuracy(Criteria.ACCURACY_COARSE); //Or whatever criteria you want
+			   final String PROVIDER = mLocationManager.getBestProvider(c, true);
+			   mLocationManager.requestLocationUpdates(PROVIDER, 0, 0, bestListener);
+			
+	}
+	
+	private void sendLocationMessage(double latitude, double longitude){
     	Bundle bundle = new Bundle();
     	bundle.putDouble("LATITUDE", latitude);
     	bundle.putDouble("LONGITUDE", longitude);

@@ -59,6 +59,7 @@ public class AlarmManagerService extends Service {
 		// Choose to start alarm by time or position:
 		if		(alarmType.contains("time")) 	 timeAlarm(command, time);
 		else if	(alarmType.contains("position")) positionAlarm(command);
+		else if (alarmType.contains("noteDeleted")) positionAlarm("Stop Alarm"); //TODO: add time-check
 		else Log.i("AlarmManagerService", "alarmType contained unknown value");
 		
 		Log.i("AlarmManagerService", "Stopping self");

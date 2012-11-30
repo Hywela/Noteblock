@@ -187,6 +187,7 @@ public class Notepad extends ListActivity {
 			// If no more valid notes exists in the DB, stop the alarm:
 			if (!validNotes()) {
 				Intent i = new Intent(Notepad.this, AlarmManagerService.class);
+				i.putExtra("alarmType", "noteDeleted");
 				i.putExtra("COMMAND", "Stop Alarm");
 				startService(i);
 			}

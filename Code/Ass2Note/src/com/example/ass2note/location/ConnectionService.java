@@ -34,6 +34,7 @@ public class ConnectionService extends IntentService {
 
 	private void sendBroadcastTo(String receiver){
 		Intent i = new Intent(receiver);
+		i.putExtra("fromCaller", "ConnectionService");
 		i.putExtra("gpsEnabled", isGPSEnabled());
 		i.putExtra("networkEnabled", isNetworkEnabled());
 		sendBroadcast(i);

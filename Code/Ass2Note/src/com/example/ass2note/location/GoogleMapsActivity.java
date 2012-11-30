@@ -100,7 +100,7 @@ public class GoogleMapsActivity extends MapActivity {
 		// If the user's preferred notification position was not stored in the DB:
 		if (latitude == null     	|| longitude == null 
 		 || latitude.matches("lat")	|| longitude.matches("long")) {
-			
+			System.out.println("new lati and longi");
 			View topLevelLayout = findViewById(R.id.mapButtons);
 			View bottomLevelLayout = findViewById(R.id.waitMapsLayout);
 			topLevelLayout.setVisibility(View.INVISIBLE);
@@ -116,7 +116,11 @@ public class GoogleMapsActivity extends MapActivity {
 			return true;
 		}
 		// If the service was not started, return false.
-		else return false; 
+		else {
+
+			System.out.println("old lati longi");
+			return false; 
+		}
 	}
 
 	/**
