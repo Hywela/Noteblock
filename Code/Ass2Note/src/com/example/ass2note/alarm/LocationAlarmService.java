@@ -245,8 +245,8 @@ public class LocationAlarmService extends Service {
 		NotificationCompat.Builder mBuilder = 
 				new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle(res.getString(R.string.notification_title))
-				.setContentText((res.getString(R.string.notification_content))
+				.setContentTitle(getString(R.string.notification_title))
+				.setContentText(getString(R.string.notification_content)
 						+ titleList.get(number).toString());
 		
 		/* Set the notification on the panel to remove itself when the user 

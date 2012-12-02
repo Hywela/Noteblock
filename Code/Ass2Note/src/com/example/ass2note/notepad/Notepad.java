@@ -83,8 +83,9 @@ public class Notepad extends ListActivity {
 	}
 
 	/**
-	 * Method for starting a note in NoteEdit. The noteId will be sent along
-	 * and it starts NoteEdit with startActivityForResult.
+	 * Method for starting a note in NoteEdit. The noteId will be sent along and
+	 * it starts NoteEdit with startActivityForResult.
+	 * 
 	 * @param key
 	 */
 	private void startNoteEdit(Long key) {
@@ -93,37 +94,7 @@ public class Notepad extends ListActivity {
 		startActivityForResult(i, ACTIVITY_EDIT);
 	}
 
-	private long time() {
-		Cursor notesCursor = mDbHelper.fetchAllNotes();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-
-
-    	Date dd = new Date();
-        long dat = dd.getTime();
-        long temp = 0;
-        while (notesCursor.moveToNext()) 
-        {
-        	long sjekkDate =  notesCursor.getLong( notesCursor.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME));
-    
-            if(sjekkDate >= dat){
-            	
-            	
-            	if ( sjekkDate <= temp)
-            	temp = sjekkDate;
-            	
-            	
-            }
-            if(temp == 0) {
-            		temp = sjekkDate;}
-            
-            
-        } //- End while()
-        
-        Toast.makeText(this, dateFormat.format(temp) , Toast.LENGTH_SHORT).show();
-     return temp;
-
-	}// -End time();
-
+	
 	private void fillData() {
 		Cursor notesCursor = mDbHelper.fetchAllNotes();
 		startManagingCursor(notesCursor);
@@ -161,7 +132,6 @@ public class Notepad extends ListActivity {
 
 		case INSERT_GPS:
 			// TEST CASES
-			startTimeAlarm();
 			return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
@@ -212,10 +182,11 @@ public class Notepad extends ListActivity {
 	}
 
 	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+	protected void onActivityResult(int requestCode, int resultCode,
+			Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
 		Log.i("Notepad", "onActivityresult");
-		
+
 		// TODO: This can be called elsewhere.
 		startLocationAlarm();
 
@@ -240,18 +211,10 @@ public class Notepad extends ListActivity {
 		});
 	}
 
-	private void startTimeAlarm() {
-		long closestTime = time();
-		Intent i = new Intent(Notepad.this, AlarmManagerService.class);
-		i.putExtra("alarmType", "time");
-		i.putExtra("time", closestTime);
-		i.putExtra("COMMAND", "Start Alarm");
-		startService(i);
-	}
 
 	/**
-	 * Method for starting AlarmManagerService. The service will only be 
-	 * started if there exist at least one valid note in the DB.
+	 * Method for starting AlarmManagerService. The service will only be started
+	 * if there exist at least one valid note in the DB.
 	 */
 	public void startLocationAlarm() {
 		Log.i("Notepad", "starting AlarmManagerservice");
@@ -270,8 +233,9 @@ public class Notepad extends ListActivity {
 	/**
 	 * Method for deciding if the database contain valid notes, or notes that
 	 * can be notified.
+	 * 
 	 * @return true if there exist at least one valid note in the database, and
-	 * false otherwise.
+	 *         false otherwise.
 	 */
 	private boolean validNotes() {
 		// Fetch all notes from the Database.
@@ -299,6 +263,7 @@ public class Notepad extends ListActivity {
 	 * Method for canceling the notification of a note, from the panel. It is
 	 * used if the notification has not been displayed before the note is
 	 * deleted or removed by other means.
+	 * 
 	 * @param id
 	 */
 	private void cancelNotification(Long id) {

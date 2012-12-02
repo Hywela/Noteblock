@@ -19,56 +19,55 @@ import com.example.ass2note.location.ConnectionService;
 public class InitiateAlarmButtons {
 	private Context context;
 	private Calendar myCalendar = Calendar.getInstance();
-	private DatePickerDialog.OnDateSetListener d;
-	private TimePickerDialog.OnTimeSetListener t;
+	// private DatePickerDialog.OnDateSetListener d;
+	// private TimePickerDialog.OnTimeSetListener t;
 	private long da = 0;
+	private int timesCalledDate = 1, timesCalledTime = 1;
 
-	
 	public InitiateAlarmButtons(Context cont) {
 		context = cont;
 		da = myCalendar.getTimeInMillis();
-		initiateTimePickerDialog();
+		// initiateTimePickerDialog();
 	}
 
-	public void initiateTimePickerDialog() {
+	// public void initiateTimePickerDialog() {
 
-		d = new DatePickerDialog.OnDateSetListener() {
-			boolean dateDialogFired = false;
+	DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
+		// boolean dateDialogFired = false;
 
-			public void onDateSet(DatePicker view, int year, int monthOfYear,
-					int dayOfMonth) {
-				if (dateDialogFired == false) {
-					dateDialogFired = true;
-					Log.i("test", "setting date");
-					myCalendar.set(Calendar.YEAR, year);
-					myCalendar.set(Calendar.MONTH, monthOfYear);
-					myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+		public void onDateSet(DatePicker view, int year, int monthOfYear,
+				int dayOfMonth) {
+			timesCalledDate++;
 
-					new TimePickerDialog(context, t,
-							myCalendar.get(Calendar.HOUR_OF_DAY),
-							myCalendar.get(Calendar.MINUTE), true).show();
-				}
+			if ((timesCalledDate % 2) == 0) {
+				Log.i("test", "setting date");
+				myCalendar.set(Calendar.YEAR, year);
+				myCalendar.set(Calendar.MONTH, monthOfYear);
+				myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+				new TimePickerDialog(context, t,
+						myCalendar.get(Calendar.HOUR_OF_DAY),
+						myCalendar.get(Calendar.MINUTE), true).show();
 			}
-		};
+		}
+	};
 
-		t = new TimePickerDialog.OnTimeSetListener() {
-			boolean timeDialogFired = false;
+	TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
+		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+			timesCalledTime++;
+			if ((timesCalledTime % 2) == 0) {
+				Log.i("test", "setting time");
 
-			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-				if (timeDialogFired == false) {
-					timeDialogFired = true;
-					Log.i("test", "setting time");
+				myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+				myCalendar.set(Calendar.MINUTE, minute);
+				da = myCalendar.getTimeInMillis();
 
-					myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-					myCalendar.set(Calendar.MINUTE, minute);
-					da = myCalendar.getTimeInMillis();
+				updateTime();
+			} // end if
+		} // end onTimeSet
+	};
 
-					updateTimeInDb();
-				} // end if
-			} // end onTimeSet
-		};
-		
-	}
+	// }
 
 	public void initiateAlarmButtonDialog() {
 		final Dialog dialog = new Dialog(context);
@@ -97,11 +96,11 @@ public class InitiateAlarmButtons {
 		positionButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				System.out.println("pressed positionbutton");
-				
+
 				Intent intent = new Intent(context, ConnectionService.class);
 				intent.putExtra("fromActivity", "NoteEdit");
 				context.startService(intent);
-				
+
 				dialog.dismiss();
 			}
 		});
@@ -111,10 +110,10 @@ public class InitiateAlarmButtons {
 		return da;
 	}
 
-	private void updateTimeInDb() {
+	private void updateTime() {
 		Intent i = new Intent(
 				"com.example.ass2note.notepad.NoteEdit.connectionReceiver");
-		i.putExtra("fromCaller", "test");
+		i.putExtra("fromCaller", "InitiateAlarmButtons");
 		i.putExtra("command", "updateTime");
 		i.putExtra("time", da);
 		context.sendBroadcast(i);

@@ -14,6 +14,7 @@ public class NoteEditSavePopulate {
 	private Long mRowId;
 	private EditText mTitleText, mBodyText;
 	private String positionReminder = "false"; 
+	private String timeReminder = "false";
 	private long time = 0;
 	private String lati = "lat", longi = "long";
 	private String snippet = "";
@@ -52,6 +53,10 @@ public class NoteEditSavePopulate {
 		return snippet;
 	}
 	
+	public String getTimeReminder(){
+		return timeReminder;
+	}
+	
 	public void populateFields() {
 		if (mRowId != null) {
 
@@ -77,12 +82,14 @@ public class NoteEditSavePopulate {
 					.getColumnIndexOrThrow(NotesDbAdapter.KEY_LONG));
 			snippet = note.getString(note
 					.getColumnIndexOrThrow(NotesDbAdapter.KEY_SNIPPET));
+
+			timeReminder = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME_REMINDER));
 		}
 	}
 	
 	// Saves the values to the database
 		public void saveState(String title, String body, String latitude, 
-				String longitude, String positionReminder, String snippet) {
+				String longitude, String positionReminder, String snippet, String timeReminder) {
 			/*String title = mTitleText.getText().toString();
 			String body = mBodyText.getText().toString();
 
@@ -91,13 +98,13 @@ public class NoteEditSavePopulate {
 */
 			if (mRowId == null) {
 				long id = mDbHelper.createNote(title, body, initiateAlarmButtons.getDa(), longitude, latitude,
-						positionReminder, snippet);
+						positionReminder, snippet, timeReminder);
 				if (id > 0) {
 					mRowId = id;
 				}
 			} else {
 				mDbHelper.updateNote(mRowId, title, body, longitude, latitude,
-						positionReminder, snippet);
+						positionReminder, snippet, timeReminder);
 
 			}
 		}

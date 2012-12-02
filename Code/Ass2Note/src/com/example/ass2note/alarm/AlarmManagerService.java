@@ -54,10 +54,9 @@ public class AlarmManagerService extends Service {
 		// Get the sent information:
 		String alarmType = intent.getStringExtra("alarmType");
 		String command = intent.getStringExtra("COMMAND");
-		long time = intent.getLongExtra("time", 0);
 		
 		// Choose to start alarm by time or position:
-		if		(alarmType.contains("time")) 	 timeAlarm(command, time);
+		if		(alarmType.contains("time")) 	 timeAlarm(command, intent);
 		else if	(alarmType.contains("position")) positionAlarm(command);
 		else if (alarmType.contains("noteDeleted")) positionAlarm("Stop Alarm"); //TODO: add time-check
 		else Log.i("AlarmManagerService", "alarmType contained unknown value");
@@ -68,8 +67,11 @@ public class AlarmManagerService extends Service {
 	}
 	
 	
-	private void timeAlarm(String command, long time){
-		if		(command.contains("Start Alarm")) startTimeAlarm(time);
+	private void timeAlarm(String command, Intent intent){
+		long time = intent.getLongExtra("time", 0);
+		long rowId = intent.getLongExtra("rowId", 0);
+		
+		if		(command.contains("Start Alarm")) startTimeAlarm(time, rowId);
 		else if	(command.contains("Stop Alarm"))  stopTimeAlarm();
 		else Log.e("AlarmManagerService", "Command contained unknown value");
 	}
@@ -85,24 +87,26 @@ public class AlarmManagerService extends Service {
 	// **************************** Time Alarm ***************************** \\
 	// ********************************************************************* \\
 	
-	private void startTimeAlarm(long closestTime){
-		Log.i("AlarmManagerService", "Starting a new timeAlarm loop. time is: " + closestTime);
+	private void startTimeAlarm(long time, long rowId){
+		Log.i("AlarmManagerService", "Starting a new timeAlarm loop. time is: " + time);
 		
 		// Intent for calling the correct receiver.
 		alarmReceiverIntent.putExtra("alarmType", "time");
+		alarmReceiverIntent.putExtra("alarmTime", time);
+		alarmReceiverIntent.putExtra("rowId", rowId);
     	
     	// we know mobiletuts updates at right around 1130 GMT.
     	// let's grab new stuff at around 11:45 GMT, inexactly
-    	Calendar calendar = Calendar.getInstance();
+    //	Calendar calendar = Calendar.getInstance();
 
-    	calendar.setTimeInMillis(closestTime);
+    	//calendar.setTimeInMillis(time);
 
 		// PendingIntent for making broadcast available.
 		PendingIntent pi = PendingIntent.getBroadcast(context, 
 				TIME_REQUEST_CODE, alarmReceiverIntent, 
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		
-    	alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pi);
+    	alarmManager.set(AlarmManager.RTC_WAKEUP, time/*calendar.getTimeInMillis()*/, pi);
 	}
 	
 	// TODO: Tweek this. The alarm WILL stop. Check if its ok to do so.

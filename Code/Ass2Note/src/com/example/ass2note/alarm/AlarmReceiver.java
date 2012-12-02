@@ -23,7 +23,9 @@ public class AlarmReceiver extends BroadcastReceiver {
 			
 		// If the alarm trigger was time-based:
 		}else if(alarmType.contains("time")){
+			long rowId = intent.getLongExtra("rowId", 0);
 			Intent alarmServiceIntent = new Intent(context,	TimeAlarmService.class);
+			alarmServiceIntent.putExtra("rowId", rowId);
 			context.startService(alarmServiceIntent);
 			
 		// The alarmType was not set or is invalid:

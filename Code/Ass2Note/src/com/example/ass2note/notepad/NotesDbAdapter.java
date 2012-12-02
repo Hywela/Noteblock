@@ -20,6 +20,7 @@ package com.example.ass2note.notepad;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -47,6 +48,7 @@ public class NotesDbAdapter {
     public static final String KEY_LONG = "longitude";
     public static final String KEY_POSITION_REMINDER = "positionReminder";
     public static final String KEY_SNIPPET = "snippet";
+    public static final String KEY_TIME_REMINDER = "timeReminder";
     
     public static final String KEY_ROWID = "_id";
  
@@ -61,7 +63,8 @@ public class NotesDbAdapter {
         "create table notes (_id integer primary key autoincrement, date_created TIMESTAMP NOT NULL DEFAULT current_timestamp, "
         + "title text not null, body text not null," 
         		+ " time INTEGER not null, latitude text not null, longitude text not null, " 
-        		+ " positionReminder text not null, snippet text not null);" ;
+        		+ " positionReminder text not null, snippet text not null, "
+        		+ " timeReminder text not null);" ;
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "notes";
@@ -132,7 +135,7 @@ public class NotesDbAdapter {
      */		// Puts the intial values into the database
     public long createNote(String title, String body,  long time, 
     		String longitude, String latitude, String positionReminder, 
-    		String snippet) {
+    		String snippet, String timeReminder) {
         ContentValues initialValues = new ContentValues();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         initialValues.put(KEY_TIME, dateFormat.format(time));
@@ -144,6 +147,7 @@ public class NotesDbAdapter {
         initialValues.put(KEY_LATI,latitude);
         initialValues.put(KEY_LONG,longitude);
         initialValues.put(KEY_POSITION_REMINDER,positionReminder);
+        initialValues.put(KEY_TIME_REMINDER, timeReminder);
         initialValues.put(KEY_SNIPPET, snippet);
         return mDb.insert(DATABASE_TABLE, null, initialValues);
     }
@@ -168,7 +172,7 @@ public class NotesDbAdapter {
 
         return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID,KEY_TEST, 
         		KEY_TITLE, KEY_BODY, KEY_TIME , KEY_LATI, KEY_LONG, 
-        		KEY_POSITION_REMINDER}, null, null, null, null, null);
+        		KEY_POSITION_REMINDER, KEY_TIME_REMINDER}, null, null, null, null, null, null);
     }
    
     /**
@@ -178,14 +182,15 @@ public class NotesDbAdapter {
      * @return Cursor positioned to matching note, if found
      * @throws SQLException if note could not be found/retrieved
      */
-    public Cursor fetchNote(long rowId) throws SQLException {
+    @SuppressLint("NewApi") public Cursor fetchNote(long rowId) throws SQLException {
 
         Cursor mCursor =
 
             mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,KEY_TEST,
                     KEY_TITLE, KEY_BODY,  KEY_TIME ,KEY_LATI , KEY_LONG , 
-                    KEY_POSITION_REMINDER, KEY_SNIPPET}, KEY_ROWID + "=" + rowId, null,
-                    null, null, null, null);
+                    KEY_POSITION_REMINDER, KEY_SNIPPET, KEY_TIME_REMINDER
+                    }, KEY_ROWID + "=" + rowId, null,
+                    null, null, null, null, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
         }
@@ -206,7 +211,7 @@ public class NotesDbAdapter {
      */				// Updates the note with the values
     public boolean updateNote(long rowId, String title, String body, 
     		String longitude, String latitude, String positionReminder,
-    		String snippet) {
+    		String snippet, String timeReminder) {
         ContentValues args = new ContentValues();
       SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     // if (time != null) { args.put(KEY_TIME, dateFormat.format(time));}
@@ -217,13 +222,15 @@ public class NotesDbAdapter {
         args.put(KEY_LONG,longitude );
         args.put(KEY_POSITION_REMINDER, positionReminder);
         args.put(KEY_SNIPPET, snippet);
+        args.put(KEY_TIME_REMINDER, timeReminder);
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
     
     // Updates time
-    public boolean updateTime(long rowId, long time) {
+    public boolean updateTime(long rowId, long time, String timeReminder) {
         ContentValues args = new ContentValues();
         args.put(KEY_TIME, time);
+        args.put(KEY_TIME_REMINDER, timeReminder);
         
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }

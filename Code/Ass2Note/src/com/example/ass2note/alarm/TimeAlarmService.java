@@ -1,33 +1,142 @@
 package com.example.ass2note.alarm;
 
+import java.util.ArrayList;
+import java.util.Date;
+
+import com.example.ass2note.R;
+import com.example.ass2note.notepad.Notepad;
+import com.example.ass2note.notepad.NotesDbAdapter;
+
+import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.IBinder;
-import android.widget.Toast;
-
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 /*
  * Her kan du kode alt som skal skje dersom alarmen gjekk av. Dette er ganske
  * likt LocationAlarmService, så vi burde finne en måte å bruke samme kodane på.
  * Men det viktigaste er at det fungerar først. 
  */
-public class TimeAlarmService extends Service {
-    public TimeAlarmService() {
-    }
+public class TimeAlarmService extends IntentService {
+	private NotesDbAdapter mDbHelper; // The database-class.
+	private long alarmTime;
+	private long rowId;
+	private String title;
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-    
-    @Override
-    public void onCreate() {
-    	super.onCreate();
-    	
-    //	Context c = getApplicationContext();
-    //	Toast.makeText(c, "Inside TimeAlarmService!", Toast.LENGTH_LONG).show();
-    	stopSelf();
-    }
+	public TimeAlarmService(){
+		super("TimeAlarmService");
+	}
+	
+	public TimeAlarmService(String name) {
+		super(name);
+	}
+
+	@Override
+	protected void onHandleIntent(Intent intent) {
+		mDbHelper = new NotesDbAdapter(this); // Create a new instance of DB.
+		mDbHelper.open(); // Open the DB.
+		
+		alarmTime = intent.getLongExtra("alarmTime", 0);
+		rowId = intent.getLongExtra("rowId", 0);
+
+		notifyDatabase();
+		getNotificationInfo();
+		notifyUser();
+
+		startTimeAlarm();
+
+		mDbHelper.close();
+	}
+
+	// TODO: Check if the if(...) works..
+		private void startTimeAlarm() {
+			long closestTime[] = getClosestTime();
+			Log.i("TimeAlarmService", "closestTIme is: " + closestTime);
+			if (closestTime[0] > 0) {
+				Intent i = new Intent(this, AlarmManagerService.class);
+				i.putExtra("alarmType", "time");
+				i.putExtra("time", closestTime[0]);
+				i.putExtra("rowId", closestTime[1]);
+				i.putExtra("COMMAND", "Start Alarm");
+				startService(i);
+			}
+		}
+
+	private long getClosestTime()[] {
+		Cursor notesCursor = mDbHelper.fetchAllNotes();
+		// SimpleDateFormat dateFormat = new
+		// SimpleDateFormat("dd-MM-yyyy HH:mm");
+
+		Date date = new Date();
+		long now = date.getTime();
+		long closestTime = 0;
+		long timeId = 0;
+		while (notesCursor.moveToNext()) {
+			long timeInDb = notesCursor.getLong(notesCursor
+					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME));
+			String posReminder = notesCursor.getString(notesCursor
+					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME_REMINDER));
+
+			if (timeInDb >= now && timeInDb <= closestTime
+					&& posReminder.contains("true")){
+				closestTime = timeInDb;
+				timeId = notesCursor.getLong(notesCursor.getColumnIndexOrThrow
+						(NotesDbAdapter.KEY_ROWID));
+			}
+
+			if (closestTime == 0 && posReminder.contains("true")){
+				closestTime = timeInDb;
+				timeId = notesCursor.getLong(notesCursor.getColumnIndexOrThrow
+						(NotesDbAdapter.KEY_ROWID));
+			}
+
+		} // - End while()
+		
+		long clTime[] = {closestTime, timeId};
+		
+		return clTime;
+	}// -End time();
+
+	private void getNotificationInfo(){
+		Cursor note = mDbHelper.fetchNote(rowId);
+		if(note.moveToFirst()){
+			title = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
+		}
+	}
+	
+	/**
+	 * Method for notifying the user with (lights, vibration, sound and) a
+	 * note on the panel. TODO: Add lights, vibration, sound?
+	 * TODO: THis exist already! Try to use the existing one!
+	 */
+	public void notifyUser() {
+		NotificationCompat.Builder mBuilder = 
+				new NotificationCompat.Builder(this)
+				.setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle(getString(R.string.notification_title))
+				.setContentText(getString(R.string.notification_content) + title);
+		
+		/* Set the notification on the panel to remove itself when the user 
+		   presses it.*/
+		mBuilder.setAutoCancel(true);
+		Intent notifyIntent = new Intent(this, Notepad.class);
+		notifyIntent.setAction(String.valueOf(rowId));
+		notifyIntent.putExtra("notificationSuccess", String.valueOf(rowId));
+		PendingIntent intent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
+		mBuilder.setContentIntent(intent);
+
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.notify(Integer.parseInt(String.valueOf(rowId)),mBuilder.build());
+	}
+
+	public void notifyDatabase() {
+		Log.i("TimeAlarmService", "trying to notify database. rowId: "+ rowId);
+		mDbHelper.updateTime(rowId, alarmTime, "false");
+	}
 }

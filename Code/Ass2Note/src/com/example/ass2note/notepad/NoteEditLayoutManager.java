@@ -1,5 +1,7 @@
 package com.example.ass2note.notepad;
 
+import java.text.SimpleDateFormat;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,8 +13,8 @@ public class NoteEditLayoutManager{
 	private NotesDbAdapter mDbHelper; 
 	private Long mRowId;
 	private Context context;
-	private ToggleButton alarmPosition;
-	private TextView alarmPositionInfo;
+	private ToggleButton alarmPosition, alarmTime;
+	private TextView alarmPositionInfo, alarmTimeInfo;
 	
 	public NoteEditLayoutManager(Context con, NotesDbAdapter helper, Long rowId) {
 		context = con;
@@ -25,15 +27,20 @@ public class NoteEditLayoutManager{
 		alarmPositionInfo = alarmPI;
 	}
 
+	public void setAlarmTime(ToggleButton alarmT, TextView alarmTI){
+		alarmTime = alarmT;
+		alarmTimeInfo = alarmTI;
+	}
+	
 	public boolean changePositionBtnStatus(ToggleButton positionToggle, String snippet, String longi) {
 		boolean changePosition = positionToggle.isChecked();
 
 		// If changePosition was set to "on":
 		if (changePosition) {
-			mDbHelper.updatePositionNotification(mRowId, "true");
 
 			// If the note was previously initiated with latitude and longitude:
 			if (!longi.contains("long")) {
+				mDbHelper.updatePositionNotification(mRowId, "true");
 				setPositionInfo(true, snippet);
 				return true;
 			}
@@ -61,6 +68,7 @@ public class NoteEditLayoutManager{
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int id) {
+								//mDbHelper.updatePositionNotification(mRowId, "true");
 								// FIRE ZE MISSILES!
 							}
 						})
@@ -77,14 +85,45 @@ public class NoteEditLayoutManager{
 	
 	
 	// TODO: Finish this
-	public void changeTimeStatus(ToggleButton timeToggle) {
-		// boolean on = ((ToggleButton) view).isChecked();
-		
+	public boolean changeTimeStatus(ToggleButton timeToggle, long time) {
+		boolean changePosition = timeToggle.isChecked();
+
+		// If changePosition was set to "on":
+		if (changePosition) {
+
+			// If the note was previously initiated with time:
+			if (time!=0) {
+				mDbHelper.updateTime(mRowId, time, "true");
+				setTimeInfo(true, time);
+				return true;
+			}
+
+			// If the note does not have valid time stored:
+			else {
+				setTimeInfo(false, time);
+				//mDbHelper.updateTime(mRowId, time, "true");
+				//TODO: ask the user if he/she want to be reminded of time. or just initialize timedialog..
+				//TODO: Check if there should be a return statement here..
+			}
+		}
+		// If the toggle was set to off:
+		else {
+			mDbHelper.updateTime(mRowId, time, "false");
+			setTimeInfo(false, time);
+		}
+		return false;
 	}
 	
 	public void setPositionInfo(boolean checked, String text) {
 		alarmPosition.setChecked(checked);
 		alarmPositionInfo.setText(text);
+	}
+	
+	public void setTimeInfo(boolean checked, long time){
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+		
+		alarmTime.setChecked(checked);
+		alarmTimeInfo.setText(String.valueOf(dateFormat.format(time)));
 	}
 	
 	public void closeDB(){

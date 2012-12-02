@@ -114,7 +114,8 @@
 	            android:id="@+id/alarmTimeInfo"
 	            android:layout_width="fill_parent"
 	            android:layout_height="fill_parent"
-	            android:hint="@string/no_time_alarm"/>
+	            android:hint="@string/no_time_alarm"
+	            android:gravity="center_vertical"/>
 	    </LinearLayout>
 	    <LinearLayout
 	        android:id="@+id/alarmPositionLayout"
