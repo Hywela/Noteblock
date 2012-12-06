@@ -167,9 +167,9 @@ public class NotesDbAdapter {
      */
     public Cursor fetchAllNotes() {
 
-        return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID,KEY_TEST, 
+        return mDb.query(DATABASE_TABLE, new String[] {KEY_ROWID, 
         		KEY_TITLE, KEY_BODY, KEY_TIME , KEY_LATI, KEY_LONG, 
-        		KEY_POSITION_REMINDER, KEY_TIME_REMINDER}, null, null, null, null, null, null);
+        		KEY_POSITION_REMINDER, KEY_SNIPPET, KEY_TIME_REMINDER}, null, null, null, null, null, null);
     }
    
     /**
@@ -179,15 +179,15 @@ public class NotesDbAdapter {
      * @return Cursor positioned to matching note, if found
      * @throws SQLException if note could not be found/retrieved
      */
-    @SuppressLint("NewApi") public Cursor fetchNote(long rowId) throws SQLException {
+    
+	public Cursor fetchNote(long rowId) throws SQLException {
 
         Cursor mCursor =
 
-            mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,KEY_TEST,
-                    KEY_TITLE, KEY_BODY,  KEY_TIME ,KEY_LATI , KEY_LONG , 
+            mDb.query(true, DATABASE_TABLE, new String[] {KEY_ROWID, KEY_TITLE, KEY_BODY,  KEY_TIME ,KEY_LATI , KEY_LONG , 
                     KEY_POSITION_REMINDER, KEY_SNIPPET, KEY_TIME_REMINDER
                     }, KEY_ROWID + "=" + rowId, null,
-                    null, null, null, null, null);
+                    null, null, null, null );	
         if (mCursor != null) {
             mCursor.moveToFirst();
         }

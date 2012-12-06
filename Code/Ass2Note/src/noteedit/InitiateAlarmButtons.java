@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -65,10 +66,11 @@ public class InitiateAlarmButtons {
 	}
 
 	DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
+		
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
 				int dayOfMonth) {
 			timesCalledDate++;
-
+			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN ){
 			if ((timesCalledDate % 2) == 0) {
 				myCalendar.set(Calendar.YEAR, year);
 				myCalendar.set(Calendar.MONTH, monthOfYear);
@@ -77,12 +79,20 @@ public class InitiateAlarmButtons {
 				System.out.println("year2: " + year);
 				showNewTimePickerDialog();
 			}
-		}
+			}else{
+			myCalendar.set(Calendar.YEAR, year);
+			myCalendar.set(Calendar.MONTH, monthOfYear);
+			myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+			System.out.println("year2: " + year);
+			showNewTimePickerDialog();}
+		} 
 	};
 
 	TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 			timesCalledTime++;
+			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN ){
 			if ((timesCalledTime % 2) == 0) {
 
 				myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -91,12 +101,23 @@ public class InitiateAlarmButtons {
 
 				Date date = new Date();
 				long now = date.getTime();
-				if(da > now) updateTime();
+			if(da > now) updateTime();
 				else {
 					Toast.makeText(noteEdit, "Illegal time", Toast.LENGTH_SHORT).show();
 					showNewTimePickerDialog();
 				}
 			} // end if
+			}else{myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+			myCalendar.set(Calendar.MINUTE, minute);
+			da = myCalendar.getTimeInMillis();
+
+			Date date = new Date();
+			long now = date.getTime();
+		if(da > now) updateTime();
+			else {
+				Toast.makeText(noteEdit, "Illegal time", Toast.LENGTH_SHORT).show();
+				showNewTimePickerDialog();
+			}	}
 		} // end onTimeSet
 	};
 	
