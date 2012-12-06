@@ -31,96 +31,101 @@ public class InitiateAlarmButtons {
 	private long da = 0;
 	private int timesCalledDate = 1, timesCalledTime = 1;
 	private ToggleButton alarmPosition, alarmTime, showAlarmInfo;
-	
 
 	public InitiateAlarmButtons(Context cont, NoteEditLayoutManager layoutM) {
 		noteEdit = (NoteEdit) cont;
 		da = myCalendar.getTimeInMillis();
 		layoutManager = layoutM;
-		
-		initiateAlarmButtons();	
+
+		initiateAlarmButtons();
 	}
 
-	private void initiateAlarmButtons(){
-		alarmPosition = (ToggleButton) noteEdit.findViewById(R.id.toggleAlarmPosition);
+	private void initiateAlarmButtons() {
+		alarmPosition = (ToggleButton) noteEdit
+				.findViewById(R.id.toggleAlarmPosition);
 		alarmTime = (ToggleButton) noteEdit.findViewById(R.id.toggleAlarmTime);
-		showAlarmInfo = (ToggleButton) noteEdit.findViewById(R.id.showAlarmNoteInfo);
-		
+		showAlarmInfo = (ToggleButton) noteEdit
+				.findViewById(R.id.showAlarmNoteInfo);
+
 		alarmPosition.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				layoutManager.changePositionBtnStatus();
 			}
 		});
-		
+
 		alarmTime.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				layoutManager.changeTimeStatus();
 			}
 		});
-		
+
 		showAlarmInfo.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				layoutManager.showAlarmLayout();	
+				layoutManager.showAlarmLayout();
 			}
 		});
 	}
 
 	DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
-		
+
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
 				int dayOfMonth) {
-			timesCalledDate++;
-			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN ){
-			if ((timesCalledDate % 2) == 0) {
-				myCalendar.set(Calendar.YEAR, year);
-				myCalendar.set(Calendar.MONTH, monthOfYear);
-				myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-				System.out.println("year2: " + year);
-				showNewTimePickerDialog();
-			}
-			}else{
-			myCalendar.set(Calendar.YEAR, year);
-			myCalendar.set(Calendar.MONTH, monthOfYear);
-			myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+			/*
+			 * The Jelly Bean API has an error and calls DatePicker twice, so we
+			 * need to only call it only once:
+			 */
+			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN) {
+				timesCalledDate++;
+				if ((timesCalledDate % 2) == 0)
+					setDate(year, monthOfYear, dayOfMonth);
 
-			System.out.println("year2: " + year);
-			showNewTimePickerDialog();}
-		} 
+				// All other API's calls DatePicker only once.
+			} else
+				setDate(year, monthOfYear, dayOfMonth);
+		}
 	};
+
+	private void setDate(int year, int monthOfYear, int dayOfMonth) {
+		myCalendar.set(Calendar.YEAR, year);
+		myCalendar.set(Calendar.MONTH, monthOfYear);
+		myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+		showNewTimePickerDialog();
+	}
 
 	TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			timesCalledTime++;
-			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN ){
-			if ((timesCalledTime % 2) == 0) {
 
-				myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-				myCalendar.set(Calendar.MINUTE, minute);
-				da = myCalendar.getTimeInMillis();
+			/*
+			 * The Jelly Bean API has an error and calls TimePicker twice, so we
+			 * need to only call it only once:
+			 */
+			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN) {
+				timesCalledTime++;
+				if ((timesCalledTime % 2) == 0)	setTime(hourOfDay, minute);
+			} 
+			// All other API's calls DatePicker only once.
+			else setTime(hourOfDay, minute);
 
-				Date date = new Date();
-				long now = date.getTime();
-			if(da > now) updateTime();
-				else {
-					Toast.makeText(noteEdit, "Illegal time", Toast.LENGTH_SHORT).show();
-					showNewTimePickerDialog();
-				}
-			} // end if
-			}else{myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
-			myCalendar.set(Calendar.MINUTE, minute);
-			da = myCalendar.getTimeInMillis();
-
-			Date date = new Date();
-			long now = date.getTime();
-		if(da > now) updateTime();
-			else {
-				Toast.makeText(noteEdit, "Illegal time", Toast.LENGTH_SHORT).show();
-				showNewTimePickerDialog();
-			}	}
 		} // end onTimeSet
 	};
-	
+
+	private void setTime(int hourOfDay, int minute) {
+		myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+		myCalendar.set(Calendar.MINUTE, minute);
+		da = myCalendar.getTimeInMillis();
+
+		Date date = new Date();
+		long now = date.getTime();
+		if (da > now)
+			updateTime();
+		else {
+			Toast.makeText(noteEdit, "Illegal time", Toast.LENGTH_SHORT).show();
+			showNewTimePickerDialog();
+		}
+	}
+
 	public void initiateAlarmButtonDialog() {
 		final Dialog dialog = new Dialog(noteEdit);
 		// Set the dialog title
@@ -136,11 +141,11 @@ public class InitiateAlarmButtons {
 
 		timeButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				new DatePickerDialog(noteEdit, d, myCalendar.get(Calendar.YEAR),
-						myCalendar.get(Calendar.MONTH), myCalendar
+				new DatePickerDialog(noteEdit, d,
+						myCalendar.get(Calendar.YEAR), myCalendar
+								.get(Calendar.MONTH), myCalendar
 								.get(Calendar.DAY_OF_MONTH)).show();
 
-				
 				dialog.dismiss();
 			}
 		});
@@ -161,16 +166,16 @@ public class InitiateAlarmButtons {
 	}
 
 	private void updateTime() {
-		Intent i = new Intent("com.example.ass2note.notepad.NoteEdit.connectionReceiver");
+		Intent i = new Intent(
+				"com.example.ass2note.notepad.NoteEdit.connectionReceiver");
 		i.putExtra("fromCaller", "InitiateAlarmButtons");
 		i.putExtra("command", "updateTime");
 		i.putExtra("time", da);
 		noteEdit.sendBroadcast(i);
 	}
 
-	private void showNewTimePickerDialog(){
-		new TimePickerDialog(noteEdit, t,
-				myCalendar.get(Calendar.HOUR_OF_DAY),
+	private void showNewTimePickerDialog() {
+		new TimePickerDialog(noteEdit, t, myCalendar.get(Calendar.HOUR_OF_DAY),
 				myCalendar.get(Calendar.MINUTE), true).show();
 	}
 }
