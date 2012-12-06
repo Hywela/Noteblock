@@ -30,4 +30,5 @@
     <string name="notification_content">Du har blitt påminnet av: </string>
     <string name="pin_title">Vil du bli påminnet i nærheten av denne lokasjonen?</string>
     <string name="network_alert">Vennligst sjekk nettverkstilgangen.</string>
+    <string name="toast_set_alarm">Alarmen er satt til:</string>
 </resources>

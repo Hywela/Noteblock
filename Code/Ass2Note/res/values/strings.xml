@@ -30,4 +30,5 @@
     <string name="notification_content">You have been reminded of: </string>
     <string name="pin_title">Do you want to be reminded close to this location?</string>
     <string name="network_alert">Please make sure your Network Connection is ON</string>
+    <string name="toast_set_alarm">The alarm has been set at:</string>
 </resources>

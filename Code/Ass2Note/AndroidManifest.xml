@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".notepad.NoteEdit"
+            android:name="noteedit.NoteEdit"
             android:parentActivityName=".notepad.Notepad" >
         </activity>
         <activity

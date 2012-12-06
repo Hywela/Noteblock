@@ -85,7 +85,6 @@
         android:layout_below="@+id/alarmInfo"
         android:textOn="Alarm" 
         android:textOff="Alarm"
-        android:onClick="showAlarmInfo"
 	    android:visibility="gone"/>
 
 	<LinearLayout
@@ -107,8 +106,7 @@
 	        <ToggleButton
         		android:id="@+id/toggleAlarmTime"
 		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:onClick="changeTimeStatus"/>
+		        android:layout_height="wrap_content"/>
 	        
 	        <TextView 
 	            android:id="@+id/alarmTimeInfo"
@@ -126,8 +124,7 @@
 	        <ToggleButton
         		android:id="@+id/toggleAlarmPosition"
 		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:onClick="changePositionStatus"/>
+		        android:layout_height="wrap_content"/>
 	        
 	        <TextView 
 	            android:id="@+id/alarmPositionInfo"
