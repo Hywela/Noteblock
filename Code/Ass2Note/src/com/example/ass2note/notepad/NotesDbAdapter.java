@@ -137,10 +137,7 @@ public class NotesDbAdapter {
     		String longitude, String latitude, String positionReminder, 
     		String snippet, String timeReminder) {
         ContentValues initialValues = new ContentValues();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        initialValues.put(KEY_TIME, dateFormat.format(time));
         
-     //   initialValues.put(KEY_TEST, );
         initialValues.put(KEY_TITLE, title);
         initialValues.put(KEY_BODY, body);
         initialValues.put(KEY_TIME, time);
@@ -209,7 +206,7 @@ public class NotesDbAdapter {
      * @param body value to set note body to
      * @return true if the note was successfully updated, false otherwise
      */				// Updates the note with the values
-    public boolean updateNote(long rowId, String title, String body, 
+    public boolean updateNote(long rowId, String title, String body, long time,
     		String longitude, String latitude, String positionReminder,
     		String snippet, String timeReminder) {
         ContentValues args = new ContentValues();
@@ -218,6 +215,7 @@ public class NotesDbAdapter {
       	
       	args.put(KEY_TITLE, title);
         args.put(KEY_BODY, body); 
+        args.put(KEY_TIME, time);
         args.put(KEY_LATI, latitude);
         args.put(KEY_LONG,longitude );
         args.put(KEY_POSITION_REMINDER, positionReminder);
@@ -231,15 +229,53 @@ public class NotesDbAdapter {
         ContentValues args = new ContentValues();
         args.put(KEY_TIME, time);
         args.put(KEY_TIME_REMINDER, timeReminder);
-        
+
+		Log.i("NoteDBAD", "updateTime: timereminder is: "+ timeReminder);
+		
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
     
-    public boolean updatePositionNotification(long rowId, String disableNotification){
+    public boolean updatePositionNotification(long rowId, String positionNotification){
     	ContentValues args = new ContentValues();
-    	args.put(KEY_POSITION_REMINDER, disableNotification);
+    	args.put(KEY_POSITION_REMINDER, positionNotification);
     	return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
     
+    public boolean updateTimeNotification(long rowId, String timeNotification){
+    	ContentValues args = new ContentValues();
+    	args.put(KEY_TIME_REMINDER, timeNotification);
+    	return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
+    }
     
+    public long getClosestTime()[] {
+		Cursor notesCursor = fetchAllNotes();
+		// SimpleDateFormat dateFormat = new
+		// SimpleDateFormat("dd-MM-yyyy HH:mm");
+
+		Date date = new Date();
+		long now = date.getTime();
+		long closestTime = 0;
+		long timeId = 0;
+		
+		while (notesCursor.moveToNext()) {
+			long timeInDb = notesCursor.getLong(notesCursor
+					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME));
+			String timReminder = notesCursor.getString(notesCursor
+					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME_REMINDER));
+
+			if ((timeInDb >= now && timeInDb <= closestTime && timReminder.contains("true"))
+					|| (closestTime == 0 && timReminder.contains("true"))){
+				closestTime = timeInDb;
+				timeId = notesCursor.getLong(notesCursor.getColumnIndexOrThrow
+						(NotesDbAdapter.KEY_ROWID));
+			}
+
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+			Log.i("NoteEdit", "getclosestTime: time is: " + dateFormat.format(timeInDb));
+		} // - End while()
+		
+		long clTime[] = {closestTime, timeId};
+		
+		return clTime;
+	}// -End time();
 }

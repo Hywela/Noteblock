@@ -1,5 +1,6 @@
 package com.example.ass2note.alarm;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import android.app.AlarmManager;
@@ -58,7 +59,6 @@ public class AlarmManagerService extends Service {
 		// Choose to start alarm by time or position:
 		if		(alarmType.contains("time")) 	 timeAlarm(command, intent);
 		else if	(alarmType.contains("position")) positionAlarm(command);
-		else if (alarmType.contains("noteDeleted")) positionAlarm("Stop Alarm"); //TODO: add time-check
 		else Log.i("AlarmManagerService", "alarmType contained unknown value");
 		
 		Log.i("AlarmManagerService", "Stopping self");
@@ -72,7 +72,7 @@ public class AlarmManagerService extends Service {
 		long rowId = intent.getLongExtra("rowId", 0);
 		
 		if		(command.contains("Start Alarm")) startTimeAlarm(time, rowId);
-		else if	(command.contains("Stop Alarm"))  stopTimeAlarm();
+		else if	(command.contains("Stop Alarm"))  stopTimeAlarm(time, rowId);
 		else Log.e("AlarmManagerService", "Command contained unknown value");
 	}
 	
@@ -88,19 +88,14 @@ public class AlarmManagerService extends Service {
 	// ********************************************************************* \\
 	
 	private void startTimeAlarm(long time, long rowId){
-		Log.i("AlarmManagerService", "Starting a new timeAlarm loop. time is: " + time);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+		Log.i("AlarmManagerService", "Starting a new timeAlarm loop. time is: " + dateFormat.format(time));
 		
 		// Intent for calling the correct receiver.
 		alarmReceiverIntent.putExtra("alarmType", "time");
 		alarmReceiverIntent.putExtra("alarmTime", time);
 		alarmReceiverIntent.putExtra("rowId", rowId);
     	
-    	// we know mobiletuts updates at right around 1130 GMT.
-    	// let's grab new stuff at around 11:45 GMT, inexactly
-    //	Calendar calendar = Calendar.getInstance();
-
-    	//calendar.setTimeInMillis(time);
-
 		// PendingIntent for making broadcast available.
 		PendingIntent pi = PendingIntent.getBroadcast(context, 
 				TIME_REQUEST_CODE, alarmReceiverIntent, 
@@ -110,11 +105,13 @@ public class AlarmManagerService extends Service {
 	}
 	
 	// TODO: Tweek this. The alarm WILL stop. Check if its ok to do so.
-	private void stopTimeAlarm(){
+	private void stopTimeAlarm(long time, long rowId){
 		Log.i("AlarmManagerService", "Stopping time alarm");
 		
 		// Let the receiver know that its a time-alarm.
 		alarmReceiverIntent.putExtra("alarmType", "time");
+		alarmReceiverIntent.putExtra("alarmTime", time);
+		alarmReceiverIntent.putExtra("rowId", rowId);
     	
     	// Create a PendingIntent similar to the pendingIntent in the current alarm.
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 

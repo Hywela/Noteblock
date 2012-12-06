@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import noteedit.NoteEdit;
+
 import android.app.ListActivity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -148,16 +150,23 @@ public class Notepad extends ListActivity {
 	public boolean onContextItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case DELETE_ID:
-			AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-					.getMenuInfo();
+			AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 			mDbHelper.deleteNote(info.id);
 			cancelNotification(info.id); // If the note is still on the panel,
 											// remove it.
 
+			String alarmType = "";
+			
+			// TODO: Sjekk: dersom notatet er den som har alarmen på tid, fjern alarmen og legg den til neste notat.
+			long closestTime[] = mDbHelper.getClosestTime();
+			if(closestTime[1] == info.id) alarmType = "time";
+			
 			// If no more valid notes exists in the DB, stop the alarm:
-			if (!validNotes()) {
+			if (!validNotes()) alarmType = alarmType.concat("position");
+			
+			if(!alarmType.isEmpty()){
 				Intent i = new Intent(Notepad.this, AlarmManagerService.class);
-				i.putExtra("alarmType", "noteDeleted");
+				i.putExtra("alarmType", alarmType);
 				i.putExtra("COMMAND", "Stop Alarm");
 				startService(i);
 			}
@@ -191,7 +200,7 @@ public class Notepad extends ListActivity {
 		startLocationAlarm();
 
 		if (resultCode == RESULT_OK && requestCode == ACTIVITY_GPS) {
-			if (intent.hasExtra("longitud")) {
+			if (intent.hasExtra("longitude")) {
 				longi = intent.getExtras().getDouble("longitude");
 			}
 			if (intent.hasExtra("latitude")) {
@@ -269,8 +278,13 @@ public class Notepad extends ListActivity {
 	private void cancelNotification(Long id) {
 		Log.i("Notepad", "cancelNotification: removing notification from panel");
 		int noteId = Integer.parseInt(String.valueOf(id));
+		
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.cancel(noteId);
+		try{
+			mNotificationManager.cancel(noteId);
+		}catch(Exception e){
+			Log.i("NoteEdit", e.getMessage());
+		}
 	}
-
+	
 }

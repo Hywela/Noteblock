@@ -1,5 +1,6 @@
 package com.example.ass2note.alarm;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -56,7 +57,7 @@ public class TimeAlarmService extends IntentService {
 
 	// TODO: Check if the if(...) works..
 		private void startTimeAlarm() {
-			long closestTime[] = getClosestTime();
+			long closestTime[] = mDbHelper.getClosestTime();
 			Log.i("TimeAlarmService", "closestTIme is: " + closestTime);
 			if (closestTime[0] > 0) {
 				Intent i = new Intent(this, AlarmManagerService.class);
@@ -67,41 +68,6 @@ public class TimeAlarmService extends IntentService {
 				startService(i);
 			}
 		}
-
-	private long getClosestTime()[] {
-		Cursor notesCursor = mDbHelper.fetchAllNotes();
-		// SimpleDateFormat dateFormat = new
-		// SimpleDateFormat("dd-MM-yyyy HH:mm");
-
-		Date date = new Date();
-		long now = date.getTime();
-		long closestTime = 0;
-		long timeId = 0;
-		while (notesCursor.moveToNext()) {
-			long timeInDb = notesCursor.getLong(notesCursor
-					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME));
-			String posReminder = notesCursor.getString(notesCursor
-					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME_REMINDER));
-
-			if (timeInDb >= now && timeInDb <= closestTime
-					&& posReminder.contains("true")){
-				closestTime = timeInDb;
-				timeId = notesCursor.getLong(notesCursor.getColumnIndexOrThrow
-						(NotesDbAdapter.KEY_ROWID));
-			}
-
-			if (closestTime == 0 && posReminder.contains("true")){
-				closestTime = timeInDb;
-				timeId = notesCursor.getLong(notesCursor.getColumnIndexOrThrow
-						(NotesDbAdapter.KEY_ROWID));
-			}
-
-		} // - End while()
-		
-		long clTime[] = {closestTime, timeId};
-		
-		return clTime;
-	}// -End time();
 
 	private void getNotificationInfo(){
 		Cursor note = mDbHelper.fetchNote(rowId);
@@ -132,6 +98,7 @@ public class TimeAlarmService extends IntentService {
 		mBuilder.setContentIntent(intent);
 
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		
 		mNotificationManager.notify(Integer.parseInt(String.valueOf(rowId)),mBuilder.build());
 	}
 
