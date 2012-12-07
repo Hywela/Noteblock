@@ -11,7 +11,7 @@
         android:layout_height="383dp"
         android:layout_above="@+id/mapButtons"
         android:layout_below="@+id/infoMapsLayout"
-        android:apiKey="0p7NzoIvYO3rdUjNAw1gqQjfU8-5Q7x5EUirphg"
+        android:apiKey="0AOQioPq-xvCB4DytbE5titu-uHjbBhLnxPjEtw"
         android:clickable="true" >
 
     </com.google.android.maps.MapView>

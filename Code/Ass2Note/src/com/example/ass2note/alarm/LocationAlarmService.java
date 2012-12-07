@@ -115,6 +115,7 @@ public class LocationAlarmService extends Service {
 	 * user's current position or null.
 	 */
 	private void startFindPositionService(boolean gpsEnabled, boolean networkEnabled) {
+		Log.i("LocationAlarmService", "StartfindpositionService");
 		// Call FindPositionService for fetching the user's current position:
 		positionServiceIntent = new Intent(LocationAlarmService.this, FindPositionService.class);
 		positionServiceIntent.putExtra(FindPositionService.EXTRA_MESSENGER,	new Messenger(handy));

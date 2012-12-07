@@ -16,24 +16,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
 
-/*
- * Adjusting the model to save battery and data exchange
- *  As you test your application, you might find that your model for providing 
- *  good location and good performance needs some adjustment. Here are some things you might change to find a good balance between the two.
- * Reduce the size of the window
- * A smaller window in which you listen for location updates means less 
- *  interaction with GPS and network location services, thus, preserving 
- *  battery life. But it also allows for fewer locations from which to choose
- *  a best estimate.
- * Set the location providers to return updates less frequently
- *  Reducing the rate at which new updates appear during the window can also 
- *   improve battery efficiency, but at the cost of accuracy. The value of the
- *   trade-off depends on how your application is used. You can reduce the rate of updates by increasing the parameters in requestLocationUpdates() that specify the interval time and minimum distance change.
-
- Restrict a set of providers
-
- Depending on the environment where your application is used or the desired level of accuracy, you might choose to use only the Network Location Provider or only GPS, instead of both. Interacting with only one of the services reduces battery usage at a potential cost of accuracy.*/
-
 public class FindPositionService extends Service {
 	public static final String EXTRA_MESSENGER = "com.example.ass2note.location.EXTRA_MESSENGER";
 	private static final int TWO_MINUTES = 1000 * 60 * 2;
@@ -108,7 +90,7 @@ public class FindPositionService extends Service {
 		
 		// The caller wish to get a fine estimate of the user's location:
 		else if(from.contains("LocationAlarmService")){
-			
+			if(gpsEnabled) findGpsLocation();
 		}
 		
 		return super.onStartCommand(intent, flags, startId);
