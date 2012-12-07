@@ -19,7 +19,7 @@ implements TimePickerDialog.OnTimeSetListener {
 	
 	private InitiateAlarmButtons initi;
 	
-	
+	public TimePickerFragment() {}	
 public TimePickerFragment(InitiateAlarmButtons in) { initi = in;}	
 	
 	

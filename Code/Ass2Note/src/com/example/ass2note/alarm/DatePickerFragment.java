@@ -20,7 +20,7 @@ public class DatePickerFragment  extends DialogFragment
 				implements DatePickerDialog.OnDateSetListener 	{
 	
 	private InitiateAlarmButtons initi;
-	
+	public DatePickerFragment() {}
 	
 	public DatePickerFragment(InitiateAlarmButtons in) { initi = in;}	
 

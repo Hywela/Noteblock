@@ -167,7 +167,7 @@ public class Notepad extends ListActivity {
 			// If no more valid notes exists in the DB, stop the alarm:
 			if (!validNotes()) alarmType = alarmType.concat("position");
 			
-			if(!alarmType.isEmpty()){
+			if(!alarmType.contains("time") || alarmType.contains("position")){
 				Intent i = new Intent(Notepad.this, AlarmManagerService.class);
 				i.putExtra("alarmType", alarmType);
 				i.putExtra("COMMAND", "Stop Alarm");
@@ -261,7 +261,7 @@ public class Notepad extends ListActivity {
 
 			// Add all positionNotification to the list.
 			while (allNotes.moveToNext())
-				validNotes.add(allNotes.getString(7));
+				validNotes.add(allNotes.getString(6));
 
 			// If a valid note exist in the list (a note that can be notified):
 			if (validNotes.contains("true"))

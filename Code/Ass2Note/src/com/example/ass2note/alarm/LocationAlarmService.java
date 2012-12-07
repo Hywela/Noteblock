@@ -120,6 +120,7 @@ public class LocationAlarmService extends Service {
 		positionServiceIntent.putExtra(FindPositionService.EXTRA_MESSENGER,	new Messenger(handy));
 		positionServiceIntent.putExtra("gpsEnabled", gpsEnabled);
 		positionServiceIntent.putExtra("networkEnabled", networkEnabled);
+		positionServiceIntent.putExtra("from", "LocationAlarmService");
 		startService(positionServiceIntent);
 	}
 
@@ -301,11 +302,11 @@ public class LocationAlarmService extends Service {
 		if (allNotes != null) {
 			while (allNotes.moveToNext()) {
 				// Fetch location or default value:
-				noteLatitudeList.add(allNotes.getString(5));
-				noteLongitudeList.add(allNotes.getString(6));
+				noteLatitudeList.add(allNotes.getString(4));
+				noteLongitudeList.add(allNotes.getString(5));
 				noteKeyList.add(allNotes.getString(0));
-				titleList.add(allNotes.getString(2));
-				enablePositionList.add(allNotes.getString(7));
+				titleList.add(allNotes.getString(1));
+				enablePositionList.add(allNotes.getString(6));
 			}
 		}
 	}

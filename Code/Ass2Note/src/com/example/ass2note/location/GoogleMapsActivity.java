@@ -1,6 +1,9 @@
 package com.example.ass2note.location;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -8,12 +11,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 
 import com.example.ass2note.R;
-import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;
@@ -25,6 +25,7 @@ public class GoogleMapsActivity extends MapActivity {
 	private Drawable drawable;
 	private MapView mapView;
 	private String latitude = null, longitude = null;
+	private boolean gpsEnabled = false, networkEnabled = false;
 
 
 	/**
@@ -45,6 +46,8 @@ public class GoogleMapsActivity extends MapActivity {
 		Intent NoteEditIntent = getIntent();
 		latitude = NoteEditIntent.getStringExtra("LATITUDE");
 		longitude = NoteEditIntent.getStringExtra("LONGITUDE");
+		gpsEnabled = NoteEditIntent.getBooleanExtra("gpsEnabled", false);
+		networkEnabled = NoteEditIntent.getBooleanExtra("networkEnabled", false);
 
 		// Find the user's current position if the current position is invalid.
 		startFindPositionService();
@@ -53,10 +56,8 @@ public class GoogleMapsActivity extends MapActivity {
 		mapView = (MapView) findViewById(R.id.mapView);
 		mapView.setBuiltInZoomControls(true);
 
-		// Create the controller and zoom in the desired height
 		mapController = mapView.getController();
-		mapController.setZoom(16);
-
+		
 		// TODO: Find out if the pin should be placed at the bottom, or bottom left of the geopoint
 		// Fetch the correct marker for the map
 		drawable = this.getResources().getDrawable(R.drawable.pin);
@@ -110,6 +111,9 @@ public class GoogleMapsActivity extends MapActivity {
 			 * messenger to the service: */
 			findPositionServiceIntent = new Intent(this, FindPositionService.class);
 			findPositionServiceIntent.putExtra(FindPositionService.EXTRA_MESSENGER, new Messenger(handler));
+			findPositionServiceIntent.putExtra("gpsEnabled", gpsEnabled);
+			findPositionServiceIntent.putExtra("networkEnabled", networkEnabled);
+			findPositionServiceIntent.putExtra("from", "GoogleMapsActivity");
 			startService(findPositionServiceIntent);
 			
 			// If the service was started, return true.
@@ -189,14 +193,36 @@ public class GoogleMapsActivity extends MapActivity {
 				// Add the user's position to the map.
 				itemizedoverlay.addNewGeoPoint(mapView, lati, longi);
 				
+				// zoom in the desired height
+				mapController.setZoom(16);
+		
 				// Move the map to the user's position.
 				mapController.animateTo(itemizedoverlay.getUserPosition());
 				
 				// Stop FindPositionService.
 				stopService(findPositionServiceIntent);
 			}
+			// If the user's location was not found:
+			else{
+				showNoLocationDialog();
+				stopService(findPositionServiceIntent);
+			}
 		} // end handlerMessage
 	}; // End Handler handler.
+	
+	private void showNoLocationDialog(){
+		AlertDialog.Builder altDialog = new AlertDialog.Builder(this);
+		altDialog.setMessage("We didnt find your location. But feel free to choose" +
+				"where you wish to be reminded of this note.");
+		
+		altDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				
+			}
+		});
+		altDialog.show();
+	}
+	
 	
 	public void stopFindPositionService(View view){
 		stopService(findPositionServiceIntent);

@@ -24,14 +24,17 @@ import android.app.Activity;
 
 import android.app.Fragment.SavedState;
 
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -232,78 +235,58 @@ public class NoteEdit extends FragmentActivity {
 	} // end onActivityResult
 
 	private BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String fromCaller = intent.getStringExtra("fromCaller");
+		  @Override
+		  public void onReceive(Context context, Intent intent) {
+		   String fromCaller = intent.getStringExtra("fromCaller");
 
-			if (fromCaller.contains("ConnectionService")) {
-				gpsEnabled = intent.getBooleanExtra("gpsEnabled", false);
-				networkEnabled = intent.getBooleanExtra("networkEnabled", false);
-				if (networkEnabled) startGoogleMaps();
-				else alertToast(getString(R.string.network_alert));
-				
-			} else if (fromCaller.contains("InitiateAlarmButtons")) {
-				Log.i("NoteEdit", "receiver called from InitiateAlarmButtons.");
+		   if (fromCaller.contains("ConnectionService")) {
+		    checkConnection(intent);
 
-				String command = intent.getStringExtra("command");
-				if (command.contains("updateTime")) {
-					SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-					long time = intent.getLongExtra("time", 0);
-					Log.i("NoteEdit","time is: "+dateFormat.format(time));
-					
-					savePopulateManager.saveTime(time, "true");
-					layoutManager.displayAlarmInfo();
+		   } else if (fromCaller.contains("InitiateAlarmButtons")) {
+		    Log.i("NoteEdit", "receiver called from InitiateAlarmButtons.");
 
-					alertToast(getString(R.string.toast_set_alarm) +" \n"
-							+ dateFormat.format(time));
+		    String command = intent.getStringExtra("command");
+		    if (command.contains("updateTime")) {
+		     SimpleDateFormat dateFormat = new SimpleDateFormat(
+		       "dd-MM-yyyy HH:mm");
+		     long time = intent.getLongExtra("time", 0);
+		     Log.i("NoteEdit", "time is: " + dateFormat.format(0));
 
-					// TODO: Start this at an other place..
-					startTimeAlarm();
-				}else if (command.contains("stopTimeAlarm")) {
-					stopTimeAlarm(intent.getLongExtra("time", 0));
-				}
-			}
-		}
-	};
+		     savePopulateManager.saveTime(time, "true");
+		     layoutManager.displayAlarmInfo();
 
-	private void startGoogleMaps(){
-		Intent i = new Intent(NoteEdit.this, GoogleMapsActivity.class);
-		i.putExtra("LATITUDE", savePopulateManager.getLatitude());
-		i.putExtra("LONGITUDE", savePopulateManager.getLongitude());
-		startActivityForResult(i, MAPSINTENT_ID);
-	}
+		     alertToast(getString(R.string.toast_set_alarm) + " \n"
+		       + dateFormat.format(0));
+
+		     // TODO: Start this at an other place..
+		     startTimeAlarm();
+		    } else if (command.contains("stopTimeAlarm")) {
+		     stopTimeAlarm(intent.getLongExtra("time", 0));
+		    }
+		   }
+		  }
+		 };
+
+		 private void checkConnection(Intent intent) {
+		  gpsEnabled = intent.getBooleanExtra("gpsEnabled", false);
+		  networkEnabled = intent.getBooleanExtra("networkEnabled", false);
+
+		  if (networkEnabled && gpsEnabled)  startGoogleMaps();
+		  else if (networkEnabled && !gpsEnabled) alertGPSConnection();
+		  else if (!networkEnabled) alertToast(getString(R.string.network_alert));
+		  else Log.e("NoteEdit checkConnection", "Something really weird is going on now...");
+		 }
+
+		 private void startGoogleMaps() {
+		  Intent i = new Intent(NoteEdit.this, GoogleMapsActivity.class);
+		  i.putExtra("LATITUDE", savePopulateManager.getLatitude());
+		  i.putExtra("LONGITUDE", savePopulateManager.getLongitude());
+		  i.putExtra("gpsEnabled", gpsEnabled);
+		  i.putExtra("networkEnabled", networkEnabled);
+		  startActivityForResult(i, MAPSINTENT_ID);
+		 }
 	
-/*	private long getClosestTime()[] {
-		Cursor notesCursor = mDbHelper.fetchAllNotes();
-		// SimpleDateFormat dateFormat = new
-		// SimpleDateFormat("dd-MM-yyyy HH:mm");
 
-		Date date = new Date();
-		long now = date.getTime();
-		long closestTime = 0;
-		long timeId = 0;
-		
-		while (notesCursor.moveToNext()) {
-			long timeInDb = notesCursor.getLong(notesCursor
-					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME));
-			String timReminder = notesCursor.getString(notesCursor
-					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME_REMINDER));
-
-			if ((timeInDb >= now && timeInDb <= closestTime && timReminder.contains("true"))
-					|| (closestTime == 0 && timReminder.contains("true"))){
-				closestTime = timeInDb;
-				timeId = notesCursor.getLong(notesCursor.getColumnIndexOrThrow
-						(NotesDbAdapter.KEY_ROWID));
-			}
-
-			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-			Log.i("NoteEdit", "getclosestTime: time is: " + dateFormat.format(timeInDb));
-		} // - End while()
-		
-		long clTime[] = {closestTime, timeId};
-		
-		return clTime;
-	}// -End time();*/
 
 	private void startTimeAlarm() {
 		long closestTime[] = mDbHelper.getClosestTime();
@@ -333,23 +316,28 @@ public class NoteEdit extends FragmentActivity {
 				.show();
 	}
 
-	/*
-	 * private void alertGPSConnection(){ AlertDialog.Builder altDialog = new
-	 * AlertDialog.Builder(this);
-	 * altDialog.setMessage("Please start your GPS and try again. The GPS " +
-	 * "needs to be ON all the time for this function to work.");
-	 * altDialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-	 * // @Override public void onClick(DialogInterface dialog, int which) { //
-	 * enableLocationSettings(); } });
-	 * altDialog.setNegativeButton(R.string.cancel, new
-	 * DialogInterface.OnClickListener() { public void onClick(DialogInterface
-	 * dialog, int id) { // User cancelled the dialog } }); altDialog.show(); }
-	 */
+	private void alertGPSConnection() {
+		  AlertDialog.Builder altDialog = new AlertDialog.Builder(this);
+		  altDialog.setMessage("Please start your GPS and try again. The GPS "
+		    + "needs to be ON all the time for this function to work.");
+		  
+		  altDialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+		   public void onClick(DialogInterface dialog, int which) {
+		    enableLocationSettings();
+		   }
+		  });
+		  
+		  altDialog.setNegativeButton(R.string.cancel,
+		    new DialogInterface.OnClickListener() {
+		     public void onClick(DialogInterface dialog, int id) {
+		      // User cancelled the dialog
+		     }
+		    });
+		  altDialog.show();
+		 }
 
-	/*
-	 * private void enableLocationSettings() { Intent settingsIntent = new
-	 * Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-	 * startActivity(settingsIntent); }
-	 */
-
+		 private void enableLocationSettings() {
+		  Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+		  startActivity(settingsIntent);
+		 }
 }
