@@ -12,6 +12,8 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -30,7 +32,8 @@ import com.example.ass2note.alarm.DatePickerFragment;
 import com.example.ass2note.alarm.TimePickerFragment;
 import com.example.ass2note.location.ConnectionService;
 
-public class InitiateAlarmButtons {
+public class InitiateAlarmButtons implements Parcelable {
+	 private int mData;
 	private NoteEdit noteEdit;
 	private NoteEditLayoutManager layoutManager;
 	public Calendar myCalendar = Calendar.getInstance();
@@ -137,6 +140,7 @@ public class InitiateAlarmButtons {
 			
 		}else {
 			Toast.makeText(noteEdit, "Illegal time", Toast.LENGTH_SHORT).show();
+			
 			newFragment();
 		}
 	}
@@ -214,5 +218,15 @@ public void newFragment(){
 	DialogFragment newFragment;
 	 newFragment = new TimePickerFragment(inn);
 	 newFragment.show( mangerSupport , "timePicker");
+}
+
+public int describeContents() {
+	// TODO Auto-generated method stub
+	return 0;
+}
+
+public void writeToParcel(Parcel out, int flags) {
+   
+	out.writeInt(mData);
 }
 }// -- End Class

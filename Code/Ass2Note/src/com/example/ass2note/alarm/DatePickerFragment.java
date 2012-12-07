@@ -1,7 +1,10 @@
 package com.example.ass2note.alarm;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
+
+import com.example.ass2note.notepad.NotesDbAdapter;
 
 import noteedit.InitiateAlarmButtons;
 
@@ -27,6 +30,8 @@ public class DatePickerFragment  extends DialogFragment
 @Override
 public Dialog onCreateDialog(Bundle savedInstanceState) {
 // Use the current date as the default date in the picker
+	if(savedInstanceState != null){initi = savedInstanceState.getParcelable("key");} 
+	
 final Calendar	 c = Calendar.getInstance();
 	int year = c.get(Calendar.YEAR);
 	int month = c.get(Calendar.MONTH);
@@ -40,5 +45,16 @@ public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth
 	// TODO Auto-generated method stub
 	initi.setDate(year, monthOfYear, dayOfMonth);
 }
+@Override
+public void onSaveInstanceState(Bundle outState) {
+	// TODO Auto-generated method stub
+	super.onSaveInstanceState(outState);
+	
+	outState.putParcelable("key", initi);
+	initi.dimiss();
+	
+}
+
+
 
 }

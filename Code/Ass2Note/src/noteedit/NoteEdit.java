@@ -250,13 +250,13 @@ public class NoteEdit extends FragmentActivity {
 		     SimpleDateFormat dateFormat = new SimpleDateFormat(
 		       "dd-MM-yyyy HH:mm");
 		     long time = intent.getLongExtra("time", 0);
-		     Log.i("NoteEdit", "time is: " + dateFormat.format(0));
+		     Log.i("NoteEdit", "time is: " + dateFormat.format(time));
 
 		     savePopulateManager.saveTime(time, "true");
 		     layoutManager.displayAlarmInfo();
 
 		     alertToast(getString(R.string.toast_set_alarm) + " \n"
-		       + dateFormat.format(0));
+		       + dateFormat.format(time));
 
 		     // TODO: Start this at an other place..
 		     startTimeAlarm();
