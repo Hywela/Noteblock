@@ -7,9 +7,13 @@ import java.util.Date;
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,16 +26,22 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.ass2note.R;
+import com.example.ass2note.alarm.DatePickerFragment;
+import com.example.ass2note.alarm.TimePickerFragment;
 import com.example.ass2note.location.ConnectionService;
 
 public class InitiateAlarmButtons {
 	private NoteEdit noteEdit;
 	private NoteEditLayoutManager layoutManager;
-	private Calendar myCalendar = Calendar.getInstance();
+	public Calendar myCalendar = Calendar.getInstance();
 	private long da = 0;
 	private int timesCalledDate = 1, timesCalledTime = 1;
 	private ToggleButton alarmPosition, alarmTime, showAlarmInfo;
-
+	Dialog dialog;
+	
+	FragmentManager mangerSupport;
+	InitiateAlarmButtons inn;
+	
 	public InitiateAlarmButtons(Context cont, NoteEditLayoutManager layoutM) {
 		noteEdit = (NoteEdit) cont;
 		da = myCalendar.getTimeInMillis();
@@ -47,6 +57,8 @@ public class InitiateAlarmButtons {
 		showAlarmInfo = (ToggleButton) noteEdit
 				.findViewById(R.id.showAlarmNoteInfo);
 
+		
+		
 		alarmPosition.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				layoutManager.changePositionBtnStatus();
@@ -65,16 +77,18 @@ public class InitiateAlarmButtons {
 			}
 		});
 	}
-
+/*
 	DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
 
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
 				int dayOfMonth) {
-
+			
 			/*
 			 * The Jelly Bean API has an error and calls DatePicker twice, so we
 			 * need to only call it only once:
 			 */
+/*
+
 			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN) {
 				timesCalledDate++;
 				if ((timesCalledDate % 2) == 0)
@@ -85,22 +99,21 @@ public class InitiateAlarmButtons {
 				setDate(year, monthOfYear, dayOfMonth);
 		}
 	};
-
-	private void setDate(int year, int monthOfYear, int dayOfMonth) {
+*/
+	public void setDate(int year, int monthOfYear, int dayOfMonth) {
 		myCalendar.set(Calendar.YEAR, year);
 		myCalendar.set(Calendar.MONTH, monthOfYear);
 		myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-		showNewTimePickerDialog();
 	}
-
+/*
 	TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
 		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-
+			
 			/*
 			 * The Jelly Bean API has an error and calls TimePicker twice, so we
 			 * need to only call it only once:
 			 */
+	/*
 			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN) {
 				timesCalledTime++;
 				if ((timesCalledTime % 2) == 0)	setTime(hourOfDay, minute);
@@ -111,42 +124,56 @@ public class InitiateAlarmButtons {
 		} // end onTimeSet
 	};
 
-	private void setTime(int hourOfDay, int minute) {
+*/	public void setTime(int hourOfDay, int minute) {
+		
 		myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
 		myCalendar.set(Calendar.MINUTE, minute);
 		da = myCalendar.getTimeInMillis();
 
 		Date date = new Date();
 		long now = date.getTime();
-		if (da > now)
+		if (da > now){
 			updateTime();
-		else {
+			
+		}else {
 			Toast.makeText(noteEdit, "Illegal time", Toast.LENGTH_SHORT).show();
-			showNewTimePickerDialog();
+			newFragment();
 		}
 	}
 
-	public void initiateAlarmButtonDialog() {
-		final Dialog dialog = new Dialog(noteEdit);
+	public void initiateAlarmButtonDialog(final FragmentManager manger,  final InitiateAlarmButtons in) {
+		dialog = new Dialog(noteEdit);
 		// Set the dialog title
 		dialog.setTitle(R.string.alarm);
 		// dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.alert_dialog);
+		
 		dialog.show();
-
+		
 		ImageButton positionButton = (ImageButton) dialog
 				.findViewById(R.id.positionButton);
 		ImageButton timeButton = (ImageButton) dialog
 				.findViewById(R.id.timeButton);
-
+		
+		
+			
 		timeButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				new DatePickerDialog(noteEdit, d,
-						myCalendar.get(Calendar.YEAR), myCalendar
-								.get(Calendar.MONTH), myCalendar
-								.get(Calendar.DAY_OF_MONTH)).show();
-
+				mangerSupport = manger;
+				DialogFragment newFragment;
+				inn = in;
+				 newFragment = new TimePickerFragment(in);
+				 newFragment.show( manger , "timePicker");
+				 newFragment = null;
+				 
+				
+				 newFragment = new DatePickerFragment(in);
+				 newFragment.show( manger , "datePicker");
+				
+				 newFragment = null;
+				
 				dialog.dismiss();
+				
 			}
 		});
 
@@ -155,10 +182,11 @@ public class InitiateAlarmButtons {
 				Intent intent = new Intent(noteEdit, ConnectionService.class);
 				intent.putExtra("fromActivity", "NoteEdit");
 				noteEdit.startService(intent);
-
+				
 				dialog.dismiss();
 			}
 		});
+		
 	}
 
 	public long getDa() {
@@ -174,8 +202,17 @@ public class InitiateAlarmButtons {
 		noteEdit.sendBroadcast(i);
 	}
 
-	private void showNewTimePickerDialog() {
-		new TimePickerDialog(noteEdit, t, myCalendar.get(Calendar.HOUR_OF_DAY),
-				myCalendar.get(Calendar.MINUTE), true).show();
-	}
+public void dimiss() {
+	if(dialog!= null)dialog.dismiss();
 }
+public boolean isDialogShowing(){
+	  if(dialog!=null && dialog.isShowing())return true;
+	  return false;
+	 }
+
+public void newFragment(){
+	DialogFragment newFragment;
+	 newFragment = new TimePickerFragment(inn);
+	 newFragment.show( mangerSupport , "timePicker");
+}
+}// -- End Class

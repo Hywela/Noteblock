@@ -19,7 +19,12 @@ package noteedit;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+
+import android.app.Fragment.SavedState;
+
+import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,6 +32,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,10 +44,13 @@ import android.widget.ToggleButton;
 
 import com.example.ass2note.R;
 import com.example.ass2note.alarm.AlarmManagerService;
+import com.example.ass2note.alarm.DatePickerFragment;
 import com.example.ass2note.location.GoogleMapsActivity;
 import com.example.ass2note.notepad.NotesDbAdapter;
+import com.google.android.maps.MyLocationOverlay;
 
-public class NoteEdit extends Activity {
+@TargetApi(11)
+public class NoteEdit extends FragmentActivity {
 	private static final int MAPSINTENT_ID = 1;
 	private NotesDbAdapter mDbHelper;
 	private Long mRowId;
@@ -47,9 +58,9 @@ public class NoteEdit extends Activity {
 	private NoteEditLayoutManager layoutManager;
 	private NoteEditSavePopulate savePopulateManager;
 	private IntentFilter intentFilter;
-
 	private ToggleButton showAlarmInfo;
 	private boolean gpsEnabled = false, networkEnabled = false;
+	public boolean DialogCheck;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +88,9 @@ public class NoteEdit extends Activity {
 		cancelNotificationOnPanel();
 		
 		layoutManager.displayAlarmInfo();
+		//initiateAlarmButtons.DateCheck = false;
+		
+		
 	}
 
 	private void cancelNotificationOnPanel(){
@@ -91,6 +105,12 @@ public class NoteEdit extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		 if(initiateAlarmButtons.isDialogShowing())DialogCheck = true;
+		  else DialogCheck = false;
+		  
+		
+				initiateAlarmButtons.dimiss();
+		
 		savePopulateManager.closeDB();
 	}
 
@@ -131,9 +151,12 @@ public class NoteEdit extends Activity {
 		alarmButton.setOnClickListener(new View.OnClickListener() {
 			// ON click ALARM
 			public void onClick(View v) {
-				initiateAlarmButtons.initiateAlarmButtonDialog();
+				
+				initiateAlarmButtons.initiateAlarmButtonDialog(getSupportFragmentManager(),initiateAlarmButtons);
 			}
 		});
+		
+		
 	}
 
 	@Override
@@ -143,6 +166,12 @@ public class NoteEdit extends Activity {
 
 		outState.putSerializable(NotesDbAdapter.KEY_ROWID, mRowId);
 		outState.putParcelable("alarmToggle", showAlarmInfo.onSaveInstanceState());
+		 
+		if(initiateAlarmButtons.isDialogShowing())DialogCheck = true;
+		  else DialogCheck = false;
+		
+		outState.putBoolean("dialog", DialogCheck);
+		
 	}
 
 	@Override
@@ -150,6 +179,13 @@ public class NoteEdit extends Activity {
 		super.onRestoreInstanceState(savedInstanceState);
 		showAlarmInfo.onRestoreInstanceState(savedInstanceState.getParcelable("alarmToggle"));
 		layoutManager.showAlarmLayout();
+		DialogCheck = savedInstanceState.getBoolean("dialog");
+		if (DialogCheck){
+			
+			initiateAlarmButtons.initiateAlarmButtonDialog(getSupportFragmentManager(),initiateAlarmButtons);
+		}
+	
+		
 	}
 
 	@Override

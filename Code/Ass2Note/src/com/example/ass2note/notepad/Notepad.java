@@ -23,6 +23,8 @@ import java.util.Date;
 
 import noteedit.NoteEdit;
 
+import android.app.DialogFragment;
+import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -46,6 +48,7 @@ import com.example.ass2note.R;
 import com.example.ass2note.alarm.AlarmManagerService;
 import com.example.ass2note.alarm.AlarmReceiver;
 
+
 public class Notepad extends ListActivity {
 	private PendingIntent pendingIntent;
 	private static final int ACTIVITY_CREATE = 0;
@@ -66,7 +69,7 @@ public class Notepad extends ListActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		Log.i("Notepad", " oncreated");
 		setContentView(R.layout.noteblock_activity);
 		mDbHelper = new NotesDbAdapter(this);
