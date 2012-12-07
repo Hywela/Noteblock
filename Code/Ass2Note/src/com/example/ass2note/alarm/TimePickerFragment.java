@@ -48,10 +48,9 @@ public void onSaveInstanceState(Bundle outState) {
 	super.onSaveInstanceState(outState);
 	
 	outState.putParcelable("key", initi);
-	initi.dimiss();
+	
 	
 }
-
 
 
 }

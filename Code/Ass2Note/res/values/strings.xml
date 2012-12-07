@@ -31,4 +31,5 @@
     <string name="pin_title">Do you want to be reminded close to this location?</string>
     <string name="network_alert">Please make sure your Network Connection is ON</string>
     <string name="toast_set_alarm">The alarm has been set at:</string>
+    <string name="no_alarm_has_been_set">The time is older then current date, No alaram has been set</string>
 </resources>

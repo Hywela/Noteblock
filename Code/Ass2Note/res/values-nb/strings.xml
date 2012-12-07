@@ -31,4 +31,5 @@
     <string name="pin_title">Vil du bli påminnet i nærheten av denne lokasjonen?</string>
     <string name="network_alert">Vennligst sjekk nettverkstilgangen.</string>
     <string name="toast_set_alarm">Alarmen er satt til:</string>
+    <string name="no_alarm_has_been_set">Tiden er utgått, Ingen alarm er satt</string>
 </resources>

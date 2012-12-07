@@ -139,9 +139,7 @@ public class InitiateAlarmButtons implements Parcelable {
 			updateTime();
 			
 		}else {
-			Toast.makeText(noteEdit, "Illegal time", Toast.LENGTH_SHORT).show();
-			
-			newFragment();
+			Toast.makeText(noteEdit, R.string.no_alarm_has_been_set , Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -218,6 +216,7 @@ public void newFragment(){
 	DialogFragment newFragment;
 	 newFragment = new TimePickerFragment(inn);
 	 newFragment.show( mangerSupport , "timePicker");
+	 newFragment = null;
 }
 
 public int describeContents() {
