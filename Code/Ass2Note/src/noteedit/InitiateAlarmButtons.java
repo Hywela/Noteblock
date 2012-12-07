@@ -139,7 +139,11 @@ public class InitiateAlarmButtons implements Parcelable {
 			updateTime();
 			
 		}else {
-			Toast.makeText(noteEdit, R.string.no_alarm_has_been_set , Toast.LENGTH_SHORT).show();
+			
+			// We are postponing this since its a bug we dont have time to fix and the this point in time.
+			// Its just that is shows up all the time when orientating the phone since it wont save the time untile The
+			// timepicker has sett the time.
+			//Toast.makeText(noteEdit, R.string.no_alarm_has_been_set , Toast.LENGTH_SHORT).show();
 		}
 	}
 
