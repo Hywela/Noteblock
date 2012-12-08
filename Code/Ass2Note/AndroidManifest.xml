@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="noteBlock.ass2note"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="2"
+    android:versionName="1.1" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="noteedit.NoteEdit"
+            android:name=".noteedit.NoteEdit"
             android:parentActivityName=".notepad.Notepad" >
            
         </activity>
@@ -36,11 +36,6 @@
             android:name=".location.GoogleMapsActivity"
             android:theme="@android:style/Theme.Dialog" >
         </activity>
-        <activity android:name=".location.UseGps" >
-        </activity>
-
-        <service android:name=".location.TimeAndDate" >
-        </service>
         <service
             android:name=".location.FindPositionService"
             android:process=":my_process" >
