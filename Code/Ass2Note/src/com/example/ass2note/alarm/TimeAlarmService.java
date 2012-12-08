@@ -86,7 +86,7 @@ public class TimeAlarmService extends IntentService {
 				new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.ic_launcher)
 				.setContentTitle(getString(R.string.notification_title))
-				.setContentText(getString(R.string.notification_content) + title);
+				.setContentText(title);
 		
 		/* Set the notification on the panel to remove itself when the user 
 		   presses it.*/

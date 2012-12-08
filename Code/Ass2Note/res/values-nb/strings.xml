@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NoteBlock</string>
-    <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Instillinger</string>
     <string name="title_activity_main">NoteBlock</string>
     <string name="title_activity_note">NoteBlock</string>
@@ -27,9 +26,11 @@
 	<string name="no_time_alarm">Ingen tidsbasert alarm ennå.</string>
 	<string name="no_position_alarm">Ingen posisjonsbasert alarm ennå.</string>
     <string name="notification_title">NoteBlock Alarm!</string>
-    <string name="notification_content">Du har blitt påminnet av: </string>
+    <string name="position_notification_content">Du har nådd posisjonen til: </string>
     <string name="pin_title">Vil du bli påminnet i nærheten av denne lokasjonen?</string>
     <string name="network_alert">Vennligst sjekk nettverkstilgangen.</string>
     <string name="toast_set_alarm">Alarmen er satt til:</string>
     <string name="no_alarm_has_been_set">Tiden er utgått, Ingen alarm er satt</string>
+    <string name="no_maps_alert">Har du lyst til å bli påminnet ved posisjon?</string>
+   	<string name="start_google_maps">Start Google Maps</string>
 </resources>

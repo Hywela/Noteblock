@@ -67,8 +67,8 @@ public class NoteEditLayoutManager{
 	private void createNoMapsAlert(){
 		// Use the Builder class for convenient dialog construction
 		AlertDialog.Builder builder = new AlertDialog.Builder(noteEdit);
-		builder.setMessage("Would you like to be reminded by position?")
-				.setPositiveButton("Start Google Maps!",
+		builder.setMessage(R.string.no_maps_alert)
+				.setPositiveButton(R.string.start_google_maps,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int id) {
@@ -76,7 +76,7 @@ public class NoteEditLayoutManager{
 								// FIRE ZE MISSILES!
 							}
 						})
-				.setNegativeButton("Cancel",
+				.setNegativeButton(R.string.cancel,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int id) {

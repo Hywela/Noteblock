@@ -20,14 +20,14 @@ public class FindPositionService extends Service {
 	public static final String EXTRA_MESSENGER = "com.example.ass2note.location.EXTRA_MESSENGER";
 	private static final int TWO_MINUTES = 1000 * 60 * 2;
 	private LocationManager mLocationManager;
+	private Location lastKnownLocation, networkLocation, gpsLocation;
 	private Bundle extras;
 	private Messenger messenger;
 	private LocationListener networkListener, gpsListener, bestListener;
-	private Location mobileLocation;
-	private boolean networkEnabled=false, gpsEnabled=false;
-	private Timer timeout;
+	private boolean networkEnabled = false, gpsEnabled = false;
+	private boolean networkChecked=false, gpsChecked=false;
+	private Timer timeout, gpsTimeout, networkTimeout;
 	private String from = "";
-	
 
 	public FindPositionService() {
 		super();
@@ -48,11 +48,17 @@ public class FindPositionService extends Service {
 	@Override
 	public void onDestroy() {
 		Log.i("FindPositionService", "destroyed service");
-//		boolean networkProviderEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-/*		boolean gpsProviderEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);*/
-//		if (networkProviderEnabled)	mLocationManager.removeUpdates(networkListener);
-	/*	if (gpsProviderEnabled)
-			mLocationManager.removeUpdates(gpsListener);*/
+		// boolean networkProviderEnabled =
+		// mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+		/*
+		 * boolean gpsProviderEnabled =
+		 * mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		 */
+		// if (networkProviderEnabled)
+		// mLocationManager.removeUpdates(networkListener);
+		/*
+		 * if (gpsProviderEnabled) mLocationManager.removeUpdates(gpsListener);
+		 */
 
 		super.onDestroy();
 		// Code to execute when the service is shutting down
@@ -64,115 +70,36 @@ public class FindPositionService extends Service {
 		Log.i("FindPositionService", "onstart");
 
 		// Acquire a reference to the system Location Manager.
-		mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		
+		mLocationManager = (LocationManager) this
+				.getSystemService(Context.LOCATION_SERVICE);
+
 		extras = intent.getExtras();
 		messenger = (Messenger) extras.get(EXTRA_MESSENGER);
 		networkEnabled = intent.getBooleanExtra("networkEnabled", false);
 		gpsEnabled = intent.getBooleanExtra("gpsEnabled", false);
-		from = intent.getStringExtra("from");
+		from = intent.getStringExtra("from");;
 
-//			getLastKnownLocation(extras.getBoolean("networkEnabled"), extras.getBoolean("gpsEnabled"));
-		/*
-		 * if(extras.containsKey("gpsEnabled")){ boolean gpsEnabled =
-		 * extras.getBoolean("gpsEnabled"); boolean networkEnabled =
-		 * extras.getBoolean("networkEnabled");
-		 */
-		// TODO: Make so that only googlemapsactivity calls this sequence of codes.
-//		if(networkEnabled) findNetworkLocation();
-//		else findGpsLocation();
-		
-		
-//		 findGpsLocation();
-		
 		// The caller only wish to get a rough estimate of the user's location.
-		if(from.contains("GoogleMapsActivity"))	findBestLocation();
-		
+		if (from.contains("GoogleMapsActivity"))
+			findBestLocation();
+
 		// The caller wish to get a fine estimate of the user's location:
-		else if(from.contains("LocationAlarmService")){
-			if(gpsEnabled) findGpsLocation();
+		else if (from.contains("LocationAlarmService")) {
+			if (gpsEnabled)	findGpsLocation();
+			else gpsChecked = true;
+			
+			if(networkEnabled) findNetworkLocation();
+			else networkChecked = true;
 		}
-		
+
 		return super.onStartCommand(intent, flags, startId);
-	}
-
-	
-	 public void findNetworkLocation() {
-		Log.i("FindPositionService", "findNetworkLocation");
-
-		// Define a listener that responds to location updates.
-		// It is called when a new location is found by the network location
-		// provider.
-		networkListener = new LocationListener() {
-			public void onLocationChanged(Location location) {
-				Log.i("FindPositionService","networkListener registered position on onLocationChanged");
-				timeout.cancel();
-				mLocationManager.removeUpdates(this);
-				sendLocationMessage(location.getLatitude() * 1000000,
-						location.getLongitude() * 1000000);
-			}
-
-			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
-				System.out.println("network status changed");
-			}
-
-			public void onProviderEnabled(String provider) {
-				System.out.println("network provider enabled");
-			}
-
-			public void onProviderDisabled(String provider) {
-				System.out.println("network provider disabled");
-			}
-		};
-
-		mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, networkListener);
-		
-		timeout=new Timer();
-		timeout.schedule(new GetLastLocation(), 10000);
-	}
-
-	public void findGpsLocation() {
-		Log.i("FindPositionService", "findGPSLocation");
-
-		// Define a listener that responds to location updates.
-		// It is called when a new location is found by the network location
-		// provider.
-		gpsListener = new LocationListener() {
-			public void onLocationChanged(Location location) {
-				Log.i("FindPositionService", "GpsListener registered position on onLocationChanged");
-				timeout.cancel();
-				mLocationManager.removeUpdates(this);
-				sendLocationMessage(location.getLatitude() * 1000000,
-						location.getLongitude() * 1000000);
-			}
-
-			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
-				System.out.println("gps status changed");
-			}
-
-			public void onProviderEnabled(String provider) {
-				System.out.println("gps provider enabled");
-			}
-
-			public void onProviderDisabled(String provider) {
-				System.out.println("gps provider disabled");
-			}
-		};
-
-		// Register the listener with the Location Manager to receive location
-		// updates
-		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, gpsListener);
-
-		timeout=new Timer();
-		timeout.schedule(new GetLastLocation(), 30000);
 	}
 
 	private void findBestLocation() {
 		bestListener = new LocationListener() {
 			public void onLocationChanged(Location location) {
-				Log.i("FindPositionService", "LocationListener registered position on onLocationChanged");
+				Log.i("FindPositionService",
+						"LocationListener registered position on onLocationChanged");
 				timeout.cancel();
 				mLocationManager.removeUpdates(this);
 				sendLocationMessage(location.getLatitude() * 1000000,
@@ -198,16 +125,127 @@ public class FindPositionService extends Service {
 													// want
 		final String PROVIDER = mLocationManager.getBestProvider(c, true);
 		mLocationManager.requestLocationUpdates(PROVIDER, 0, 0, bestListener);
-		
-		/* 
-		 * Create a timeout that will run after 9 seconds, so the user don't 
-		 * have to wait 
+
+		/*
+		 * Create a timeout that will run after 9 seconds, so the user don't
+		 * have to wait
 		 */
-		timeout=new Timer();
+		timeout = new Timer();
 		timeout.schedule(new GetLastLocation(), 9000);
 	}
 
+	public void findNetworkLocation() {
+		Log.i("FindPositionService", "findNetworkLocation");
+
+		// Define a listener that responds to location updates.
+		// It is called when a new location is found by the network location
+		// provider.
+		networkListener = new LocationListener() {
+			public void onLocationChanged(Location location) {
+				Log.i("FindPositionService",
+						"networkListener registered position on onLocationChanged");
+				networkTimeout.cancel();
+				mLocationManager.removeUpdates(this);
+				networkLocation = location;
+				networkChecked = true;
+				
+				if(gpsChecked){
+					if(gpsLocation != null){
+						boolean networkIsBest = isBetterLocation(networkLocation, gpsLocation);
+						if(networkIsBest)
+							sendLocationMessage(
+									networkLocation.getLatitude() * 1000000,
+									networkLocation.getLongitude() * 1000000);
+						else
+							sendLocationMessage(
+									gpsLocation.getLatitude() * 1000000,
+									gpsLocation.getLongitude() * 1000000);
+					}else
+						sendLocationMessage(
+								networkLocation.getLatitude() * 1000000,
+								networkLocation.getLongitude() * 1000000);
+				}
+			}
+
+			public void onStatusChanged(String provider, int status,
+					Bundle extras) {
+				System.out.println("network status changed");
+			}
+
+			public void onProviderEnabled(String provider) {
+				System.out.println("network provider enabled");
+			}
+
+			public void onProviderDisabled(String provider) {
+				System.out.println("network provider disabled");
+			}
+		};
+
+		mLocationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 0, 0, networkListener);
+
+		networkTimeout = new Timer();
+		networkTimeout.schedule(new GetLastLocation(), 10000);
+	}
 	
+
+	public void findGpsLocation() {
+		Log.i("FindPositionService", "findGPSLocation");
+
+		// Define a listener that responds to location updates.
+		// It is called when a new location is found by the network location
+		// provider.
+		gpsListener = new LocationListener() {
+			public void onLocationChanged(Location location) {
+				Log.i("FindPositionService", "GpsListener registered position on onLocationChanged");
+				gpsTimeout.cancel();
+				mLocationManager.removeUpdates(this);
+				gpsLocation = location;
+				gpsChecked = true;
+				
+				/* If the networkListener already found the user's location 
+					or had a timeout: */
+				if(networkChecked){
+					if(networkLocation != null){
+						boolean networkIsBest = isBetterLocation(networkLocation, gpsLocation);
+						if(networkIsBest)
+							sendLocationMessage(
+									networkLocation.getLatitude() * 1000000,
+									networkLocation.getLongitude() * 1000000);
+						else
+							sendLocationMessage(
+									gpsLocation.getLatitude() * 1000000,
+									gpsLocation.getLongitude() * 1000000);
+					}else
+						sendLocationMessage(
+								gpsLocation.getLatitude() * 1000000,
+								gpsLocation.getLongitude() * 1000000);
+				}
+			}
+
+			public void onStatusChanged(String provider, int status,
+					Bundle extras) {
+				System.out.println("gps status changed");
+			}
+
+			public void onProviderEnabled(String provider) {
+				System.out.println("gps provider enabled");
+			}
+
+			public void onProviderDisabled(String provider) {
+				System.out.println("gps provider disabled");
+			}
+		};
+
+		// Register the listener with the Location Manager to receive location
+		// updates
+		mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+				0, 0, gpsListener);
+
+		gpsTimeout = new Timer();
+		gpsTimeout.schedule(new GetLastLocation(), 30000);
+	}
+
 	private void sendLocationMessage(double latitude, double longitude) {
 		Bundle bundle = new Bundle();
 		bundle.putDouble("LATITUDE", latitude);
@@ -287,41 +325,77 @@ public class FindPositionService extends Service {
 		return provider1.equals(provider2);
 	}
 
-
-	private boolean getLastKnownLocation(){
-		if(networkEnabled)
-			mobileLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+	private boolean getLastKnownLocation() {
+		if (networkEnabled)
+			lastKnownLocation = mLocationManager
+					.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 		else
-			mobileLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		
-		if(mobileLocation!=null){
-			sendLocationMessage(mobileLocation.getLatitude() * 1000000,	mobileLocation.getLongitude() * 1000000);
+			lastKnownLocation = mLocationManager
+					.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+		if (lastKnownLocation != null) {
+			sendLocationMessage(lastKnownLocation.getLatitude() * 1000000,
+					lastKnownLocation.getLongitude() * 1000000);
 			return true;
 		}
 		return false;
 	}
+
 	
 	class GetLastLocation extends TimerTask {
-        @Override
-        public void run() {
-        	Log.i("FindPositionService", "GetLastLocation running");
-        	
-        	if(bestListener != null) mLocationManager.removeUpdates(bestListener);
-        	
-        	if(networkListener!=null) mLocationManager.removeUpdates(networkListener);
-        	else if(gpsListener!=null) mLocationManager.removeUpdates(gpsListener);
-        	
-        	// If no last-known-location was found either, return null.
-        	if(!getLastKnownLocation()){
-        		Message msg = Message.obtain();
-        		try { messenger.send(msg);
-        		} catch (android.os.RemoteException e1) {
-        			Log.w(getClass().getName(), "Exception sending message", e1);
-        		}
-        	}
-             
-        }
-    }
+		
+		@Override
+		public void run() {
+			Log.i("FindPositionService", "GetLastLocation running");
+
+			if (bestListener != null) {
+				Log.i("FindPositionService",
+						"TImertask maybe called from bestListener");
+				mLocationManager.removeUpdates(bestListener);
+
+				// If no last-known-location was found either, return null.
+				if (!getLastKnownLocation()) {
+					returnEmptyMessage();
+				}
+			}
+			
+			// If the gpsListener couldnt find the user's location:
+			if (gpsListener != null) {
+				Log.i("FindPositionService", "Timertask maybe called from gpsListener");
+				mLocationManager.removeUpdates(gpsListener);
+				gpsChecked = true;
+				
+				if(networkChecked && networkLocation==null) returnEmptyMessage();
+				else if(networkChecked && networkLocation!=null){
+					sendLocationMessage(networkLocation.getLatitude() * 1000000,
+							networkLocation.getLongitude() * 1000000);
+				}
+			}
+
+			if (networkListener != null) {
+				Log.i("FindPositionService", "Timertask maybe called from gpsListener");
+				mLocationManager.removeUpdates(networkListener);
+				networkChecked = true;
+				
+				// If the listeners couldn't find the user's location at all:
+				if(gpsChecked && gpsLocation==null) returnEmptyMessage();
+				else if(gpsChecked && gpsLocation!=null){
+					sendLocationMessage(gpsLocation.getLatitude() * 1000000,
+							gpsLocation.getLongitude() * 1000000);
+				}
+			}
+
+		}
+	}
 	
-	
+	public void returnEmptyMessage(){
+		Message msg = Message.obtain();
+		try {
+			messenger.send(msg);
+		} catch (android.os.RemoteException e1) {
+			Log.w(getClass().getName(),
+					"Exception sending message", e1);
+		}
+	}
+
 }
