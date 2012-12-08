@@ -100,6 +100,10 @@ public class TimeAlarmService extends IntentService {
 				.setContentTitle(getString(R.string.notification_title))
 				.setContentText(title);
 		
+		long vibraPattern[] = {0, 500, 250, 500};
+		mBuilder.setVibrate(vibraPattern);
+		mBuilder.setLights(0xff00ff00, 300, 1000);
+		
 		/* Set the notification on the panel to remove itself when the user 
 		   presses it.*/
 		mBuilder.setAutoCancel(true);

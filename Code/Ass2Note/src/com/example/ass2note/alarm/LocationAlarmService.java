@@ -317,6 +317,10 @@ public class LocationAlarmService extends Service {
 				.setContentText(getString(R.string.position_notification_content)
 								+ titleList.get(number).toString());
 
+		long vibraPattern[] = {0, 500, 250, 500};
+		mBuilder.setVibrate(vibraPattern);
+		mBuilder.setLights(0xff00ff00, 300, 1000);
+		
 		/*
 		 * Set the notification on the panel to remove itself when the user
 		 * presses it.
