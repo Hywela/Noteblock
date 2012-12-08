@@ -1,36 +1,24 @@
-package ass2note.noteedit;
+package noteBlock.ass2note.noteedit;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import android.annotation.TargetApi;
-import android.app.DatePickerDialog;
+import noteBlock.ass2note.R;
+import noteBlock.ass2note.alarm.DatePickerFragment;
+import noteBlock.ass2note.alarm.TimePickerFragment;
+import noteBlock.ass2note.location.ConnectionService;
 import android.app.Dialog;
-
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
 import android.widget.ToggleButton;
-import ass2note.alarm.DatePickerFragment;
-import ass2note.alarm.TimePickerFragment;
-import ass2note.location.ConnectionService;
 
-import com.example.ass2note.R;
 
 public class InitiateAlarmButtons implements Parcelable {
 	 private int mData;

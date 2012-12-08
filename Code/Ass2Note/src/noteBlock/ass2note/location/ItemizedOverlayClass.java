@@ -1,9 +1,10 @@
-package ass2note.location;
+package noteBlock.ass2note.location;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import noteBlock.ass2note.R;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -14,7 +15,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.util.Log;
 
-import com.example.ass2note.R;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;

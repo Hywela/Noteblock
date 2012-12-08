@@ -1,8 +1,8 @@
-package ass2note.location;
+package noteBlock.ass2note.location;
 
+import noteBlock.ass2note.R;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -13,7 +13,6 @@ import android.os.Messenger;
 import android.util.Log;
 import android.view.View;
 
-import com.example.ass2note.R;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapController;
 import com.google.android.maps.MapView;

@@ -1,23 +1,13 @@
-/*
- * Copyright (C) 2008 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
-package ass2note.noteedit;
+
+package noteBlock.ass2note.noteedit;
 
 import java.text.SimpleDateFormat;
 
+import noteBlock.ass2note.R;
+import noteBlock.ass2note.alarm.AlarmManagerService;
+import noteBlock.ass2note.location.GoogleMapsActivity;
+import noteBlock.ass2note.notepad.NotesDbAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -36,11 +26,7 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import ass2note.alarm.AlarmManagerService;
-import ass2note.location.GoogleMapsActivity;
-import ass2note.notepad.NotesDbAdapter;
 
-import com.example.ass2note.R;
 
 
 

@@ -1,8 +1,9 @@
-package ass2note.noteedit;
+package noteBlock.ass2note.noteedit;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import noteBlock.ass2note.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,7 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import com.example.ass2note.R;
 
 
 

@@ -1,4 +1,4 @@
-package ass2note.alarm;
+package noteBlock.ass2note.alarm;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

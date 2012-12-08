@@ -1,5 +1,8 @@
-package ass2note.alarm;
+package noteBlock.ass2note.alarm;
 
+import noteBlock.ass2note.R;
+import noteBlock.ass2note.notepad.Notepad;
+import noteBlock.ass2note.notepad.NotesDbAdapter;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,10 +14,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import ass2note.notepad.Notepad;
-import ass2note.notepad.NotesDbAdapter;
 
-import com.example.ass2note.R;
 
 /*
  * Her kan du kode alt som skal skje dersom alarmen gjekk av. Dette er ganske

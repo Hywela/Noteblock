@@ -1,14 +1,14 @@
-package ass2note.noteedit;
+package noteBlock.ass2note.noteedit;
 
 import java.text.SimpleDateFormat;
 
+import noteBlock.ass2note.R;
+import noteBlock.ass2note.notepad.NotesDbAdapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 import android.widget.EditText;
-import ass2note.notepad.NotesDbAdapter;
 
-import com.example.ass2note.R;
 
 public class NoteEditSavePopulate {
 	private NoteEdit noteEdit;

@@ -1,8 +1,12 @@
-package ass2note.alarm;
+package noteBlock.ass2note.alarm;
 
 import java.util.ArrayList;
 
-
+import noteBlock.ass2note.R;
+import noteBlock.ass2note.location.ConnectionService;
+import noteBlock.ass2note.location.FindPositionService;
+import noteBlock.ass2note.notepad.Notepad;
+import noteBlock.ass2note.notepad.NotesDbAdapter;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -23,12 +27,7 @@ import android.os.Message;
 import android.os.Messenger;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import ass2note.location.ConnectionService;
-import ass2note.location.FindPositionService;
-import ass2note.notepad.Notepad;
-import ass2note.notepad.NotesDbAdapter;
 
-import com.example.ass2note.R;
 
 public class LocationAlarmService extends Service {
 	private static final int NOTIFICATION_DISTANCE = 100; // MAX distance in
