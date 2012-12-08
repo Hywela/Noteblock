@@ -1,4 +1,4 @@
-package com.example.ass2note.location;
+package ass2note.location;
 
 import android.app.Activity;
 import android.app.AlertDialog;

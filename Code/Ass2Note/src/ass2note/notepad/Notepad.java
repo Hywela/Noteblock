@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.example.ass2note.notepad;
+package ass2note.notepad;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-import noteedit.NoteEdit;
 
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
@@ -43,10 +42,11 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
+import ass2note.alarm.AlarmManagerService;
+import ass2note.alarm.AlarmReceiver;
+import ass2note.noteedit.NoteEdit;
 
 import com.example.ass2note.R;
-import com.example.ass2note.alarm.AlarmManagerService;
-import com.example.ass2note.alarm.AlarmReceiver;
 
 
 public class Notepad extends ListActivity {

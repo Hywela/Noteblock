@@ -1,4 +1,4 @@
-package noteedit;
+package ass2note.noteedit;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -26,11 +26,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import ass2note.alarm.DatePickerFragment;
+import ass2note.alarm.TimePickerFragment;
+import ass2note.location.ConnectionService;
 
 import com.example.ass2note.R;
-import com.example.ass2note.alarm.DatePickerFragment;
-import com.example.ass2note.alarm.TimePickerFragment;
-import com.example.ass2note.location.ConnectionService;
 
 public class InitiateAlarmButtons implements Parcelable {
 	 private int mData;

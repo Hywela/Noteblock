@@ -1,20 +1,12 @@
-package com.example.ass2note.alarm;
+package ass2note.alarm;
 
-import java.io.Serializable;
 import java.util.Calendar;
-import java.util.Date;
-
-import com.example.ass2note.notepad.NotesDbAdapter;
-
-import noteedit.InitiateAlarmButtons;
-
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.widget.DatePicker;
-import android.widget.Toast;
+import ass2note.noteedit.InitiateAlarmButtons;
 
 
 

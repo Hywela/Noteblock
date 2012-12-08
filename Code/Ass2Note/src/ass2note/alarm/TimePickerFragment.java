@@ -1,9 +1,7 @@
-package com.example.ass2note.alarm;
+package ass2note.alarm;
 
-import java.io.ObjectOutputStream.PutField;
 import java.util.Calendar;
 
-import noteedit.InitiateAlarmButtons;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -11,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
 import android.widget.TimePicker;
+import ass2note.noteedit.InitiateAlarmButtons;
 
 
 

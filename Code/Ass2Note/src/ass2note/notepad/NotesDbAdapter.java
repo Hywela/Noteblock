@@ -14,7 +14,7 @@
  * the License.
  */
 
-package com.example.ass2note.notepad;
+package ass2note.notepad;
 
 
 import java.text.SimpleDateFormat;

@@ -1,4 +1,4 @@
-package com.example.ass2note.location;
+package ass2note.location;
 
 import java.util.ArrayList;
 import java.util.List;

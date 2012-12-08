@@ -14,43 +14,35 @@
  * limitations under the License.
  */
 
-package noteedit;
+package ass2note.noteedit;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-
-import android.app.Fragment.SavedState;
-
 import android.app.AlertDialog;
-import android.app.FragmentTransaction;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+import ass2note.alarm.AlarmManagerService;
+import ass2note.location.GoogleMapsActivity;
+import ass2note.notepad.NotesDbAdapter;
 
 import com.example.ass2note.R;
-import com.example.ass2note.alarm.AlarmManagerService;
-import com.example.ass2note.alarm.DatePickerFragment;
-import com.example.ass2note.location.GoogleMapsActivity;
-import com.example.ass2note.notepad.NotesDbAdapter;
-import com.google.android.maps.MyLocationOverlay;
+
+
 
 @TargetApi(11)
 public class NoteEdit extends FragmentActivity {
