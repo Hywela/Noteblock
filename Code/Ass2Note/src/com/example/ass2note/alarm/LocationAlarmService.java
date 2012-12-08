@@ -12,6 +12,9 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.location.Location;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -248,6 +251,7 @@ public class LocationAlarmService extends Service {
 					System.out.println("NOOOOTIFICATION ALERT!!");
 					notifyDatabase(number); // Update the DB.
 					notifyUser(number); // Notify the user.
+					notifyUserWithSound();
 				} else
 					Log.i("LocationAlarmService", "user is still too far away");
 			} else
@@ -293,6 +297,14 @@ public class LocationAlarmService extends Service {
 		startService(i);
 	}
 
+	private void notifyUserWithSound(){
+		 try {
+		        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+		        r.play();
+		    } catch (Exception e) {}
+	}
+	
 	/**
 	 * Method for notifying the user with (lights, vibration, sound and) a note
 	 * on the panel. TODO: Add lights, vibration, sound?

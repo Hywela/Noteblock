@@ -15,6 +15,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -49,6 +52,7 @@ public class TimeAlarmService extends IntentService {
 		notifyDatabase();
 		getNotificationInfo();
 		notifyUser();
+		notifyUserWithSound();
 
 		startTimeAlarm();
 
@@ -74,6 +78,14 @@ public class TimeAlarmService extends IntentService {
 		if(note.moveToFirst()){
 			title = note.getString(note.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
 		}
+	}
+	
+	private void notifyUserWithSound(){
+		 try {
+		        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		        Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+		        r.play();
+		    } catch (Exception e) {}
 	}
 	
 	/**
