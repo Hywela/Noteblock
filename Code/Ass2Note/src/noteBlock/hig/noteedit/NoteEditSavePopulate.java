@@ -9,7 +9,7 @@ import android.database.Cursor;
 import android.util.Log;
 import android.widget.EditText;
 
-
+	
 public class NoteEditSavePopulate {
 	private NoteEdit noteEdit;
 	private NotesDbAdapter mDbHelper;
@@ -26,7 +26,7 @@ public class NoteEditSavePopulate {
 		noteEdit = (NoteEdit) con;
 		mDbHelper = dbHelper;
 		mRowId = rowId;
-
+		
 		mTitleText = (EditText) noteEdit.findViewById(R.id.title);
 		mBodyText = (EditText) noteEdit.findViewById(R.id.body);
 	}
@@ -96,9 +96,12 @@ public class NoteEditSavePopulate {
 		Log.i("NoteEditSave", "time is: "+ dateFormat.format(time));
 		Log.i("NoteEditSave", "timereminder is: "+ timeReminder);
 		if (mRowId == null) {
+			
+			
 			long id = mDbHelper.createNote(mTitleText.getText().toString(),
 					mBodyText.getText().toString(), time, longitude, latitude,
 					positionReminder, snippet, timeReminder);
+			 
 			if (id > 0) {
 				mRowId = id;
 			}

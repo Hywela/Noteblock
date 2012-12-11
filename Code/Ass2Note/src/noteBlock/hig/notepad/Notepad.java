@@ -104,7 +104,7 @@ public class Notepad extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
 		menu.add(0, INSERT_ID, 0, R.string.menu_insert);
-		menu.add(0, INSERT_GPS, 0, R.string.menu_gps);
+		
 		return true;
 	}
 
@@ -113,10 +113,6 @@ public class Notepad extends ListActivity {
 		switch (item.getItemId()) {
 		case INSERT_ID:
 			createNote();
-
-		case INSERT_GPS:
-			// TEST CASES
-			return true;
 		}
 		return super.onMenuItemSelected(featureId, item);
 	}

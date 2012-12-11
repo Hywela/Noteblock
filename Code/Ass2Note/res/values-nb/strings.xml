@@ -33,4 +33,6 @@
     <string name="no_alarm_has_been_set">Tiden er utgått, Ingen alarm er satt</string>
     <string name="no_maps_alert">Har du lyst til å bli påminnet ved posisjon?</string>
    	<string name="start_google_maps">Start Google Maps</string>
+   	<string name="noGpsNetwork">Du treng enten gps eller nettverkstilgang for at posisjons-alarmen skal virke.</string>
+   	 <string name="stoppedAlarm">Alarmen har stoppet.</string>
 </resources>

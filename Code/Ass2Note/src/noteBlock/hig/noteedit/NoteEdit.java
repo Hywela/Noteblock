@@ -30,7 +30,7 @@ import android.widget.ToggleButton;
 
 
 
-@TargetApi(11)
+
 public class NoteEdit extends FragmentActivity {
 	private static final int MAPSINTENT_ID = 1;
 	private NotesDbAdapter mDbHelper;
@@ -49,7 +49,7 @@ public class NoteEdit extends FragmentActivity {
 		setContentView(R.layout.note_edit);
 		setTitle(R.string.edit_note);
 
-		Log.i("NoteEdit", "created");
+	//	Log.i("NoteEdit", "created");
 		
 		mDbHelper = new NotesDbAdapter(this);
 		mDbHelper.open();
@@ -93,6 +93,7 @@ public class NoteEdit extends FragmentActivity {
 				initiateAlarmButtons.dimiss();
 		
 		savePopulateManager.closeDB();
+		mDbHelper.close();
 	}
 
 	@Override

@@ -30,33 +30,22 @@ import android.util.Log;
 
 
 public class LocationAlarmService extends Service {
-	private static final int NOTIFICATION_DISTANCE = 100; // MAX distance in
-															// meters to when
-															// the user will be
-															// notified.
-	private Intent positionServiceIntent; // Intent for starting
-											// FindPositionService
+	// MAX distance in meters to when the user will be notified.
+	private static final int NOTIFICATION_DISTANCE = 100; 
+
+	private NotesDbAdapter mDbHelper; // The database-class.
+	private Intent positionServiceIntent; // Intent for FindPositionService.
 	private double userLatitude; // The user's latitude position.
 	private double userLongitude; // The user's longitude position.
-	private ArrayList<String> noteLatitudeList; // All latitudes stored in the
-												// DB.
-	private ArrayList<String> noteLongitudeList; // All longitudes stored in the
-													// DB.
-	private ArrayList<String> noteKeyList; // All ID's of the notes stored in
-											// the DB.
-	private ArrayList<String> titleList; // All titles of the notes stored in
-											// the DB.
-	private ArrayList<String> enablePositionList; // A list of validations for
-													// checking if the notes can
-													// be notified.
-	private NotesDbAdapter mDbHelper; // The database-class.
-	private IntentFilter intentFilter;
-	private Context context;
-	private Resources res;
 
-	/**
-	 * Constructor. Called when the service starts.
-	 */
+	// A list of validations for checking if the notes can be notified.
+	private ArrayList<String> enablePositionList;
+	private ArrayList<String> noteLatitudeList; 	// All latitudes.
+	private ArrayList<String> noteLongitudeList; 	// All longitudes.
+	private ArrayList<String> noteKeyList; 			// All ID's of the notes.
+	private ArrayList<String> titleList; 			// All titles of the notes.
+
+	
 	public LocationAlarmService() {
 		super();
 		Log.i("LocationAlarmService", "created service");
@@ -70,16 +59,13 @@ public class LocationAlarmService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		Log.i("LocationAlarmService", "oncreate called");
-
-		context = getApplicationContext();
-		res = context.getResources();
-
-		intentFilter = new IntentFilter(
-				"com.example.ass2note.alarm.LocationAlarmService.LASReceiver");
+		
+		IntentFilter intentFilter = new IntentFilter
+				("com.example.ass2note.alarm.LocationAlarmService.LASReceiver");
 		registerReceiver(LASReceiver, intentFilter);
 
-		mDbHelper = new NotesDbAdapter(this); // Create a new instance of DB.
-		mDbHelper.open(); // Open the DB.
+		mDbHelper = new NotesDbAdapter(this); 	// Create a new instance of DB.
+		mDbHelper.open(); 						// Open the DB.
 
 		// Create new lists for carrying the locations:
 		noteLatitudeList = new ArrayList<String>();
@@ -97,13 +83,6 @@ public class LocationAlarmService extends Service {
 			stopMe();
 	}
 
-	/**
-	 * This onStart is for now not implemented.
-	 * 
-	 * @param intent
-	 * @param flags
-	 * @param startId
-	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i("LocationAlarmService", "onstart called");
@@ -116,32 +95,9 @@ public class LocationAlarmService extends Service {
 		super.onDestroy();
 	}
 
-	/**
-	 * onBind will not bind to any Activity, so it returns null.
-	 */
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
-	}
-
-	/**
-	 * Method for creating an intent to start FindPositionService. A Message is
-	 * sent to FindPositionService so is can return data to this service's
-	 * handler, which is called handy. The data which will be returned is the
-	 * user's current position or null.
-	 */
-	private void startFindPositionService(boolean gpsEnabled,
-			boolean networkEnabled) {
-		Log.i("LocationAlarmService", "StartfindpositionService");
-		// Call FindPositionService for fetching the user's current position:
-		positionServiceIntent = new Intent(LocationAlarmService.this,
-				FindPositionService.class);
-		positionServiceIntent.putExtra(FindPositionService.EXTRA_MESSENGER,
-				new Messenger(handy));
-		positionServiceIntent.putExtra("gpsEnabled", gpsEnabled);
-		positionServiceIntent.putExtra("networkEnabled", networkEnabled);
-		positionServiceIntent.putExtra("from", "LocationAlarmService");
-		startService(positionServiceIntent);
 	}
 
 	/**
@@ -158,39 +114,15 @@ public class LocationAlarmService extends Service {
 
 			// If new location is sent:
 			if (data != null) {
-				System.out.println("data sent: userlati: " + data.getDouble("LATITIUDE") / 1E6);
 				userLatitude = data.getDouble("LATITUDE") / 1E6;
-				System.out.println("data sent2: userlati: " + userLatitude);
 				userLongitude = data.getDouble("LONGITUDE") / 1E6;
-				comparePositions(); // Compare the user's position with all
-									// notes.
+				comparePositions();
+			// If no location was found:
 			} else {
-
-				NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-						LocationAlarmService.this)
-						.setSmallIcon(R.drawable.ic_launcher)
-						.setContentTitle("Stopped positionalarms")
-						.setContentText(
-								"You need either network or gps connection "
-										+ "for the positionalarms to work.");
-
-				/*
-				 * Set the notification on the panel to remove itself when the
-				 * user presses it.
-				 */
-				mBuilder.setAutoCancel(true);
-				Intent notifyIntent = new Intent(LocationAlarmService.this,
-						Notepad.class);
-				PendingIntent intent = PendingIntent.getActivity(
-						LocationAlarmService.this, 444, notifyIntent, 0);
-				mBuilder.setContentIntent(intent);
-
-				NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-				mNotificationManager.notify(444, mBuilder.build());
-
+				notifyUser(getString(R.string.stoppedAlarm), 
+						   getString(R.string.noGpsNetwork), 4444);
 			}
 			
-
 			stopMe(); // Stop this service.
 		}
 	};
@@ -290,8 +222,7 @@ public class LocationAlarmService extends Service {
 	 */
 	private void stopAlarmManager() {
 		Log.i("LocationAlarmService", "stopAlarmManager stopping alarm");
-		Intent i = new Intent(LocationAlarmService.this,
-				AlarmManagerService.class);
+		Intent i = new Intent(LocationAlarmService.this, AlarmManagerService.class);
 		i.putExtra("COMMAND", "Stop Alarm");
 		i.putExtra("alarmType", "position");
 		startService(i);
@@ -309,35 +240,14 @@ public class LocationAlarmService extends Service {
 	 * Method for notifying the user with (lights, vibration, sound and) a note
 	 * on the panel. TODO: Add lights, vibration, sound?
 	 */
+	
 	public void notifyUser(int number) {
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-				this)
-				.setSmallIcon(R.drawable.ic_launcher)
-				.setContentTitle(getString(R.string.notification_title))
-				.setContentText(getString(R.string.position_notification_content)
-								+ titleList.get(number).toString());
-
-		long vibraPattern[] = {0, 500, 250, 500};
-		mBuilder.setVibrate(vibraPattern);
-		mBuilder.setLights(0xff00ff00, 300, 1000);
+		String title = getString(R.string.notification_title);
+		String content = getString(R.string.position_notification_content)
+				+ titleList.get(number).toString();
+		int requestCode = Integer.parseInt(noteKeyList.get(number).toString());
 		
-		/*
-		 * Set the notification on the panel to remove itself when the user
-		 * presses it.
-		 */
-		mBuilder.setAutoCancel(true);
-		Intent notifyIntent = new Intent(this, Notepad.class);
-		notifyIntent.setAction(String.valueOf(number));
-		notifyIntent.putExtra("notificationSuccess", noteKeyList.get(number)
-				.toString());
-		PendingIntent intent = PendingIntent.getActivity(this, 0, notifyIntent,
-				0);
-		mBuilder.setContentIntent(intent);
-
-		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.notify(
-				Integer.parseInt(noteKeyList.get(number).toString()),
-				mBuilder.build());
+		notifyUser(title, content, requestCode);
 	}
 
 	/**
@@ -411,4 +321,49 @@ public class LocationAlarmService extends Service {
 
 	};
 
+
+	/**
+	 * Method for creating an intent to start FindPositionService. A Message is
+	 * sent to FindPositionService so is can return data to this service's
+	 * handler.
+	 */
+	private void startFindPositionService(boolean gpsEnabled, boolean networkEnabled) {
+		Log.i("LocationAlarmService", "StartfindpositionService");
+		
+		// Call FindPositionService for fetching the user's current position:
+		positionServiceIntent = new Intent(LocationAlarmService.this, FindPositionService.class);
+		positionServiceIntent.putExtra(FindPositionService.EXTRA_MESSENGER,	new Messenger(handy));
+		positionServiceIntent.putExtra("gpsEnabled", gpsEnabled);
+		positionServiceIntent.putExtra("networkEnabled", networkEnabled);
+		positionServiceIntent.putExtra("from", "LocationAlarmService");
+		startService(positionServiceIntent);
+	}
+	
+	private void notifyUser(String title, String content, int requestCode){
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
+				LocationAlarmService.this)
+				.setSmallIcon(R.drawable.ic_launcher)
+				.setContentTitle(title)
+				.setContentText(content);
+
+		mBuilder.setAutoCancel(true);
+		Intent notifyIntent = new Intent(LocationAlarmService.this,	Notepad.class);
+		
+		// If the notification is for alerting the user of a note:
+		if(requestCode!=4444){
+			long vibraPattern[] = {0, 500, 250, 500};
+			mBuilder.setVibrate(vibraPattern);
+			mBuilder.setLights(0xff00ff00, 300, 1000);
+			
+			notifyIntent.setAction(String.valueOf(requestCode));
+			notifyIntent.putExtra("notificationSuccess", String.valueOf(requestCode));
+		}
+		
+		PendingIntent intent = PendingIntent.getActivity(LocationAlarmService.this, requestCode, notifyIntent, 0);
+		mBuilder.setContentIntent(intent);
+
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.notify(requestCode, mBuilder.build());
+	}
 }
+
