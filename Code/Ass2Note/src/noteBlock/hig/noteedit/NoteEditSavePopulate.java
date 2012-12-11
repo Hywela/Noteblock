@@ -31,6 +31,14 @@ public class NoteEditSavePopulate {
 		mBodyText = (EditText) noteEdit.findViewById(R.id.body);
 	}
 
+	public String getTitle(){
+		return mTitleText.getText().toString();
+	}
+	
+	public String getBody(){
+		return mBodyText.getText().toString();
+	}
+	
 	public String getPositionReminder() {
 		return positionReminder;
 	}
@@ -143,5 +151,24 @@ public class NoteEditSavePopulate {
 
 	public void closeDB(){
 		mDbHelper.close();
+	}
+	
+	public boolean noTitle(){
+		if ((getTitle()== "" || getTitle()==null)
+		&& ((getBody() != "" || getBody() !=null)
+			|| getLatitude() !="lat" 
+			|| getTime()!=0))
+			return true;
+		return false;
+	}
+	
+	public boolean deadNote(){
+		if ((getTitle()== "" || getTitle()==null)
+		&& ((getBody() == "" || getBody() ==null)
+			|| getLatitude() =="lat" 
+			|| getTime()==0))
+			return true;
+		
+		return false;
 	}
 }

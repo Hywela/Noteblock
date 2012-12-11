@@ -29,15 +29,11 @@ import android.widget.SimpleCursorAdapter;
 
 
 public class Notepad extends ListActivity {
-	private PendingIntent pendingIntent;
 	private static final int ACTIVITY_CREATE = 0;
 	private static final int ACTIVITY_EDIT = 1;
 	private static final int ACTIVITY_GPS = 2;
 	private static final int INSERT_ID = Menu.FIRST;
-	private static final int INSERT_GPS = Menu.CATEGORY_SECONDARY;
 	private static final int DELETE_ID = Menu.FIRST + 1;
-	private ArrayList times = new ArrayList();
-	private ArrayList rowid = new ArrayList();
 	private NotesDbAdapter mDbHelper;
 
 	int aa = 0;
@@ -174,19 +170,20 @@ public class Notepad extends ListActivity {
 		super.onActivityResult(requestCode, resultCode, intent);
 		Log.i("Notepad", "onActivityresult");
 
-		// TODO: This can be called elsewhere.
-		startLocationAlarm();
-
 		if (resultCode == RESULT_OK && requestCode == ACTIVITY_GPS) {
+			// TODO: This can be called elsewhere.
+			startLocationAlarm();
+			
 			if (intent.hasExtra("longitude")) {
 				longi = intent.getExtras().getDouble("longitude");
 			}
 			if (intent.hasExtra("latitude")) {
 				lati = intent.getExtras().getDouble("latitude");
 			}
-
-		} else
+		} else{
+			mDbHelper.deleteNote(rowId)
 			fillData();
+		}
 	}
 
 	protected void onButtonClick() {

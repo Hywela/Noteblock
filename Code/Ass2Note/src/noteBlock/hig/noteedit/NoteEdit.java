@@ -1,5 +1,3 @@
-
-
 package noteBlock.hig.noteedit;
 
 import java.text.SimpleDateFormat;
@@ -8,7 +6,6 @@ import noteBlock.hig.R;
 import noteBlock.hig.alarm.AlarmManagerService;
 import noteBlock.hig.location.GoogleMapsActivity;
 import noteBlock.hig.notepad.NotesDbAdapter;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
@@ -23,13 +20,10 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
-
-
-
 
 public class NoteEdit extends FragmentActivity {
 	private static final int MAPSINTENT_ID = 1;
@@ -49,8 +43,8 @@ public class NoteEdit extends FragmentActivity {
 		setContentView(R.layout.note_edit);
 		setTitle(R.string.edit_note);
 
-	//	Log.i("NoteEdit", "created");
-		
+		// Log.i("NoteEdit", "created");
+
 		mDbHelper = new NotesDbAdapter(this);
 		mDbHelper.open();
 
@@ -58,42 +52,52 @@ public class NoteEdit extends FragmentActivity {
 
 		savePopulateManager = new NoteEditSavePopulate(this, mDbHelper, mRowId);
 		savePopulateManager.populateFields();
-		layoutManager = new NoteEditLayoutManager(this, mRowId, savePopulateManager);
+		layoutManager = new NoteEditLayoutManager(this, mRowId,
+				savePopulateManager);
 		initiateAlarmButtons = new InitiateAlarmButtons(this, layoutManager);
 
 		// Set onClickListeners on buttons.
 		initiateButtons();
 
-		intentFilter = new IntentFilter("com.example.ass2note.notepad.NoteEdit.connectionReceiver");
+		intentFilter = new IntentFilter(
+				"com.example.ass2note.notepad.NoteEdit.connectionReceiver");
 
 		cancelNotificationOnPanel();
-		
+
 		layoutManager.displayAlarmInfo();
-		//initiateAlarmButtons.DateCheck = false;
-		
-		
+		// initiateAlarmButtons.DateCheck = false;
+
 	}
 
-	private void cancelNotificationOnPanel(){
+	private void cancelNotificationOnPanel() {
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		try{
-			mNotificationManager.cancel((Integer.parseInt(String.valueOf(mRowId))));
-		}catch(Exception e){
+		try {
+			mNotificationManager.cancel((Integer.parseInt(String
+					.valueOf(mRowId))));
+		} catch (Exception e) {
 			Log.i("NoteEdit", e.getMessage());
 		}
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		 if(initiateAlarmButtons.isDialogShowing())DialogCheck = true;
-		  else DialogCheck = false;
-		  
-		
-				initiateAlarmButtons.dimiss();
-		
+		if (initiateAlarmButtons.isDialogShowing())
+			DialogCheck = true;
+		else
+			DialogCheck = false;
+
+		initiateAlarmButtons.dimiss();
+
 		savePopulateManager.closeDB();
 		mDbHelper.close();
+
+
+		if(savePopulateManager.deadNote()){
+			Intent i = new Intent();
+			i.putExtra("rowId", mRowId);
+			setResult(Activity.RESULT_CANCELED, i);
+		}
 	}
 
 	@Override
@@ -117,28 +121,39 @@ public class NoteEdit extends FragmentActivity {
 	private void initiateButtons() {
 		Button confirmButton = (Button) findViewById(R.id.confirm);
 		Button alarmButton = (Button) findViewById(R.id.newNoteAlarm);
-		
+
 		showAlarmInfo = (ToggleButton) findViewById(R.id.showAlarmNoteInfo);
 		showAlarmInfo.setSaveEnabled(false);
-		
-		
+
 		confirmButton.setOnClickListener(new View.OnClickListener() {
 			// ON click CONFIRM
 			public void onClick(View view) {
-				setResult(RESULT_OK);
-				finish();
+				
+				if(savePopulateManager.getTitle() != null && savePopulateManager.getTitle()!= ""){
+					setResult(RESULT_OK);
+					finish();
+				}else if(savePopulateManager.noTitle()){
+					alertToast("Please enter a title");
+					EditText mTitleText = (EditText) findViewById(R.id.title);
+					mTitleText.requestFocus();
+				}else{
+					Intent i = new Intent();
+					i.putExtra("rowId", mRowId);
+					setResult(Activity.RESULT_CANCELED, i);
+					finish();
+				}
 			}
 		});
 
 		alarmButton.setOnClickListener(new View.OnClickListener() {
 			// ON click ALARM
 			public void onClick(View v) {
-				
-				initiateAlarmButtons.initiateAlarmButtonDialog(getSupportFragmentManager(),initiateAlarmButtons);
+
+				initiateAlarmButtons.initiateAlarmButtonDialog(
+						getSupportFragmentManager(), initiateAlarmButtons);
 			}
 		});
-		
-		
+
 	}
 
 	@Override
@@ -147,27 +162,31 @@ public class NoteEdit extends FragmentActivity {
 		savePopulateManager.saveState();
 
 		outState.putSerializable(NotesDbAdapter.KEY_ROWID, mRowId);
-		outState.putParcelable("alarmToggle", showAlarmInfo.onSaveInstanceState());
-		 
-		if(initiateAlarmButtons.isDialogShowing())DialogCheck = true;
-		  else DialogCheck = false;
-		
+		outState.putParcelable("alarmToggle",
+				showAlarmInfo.onSaveInstanceState());
+
+		if (initiateAlarmButtons.isDialogShowing())
+			DialogCheck = true;
+		else
+			DialogCheck = false;
+
 		outState.putBoolean("dialog", DialogCheck);
-		
+
 	}
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		showAlarmInfo.onRestoreInstanceState(savedInstanceState.getParcelable("alarmToggle"));
+		showAlarmInfo.onRestoreInstanceState(savedInstanceState
+				.getParcelable("alarmToggle"));
 		layoutManager.showAlarmLayout();
 		DialogCheck = savedInstanceState.getBoolean("dialog");
-		if (DialogCheck){
-			
-			initiateAlarmButtons.initiateAlarmButtonDialog(getSupportFragmentManager(),initiateAlarmButtons);
+		if (DialogCheck) {
+
+			initiateAlarmButtons.initiateAlarmButtonDialog(
+					getSupportFragmentManager(), initiateAlarmButtons);
 		}
-	
-		
+
 	}
 
 	@Override
@@ -199,8 +218,9 @@ public class NoteEdit extends FragmentActivity {
 			// A new location was selected:
 			case Activity.RESULT_OK: {
 				// Fetch the new data:
-				savePopulateManager.savePosition(data.getStringExtra
-						("latitude"), data.getStringExtra("longitude"), 
+				savePopulateManager.savePosition(
+						data.getStringExtra("latitude"),
+						data.getStringExtra("longitude"),
 						data.getStringExtra("snippet"), "true");
 
 				layoutManager.displayAlarmInfo();
@@ -214,58 +234,61 @@ public class NoteEdit extends FragmentActivity {
 	} // end onActivityResult
 
 	private BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
-		  @Override
-		  public void onReceive(Context context, Intent intent) {
-		   String fromCaller = intent.getStringExtra("fromCaller");
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String fromCaller = intent.getStringExtra("fromCaller");
 
-		   if (fromCaller.contains("ConnectionService")) {
-		    checkConnection(intent);
+			if (fromCaller.contains("ConnectionService")) {
+				checkConnection(intent);
 
-		   } else if (fromCaller.contains("InitiateAlarmButtons")) {
-		    Log.i("NoteEdit", "receiver called from InitiateAlarmButtons.");
+			} else if (fromCaller.contains("InitiateAlarmButtons")) {
+				Log.i("NoteEdit", "receiver called from InitiateAlarmButtons.");
 
-		    String command = intent.getStringExtra("command");
-		    if (command.contains("updateTime")) {
-		     SimpleDateFormat dateFormat = new SimpleDateFormat(
-		       "dd-MM-yyyy HH:mm");
-		     long time = intent.getLongExtra("time", 0);
-		     Log.i("NoteEdit", "time is: " + dateFormat.format(time));
+				String command = intent.getStringExtra("command");
+				if (command.contains("updateTime")) {
+					SimpleDateFormat dateFormat = new SimpleDateFormat(
+							"dd-MM-yyyy HH:mm");
+					long time = intent.getLongExtra("time", 0);
+					Log.i("NoteEdit", "time is: " + dateFormat.format(time));
 
-		     savePopulateManager.saveTime(time, "true");
-		     layoutManager.displayAlarmInfo();
+					savePopulateManager.saveTime(time, "true");
+					layoutManager.displayAlarmInfo();
 
-		     alertToast(getString(R.string.toast_set_alarm) + " \n"
-		       + dateFormat.format(time));
+					alertToast(getString(R.string.toast_set_alarm) + " \n"
+							+ dateFormat.format(time));
 
-		     // TODO: Start this at an other place..
-		     startTimeAlarm();
-		    } else if (command.contains("stopTimeAlarm")) {
-		     stopTimeAlarm(intent.getLongExtra("time", 0));
-		    }
-		   }
-		  }
-		 };
+					// TODO: Start this at an other place..
+					startTimeAlarm();
+				} else if (command.contains("stopTimeAlarm")) {
+					stopTimeAlarm(intent.getLongExtra("time", 0));
+				}
+			}
+		}
+	};
 
-		 private void checkConnection(Intent intent) {
-		  gpsEnabled = intent.getBooleanExtra("gpsEnabled", false);
-		  networkEnabled = intent.getBooleanExtra("networkEnabled", false);
+	private void checkConnection(Intent intent) {
+		gpsEnabled = intent.getBooleanExtra("gpsEnabled", false);
+		networkEnabled = intent.getBooleanExtra("networkEnabled", false);
 
-		  if (networkEnabled && gpsEnabled)  startGoogleMaps();
-		  else if (networkEnabled && !gpsEnabled) alertGPSConnection();
-		  else if (!networkEnabled) alertToast(getString(R.string.network_alert));
-		  else Log.e("NoteEdit checkConnection", "Something really weird is going on now...");
-		 }
+		if (networkEnabled && gpsEnabled)
+			startGoogleMaps();
+		else if (networkEnabled && !gpsEnabled)
+			alertGPSConnection();
+		else if (!networkEnabled)
+			alertToast(getString(R.string.network_alert));
+		else
+			Log.e("NoteEdit checkConnection",
+					"Something really weird is going on now...");
+	}
 
-		 private void startGoogleMaps() {
-		  Intent i = new Intent(NoteEdit.this, GoogleMapsActivity.class);
-		  i.putExtra("LATITUDE", savePopulateManager.getLatitude());
-		  i.putExtra("LONGITUDE", savePopulateManager.getLongitude());
-		  i.putExtra("gpsEnabled", gpsEnabled);
-		  i.putExtra("networkEnabled", networkEnabled);
-		  startActivityForResult(i, MAPSINTENT_ID);
-		 }
-	
-
+	private void startGoogleMaps() {
+		Intent i = new Intent(NoteEdit.this, GoogleMapsActivity.class);
+		i.putExtra("LATITUDE", savePopulateManager.getLatitude());
+		i.putExtra("LONGITUDE", savePopulateManager.getLongitude());
+		i.putExtra("gpsEnabled", gpsEnabled);
+		i.putExtra("networkEnabled", networkEnabled);
+		startActivityForResult(i, MAPSINTENT_ID);
+	}
 
 	private void startTimeAlarm() {
 		long closestTime[] = mDbHelper.getClosestTime();
@@ -278,7 +301,7 @@ public class NoteEdit extends FragmentActivity {
 			startService(i);
 		}
 	}
-	
+
 	private void stopTimeAlarm(long time) {
 		if (time > 0) {
 			Intent i = new Intent(this, AlarmManagerService.class);
@@ -296,27 +319,28 @@ public class NoteEdit extends FragmentActivity {
 	}
 
 	private void alertGPSConnection() {
-		  AlertDialog.Builder altDialog = new AlertDialog.Builder(this);
-		  altDialog.setMessage("Please start your GPS and try again. The GPS "
-		    + "needs to be ON all the time for this function to work.");
-		  
-		  altDialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
-		   public void onClick(DialogInterface dialog, int which) {
-		    enableLocationSettings();
-		   }
-		  });
-		  
-		  altDialog.setNegativeButton(R.string.cancel,
-		    new DialogInterface.OnClickListener() {
-		     public void onClick(DialogInterface dialog, int id) {
-		      // User cancelled the dialog
-		     }
-		    });
-		  altDialog.show();
-		 }
+		AlertDialog.Builder altDialog = new AlertDialog.Builder(this);
+		altDialog.setMessage("Please start your GPS and try again. The GPS "
+				+ "needs to be ON all the time for this function to work.");
 
-		 private void enableLocationSettings() {
-		  Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-		  startActivity(settingsIntent);
-		 }
+		altDialog.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				enableLocationSettings();
+			}
+		});
+
+		altDialog.setNegativeButton(R.string.cancel,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						// User cancelled the dialog
+					}
+				});
+		altDialog.show();
+	}
+
+	private void enableLocationSettings() {
+		Intent settingsIntent = new Intent(
+				Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+		startActivity(settingsIntent);
+	}
 }
