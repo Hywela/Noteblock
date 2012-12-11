@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import noteBlock.hig.R;
 import noteBlock.hig.alarm.AlarmManagerService;
 import noteBlock.hig.location.GoogleMapsActivity;
+import noteBlock.hig.notepad.Notepad;
 import noteBlock.hig.notepad.NotesDbAdapter;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,6 +26,12 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+/**
+ * This is a activity thats called from the {@link Notepad}
+ * It Extends FragmentActivity so we can have orientation on the date input
+ * @author Kristoffer Benum , and Solveig Sørheim
+ *
+ */
 public class NoteEdit extends FragmentActivity {
 	private static final int MAPSINTENT_ID = 1;
 	private NotesDbAdapter mDbHelper;

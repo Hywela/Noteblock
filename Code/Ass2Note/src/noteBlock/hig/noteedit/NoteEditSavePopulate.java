@@ -1,3 +1,8 @@
+/**
+ * This is a mainly class for the NoteEdit activity 
+ * This calss basicly helps with saving and updating the notes in the database
+ *  Creation is also apart of it (the note)
+ */
 package noteBlock.hig.noteedit;
 
 import java.text.SimpleDateFormat;
@@ -62,7 +67,9 @@ public class NoteEditSavePopulate {
 	public String getTimeReminder() {
 		return timeReminder;
 	}
-
+	/**
+	 * Populates the lisview with the title of the notes in the database
+	 */
 	public void populateFields() {
 		if (mRowId != null) {
 			Cursor note = mDbHelper.fetchNote(mRowId);
@@ -97,14 +104,13 @@ public class NoteEditSavePopulate {
 		}
 	}
 
-	// Saves the values to the database
+	// Saves the values to the database also creates the note
 	public void saveState() {
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 		Log.i("NoteEditSave", "time is: "+ dateFormat.format(time));
 		Log.i("NoteEditSave", "timereminder is: "+ timeReminder);
 		if (mRowId == null) {
-			
 			
 			long id = mDbHelper.createNote(mTitleText.getText().toString(),
 					mBodyText.getText().toString(), time, longitude, latitude,
@@ -119,7 +125,13 @@ public class NoteEditSavePopulate {
 					positionReminder, snippet, timeReminder);
 		}
 	}
-
+	/**
+	 * Saves the postion 
+	 * @param lati
+	 * @param longi
+	 * @param snipp
+	 * @param posReminder
+	 */
 	public void savePosition(String lati, String longi, String snipp,
 			String posReminder) {
 		System.out.println("savepos");
@@ -129,21 +141,32 @@ public class NoteEditSavePopulate {
 		positionReminder = posReminder;
 		saveState();
 	}
-
+	/**
+	 * Updates the postion
+	 * @param posReminder
+	 */
 	public void updatePositionNotify(String posReminder) {
 		System.out.println("updatepos");
 		positionReminder = posReminder;
 		mDbHelper.updatePositionNotification(mRowId, positionReminder);
 	}
-
+	/**
+	 * Updates the time reminder 
+	 * @param timReminder
+	 */
 	public void updateTimeNotification(String timReminder) {
-		System.out.println("updatetime");
+	//debughelper	//System.out.println("updatetime");
 		timeReminder = timReminder;
 		mDbHelper.updateTimeNotification(mRowId, timReminder);
 	}
 
+	/**
+	 * 
+	 * @param tim Time gotten from user input
+	 * @param timReminder true or false
+	 */
 	public void saveTime(long tim, String timReminder) {
-		System.out.println("savetime");
+	//debughelper	System.out.println("savetime");
 		time = tim;
 		timeReminder = timReminder;
 		saveState();
@@ -152,7 +175,10 @@ public class NoteEditSavePopulate {
 	public void closeDB(){
 		mDbHelper.close();
 	}
-	
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean noTitle(){
 		if ((getTitle()== "" || getTitle()==null)
 		&& ((getBody() != "" || getBody() !=null)
@@ -161,7 +187,10 @@ public class NoteEditSavePopulate {
 			return true;
 		return false;
 	}
-	
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean deadNote(){
 		if ((getTitle()== "" || getTitle()==null)
 		&& ((getBody() == "" || getBody() ==null)
