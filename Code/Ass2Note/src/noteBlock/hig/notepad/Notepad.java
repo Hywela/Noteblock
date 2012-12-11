@@ -181,7 +181,7 @@ public class Notepad extends ListActivity {
 				lati = intent.getExtras().getDouble("latitude");
 			}
 		} else{
-			mDbHelper.deleteNote(rowId)
+		//	mDbHelper.deleteNote(rowId)
 			fillData();
 		}
 	}
