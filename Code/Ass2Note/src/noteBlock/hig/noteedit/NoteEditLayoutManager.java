@@ -8,9 +8,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
@@ -98,6 +100,7 @@ public class NoteEditLayoutManager{
 
 			// If the note was previously initiated with time:
 			if (savePopulate.getTime()!=0) {
+				
 				savePopulate.updateTimeNotification("true");
 				setTimeInfo(true, savePopulate.getTime());
 				updateAlarm("updateTime");

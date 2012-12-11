@@ -68,54 +68,14 @@ public class InitiateAlarmButtons implements Parcelable {
 			}
 		});
 	}
-/*
-	DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
 
-		public void onDateSet(DatePicker view, int year, int monthOfYear,
-				int dayOfMonth) {
-			
-			/*
-			 * The Jelly Bean API has an error and calls DatePicker twice, so we
-			 * need to only call it only once:
-			 */
-/*
-
-			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN) {
-				timesCalledDate++;
-				if ((timesCalledDate % 2) == 0)
-					setDate(year, monthOfYear, dayOfMonth);
-
-				// All other API's calls DatePicker only once.
-			} else
-				setDate(year, monthOfYear, dayOfMonth);
-		}
-	};
-*/
 	public void setDate(int year, int monthOfYear, int dayOfMonth) {
 		myCalendar.set(Calendar.YEAR, year);
 		myCalendar.set(Calendar.MONTH, monthOfYear);
 		myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 	}
-/*
-	TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
-		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			
-			/*
-			 * The Jelly Bean API has an error and calls TimePicker twice, so we
-			 * need to only call it only once:
-			 */
-	/*
-			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN) {
-				timesCalledTime++;
-				if ((timesCalledTime % 2) == 0)	setTime(hourOfDay, minute);
-			} 
-			// All other API's calls DatePicker only once.
-			else setTime(hourOfDay, minute);
 
-		} // end onTimeSet
-	};
-
-*/	public void setTime(int hourOfDay, int minute) {
+	public void setTime(int hourOfDay, int minute) {
 		
 		myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
 		myCalendar.set(Calendar.MINUTE, minute);
@@ -203,7 +163,8 @@ public boolean isDialogShowing(){
 	  if(dialog!=null && dialog.isShowing())return true;
 	  return false;
 	 }
-
+// was supposed to be used is not used because we encountered a bug another place in the code
+// Is still there because if we need it in the future-
 public void newFragment(){
 	DialogFragment newFragment;
 	 newFragment = new TimePickerFragment(inn);

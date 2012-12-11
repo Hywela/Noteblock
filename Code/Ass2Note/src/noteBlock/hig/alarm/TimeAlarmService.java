@@ -114,6 +114,6 @@ public class TimeAlarmService extends IntentService {
 
 	public void notifyDatabase() {
 		Log.i("TimeAlarmService", "trying to notify database. rowId: "+ rowId);
-		mDbHelper.updateTime(rowId, alarmTime, "false");
+		mDbHelper.updateTimeNotification(rowId, "false");
 	}
 }

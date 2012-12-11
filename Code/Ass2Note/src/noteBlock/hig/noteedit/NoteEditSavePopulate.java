@@ -61,6 +61,7 @@ public class NoteEditSavePopulate {
 
 			mTitleText.setText(note.getString(note
 					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE)));
+			
 			mBodyText.setText(note.getString(note
 					.getColumnIndexOrThrow(NotesDbAdapter.KEY_BODY)));
 
@@ -82,7 +83,7 @@ public class NoteEditSavePopulate {
 			timeReminder = note.getString(note
 					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TIME_REMINDER));
 			
-
+				
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 			Log.i("NoteEditPopulate", "time is: "+ dateFormat.format(time));
 			Log.i("NoteEditPopulate", "timereminder is: "+ timeReminder);
