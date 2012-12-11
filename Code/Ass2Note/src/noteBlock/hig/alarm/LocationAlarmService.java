@@ -1,12 +1,12 @@
-package noteBlock.ass2note.alarm;
+package noteBlock.hig.alarm;
 
 import java.util.ArrayList;
 
-import noteBlock.ass2note.R;
-import noteBlock.ass2note.location.ConnectionService;
-import noteBlock.ass2note.location.FindPositionService;
-import noteBlock.ass2note.notepad.Notepad;
-import noteBlock.ass2note.notepad.NotesDbAdapter;
+import noteBlock.hig.R;
+import noteBlock.hig.location.ConnectionService;
+import noteBlock.hig.location.FindPositionService;
+import noteBlock.hig.notepad.Notepad;
+import noteBlock.hig.notepad.NotesDbAdapter;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;

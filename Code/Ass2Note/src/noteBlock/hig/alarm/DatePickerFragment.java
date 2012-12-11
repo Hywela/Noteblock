@@ -1,8 +1,8 @@
-package noteBlock.ass2note.alarm;
+package noteBlock.hig.alarm;
 
 import java.util.Calendar;
 
-import noteBlock.ass2note.noteedit.InitiateAlarmButtons;
+import noteBlock.hig.noteedit.InitiateAlarmButtons;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;

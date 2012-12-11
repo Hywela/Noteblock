@@ -1,9 +1,9 @@
-package noteBlock.ass2note.noteedit;
+package noteBlock.hig.noteedit;
 
 import java.text.SimpleDateFormat;
 
-import noteBlock.ass2note.R;
-import noteBlock.ass2note.notepad.NotesDbAdapter;
+import noteBlock.hig.R;
+import noteBlock.hig.notepad.NotesDbAdapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;

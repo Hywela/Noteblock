@@ -1,4 +1,4 @@
-package noteBlock.ass2note.alarm;
+package noteBlock.hig.alarm;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

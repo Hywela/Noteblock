@@ -1,13 +1,13 @@
 
 
-package noteBlock.ass2note.noteedit;
+package noteBlock.hig.noteedit;
 
 import java.text.SimpleDateFormat;
 
-import noteBlock.ass2note.R;
-import noteBlock.ass2note.alarm.AlarmManagerService;
-import noteBlock.ass2note.location.GoogleMapsActivity;
-import noteBlock.ass2note.notepad.NotesDbAdapter;
+import noteBlock.hig.R;
+import noteBlock.hig.alarm.AlarmManagerService;
+import noteBlock.hig.location.GoogleMapsActivity;
+import noteBlock.hig.notepad.NotesDbAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;

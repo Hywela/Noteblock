@@ -1,4 +1,4 @@
-package noteBlock.ass2note.location;
+package noteBlock.hig.location;
 
 import java.util.Timer;
 import java.util.TimerTask;

@@ -1,6 +1,6 @@
 
 
-package noteBlock.ass2note.notepad;
+package noteBlock.hig.notepad;
 
 
 import java.text.SimpleDateFormat;

@@ -1,8 +1,8 @@
-package noteBlock.ass2note.alarm;
+package noteBlock.hig.alarm;
 
-import noteBlock.ass2note.R;
-import noteBlock.ass2note.notepad.Notepad;
-import noteBlock.ass2note.notepad.NotesDbAdapter;
+import noteBlock.hig.R;
+import noteBlock.hig.notepad.Notepad;
+import noteBlock.hig.notepad.NotesDbAdapter;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

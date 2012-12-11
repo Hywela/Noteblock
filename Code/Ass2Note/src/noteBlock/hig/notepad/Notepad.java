@@ -1,12 +1,12 @@
 
 
-package noteBlock.ass2note.notepad;
+package noteBlock.hig.notepad;
 
 import java.util.ArrayList;
 
-import noteBlock.ass2note.R;
-import noteBlock.ass2note.alarm.AlarmManagerService;
-import noteBlock.ass2note.noteedit.NoteEdit;
+import noteBlock.hig.R;
+import noteBlock.hig.alarm.AlarmManagerService;
+import noteBlock.hig.noteedit.NoteEdit;
 import android.app.ListActivity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;

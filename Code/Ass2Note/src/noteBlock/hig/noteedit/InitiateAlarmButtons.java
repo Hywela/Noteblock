@@ -1,12 +1,12 @@
-package noteBlock.ass2note.noteedit;
+package noteBlock.hig.noteedit;
 
 import java.util.Calendar;
 import java.util.Date;
 
-import noteBlock.ass2note.R;
-import noteBlock.ass2note.alarm.DatePickerFragment;
-import noteBlock.ass2note.alarm.TimePickerFragment;
-import noteBlock.ass2note.location.ConnectionService;
+import noteBlock.hig.R;
+import noteBlock.hig.alarm.DatePickerFragment;
+import noteBlock.hig.alarm.TimePickerFragment;
+import noteBlock.hig.location.ConnectionService;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;

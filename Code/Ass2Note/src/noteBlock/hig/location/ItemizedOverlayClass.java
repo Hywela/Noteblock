@@ -1,10 +1,10 @@
-package noteBlock.ass2note.location;
+package noteBlock.hig.location;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import noteBlock.ass2note.R;
+import noteBlock.hig.R;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;

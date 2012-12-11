@@ -1,6 +1,6 @@
-package noteBlock.ass2note.location;
+package noteBlock.hig.location;
 
-import noteBlock.ass2note.R;
+import noteBlock.hig.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;

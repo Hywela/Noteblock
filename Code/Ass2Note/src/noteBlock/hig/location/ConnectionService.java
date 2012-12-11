@@ -1,4 +1,4 @@
-package noteBlock.ass2note.location;
+package noteBlock.hig.location;
 
 import android.app.IntentService;
 import android.content.Intent;

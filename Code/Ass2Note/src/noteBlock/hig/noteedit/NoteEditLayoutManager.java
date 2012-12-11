@@ -1,9 +1,9 @@
-package noteBlock.ass2note.noteedit;
+package noteBlock.hig.noteedit;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import noteBlock.ass2note.R;
+import noteBlock.hig.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
