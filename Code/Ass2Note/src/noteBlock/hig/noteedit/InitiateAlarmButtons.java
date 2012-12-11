@@ -19,6 +19,13 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.ToggleButton;
 
+/**
+ * 	Helper class for intiating the alarms
+ * @author Kristoffer benum, Solveig Sørheim
+ *	This class implements paracelable to help with orientaion
+ *	Basicly saves a object which is called again when the orientation changes
+ *  Also the support fragment is used to suport older phones
+ */
 
 public class InitiateAlarmButtons implements Parcelable {
 	 private int mData;
@@ -47,8 +54,6 @@ public class InitiateAlarmButtons implements Parcelable {
 		alarmTime = (ToggleButton) noteEdit.findViewById(R.id.toggleAlarmTime);
 		showAlarmInfo = (ToggleButton) noteEdit
 				.findViewById(R.id.showAlarmNoteInfo);
-
-		
 		
 		alarmPosition.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
@@ -68,54 +73,18 @@ public class InitiateAlarmButtons implements Parcelable {
 			}
 		});
 	}
-/*
-	DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
 
-		public void onDateSet(DatePicker view, int year, int monthOfYear,
-				int dayOfMonth) {
-			
-			/*
-			 * The Jelly Bean API has an error and calls DatePicker twice, so we
-			 * need to only call it only once:
-			 */
-/*
-
-			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN) {
-				timesCalledDate++;
-				if ((timesCalledDate % 2) == 0)
-					setDate(year, monthOfYear, dayOfMonth);
-
-				// All other API's calls DatePicker only once.
-			} else
-				setDate(year, monthOfYear, dayOfMonth);
-		}
-	};
-*/
 	public void setDate(int year, int monthOfYear, int dayOfMonth) {
 		myCalendar.set(Calendar.YEAR, year);
 		myCalendar.set(Calendar.MONTH, monthOfYear);
 		myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 	}
-/*
-	TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
-		public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-			
-			/*
-			 * The Jelly Bean API has an error and calls TimePicker twice, so we
-			 * need to only call it only once:
-			 */
-	/*
-			if (android.os.Build.VERSION.SDK_INT == android.os.Build.VERSION_CODES.JELLY_BEAN) {
-				timesCalledTime++;
-				if ((timesCalledTime % 2) == 0)	setTime(hourOfDay, minute);
-			} 
-			// All other API's calls DatePicker only once.
-			else setTime(hourOfDay, minute);
-
-		} // end onTimeSet
-	};
-
-*/	public void setTime(int hourOfDay, int minute) {
+	/**
+	 * Set The time , also checks of the time is not in the past
+	 * @param hourOfDay
+	 * @param minute
+	 */
+	public void setTime(int hourOfDay, int minute) {
 		
 		myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
 		myCalendar.set(Calendar.MINUTE, minute);
@@ -134,7 +103,13 @@ public class InitiateAlarmButtons implements Parcelable {
 			//Toast.makeText(noteEdit, R.string.no_alarm_has_been_set , Toast.LENGTH_SHORT).show();
 		}
 	}
-
+	/**
+	 * 
+	 * @param manger Sends the Fragment manager from {@link NoteEdit}
+	 * @param in Is the the version of the object from the note, 
+	 * so we can orient the screen without errors.
+	 * From {@link NoteEdit}
+	 */
 	public void initiateAlarmButtonDialog(final FragmentManager manger,  final InitiateAlarmButtons in) {
 		dialog = new Dialog(noteEdit);
 		// Set the dialog title
@@ -148,19 +123,18 @@ public class InitiateAlarmButtons implements Parcelable {
 				.findViewById(R.id.positionButton);
 		ImageButton timeButton = (ImageButton) dialog
 				.findViewById(R.id.timeButton);
-		
-		
 			
 		timeButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				mangerSupport = manger;
 				DialogFragment newFragment;
 				inn = in;
+				// opens a new Timepicker this secound 
 				 newFragment = new TimePickerFragment(in);
 				 newFragment.show( manger , "timePicker");
 				 newFragment = null;
 				 
-				
+				 // opens a new datepicker . this is shown first
 				 newFragment = new DatePickerFragment(in);
 				 newFragment.show( manger , "datePicker");
 				
@@ -168,6 +142,9 @@ public class InitiateAlarmButtons implements Parcelable {
 				
 				dialog.dismiss();
 				
+				// Basicly the timpicker is shown first and the date last
+				// but date is drawn ontop of the timeepicker
+				// TODO : Find another way
 			}
 		});
 
@@ -182,11 +159,16 @@ public class InitiateAlarmButtons implements Parcelable {
 		});
 		
 	}
-
+	/**
+	 * Returns the date
+	 * @return
+	 */
 	public long getDa() {
 		return da;
 	}
-
+	/**
+	 * Updates the The alarm 
+	 */
 	private void updateTime() {
 		Intent i = new Intent(
 				"com.example.ass2note.notepad.NoteEdit.connectionReceiver");
@@ -203,7 +185,11 @@ public boolean isDialogShowing(){
 	  if(dialog!=null && dialog.isShowing())return true;
 	  return false;
 	 }
-
+/**
+ * This is a function that is not currently used 
+ * because of a error, its is Something to be looked into later
+ * TODO: implent it with the {@link InitiateAlarmButtons} - setTime() function
+ */
 public void newFragment(){
 	DialogFragment newFragment;
 	 newFragment = new TimePickerFragment(inn);
@@ -215,7 +201,9 @@ public int describeContents() {
 	// TODO Auto-generated method stub
 	return 0;
 }
-
+/**
+ * Helps with saving the object for the orientation
+ */
 public void writeToParcel(Parcel out, int flags) {
    
 	out.writeInt(mData);

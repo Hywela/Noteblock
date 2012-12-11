@@ -50,7 +50,7 @@ public class NoteEdit extends FragmentActivity {
 		setContentView(R.layout.note_edit);
 		setTitle(R.string.edit_note);
 
-		// Log.i("NoteEdit", "created");
+		//debughelper Log.i("NoteEdit", "created");
 
 		mDbHelper = new NotesDbAdapter(this);
 		mDbHelper.open();
@@ -249,14 +249,14 @@ public class NoteEdit extends FragmentActivity {
 				checkConnection(intent);
 
 			} else if (fromCaller.contains("InitiateAlarmButtons")) {
-				Log.i("NoteEdit", "receiver called from InitiateAlarmButtons.");
+			//debughelper	Log.i("NoteEdit", "receiver called from InitiateAlarmButtons.");
 
 				String command = intent.getStringExtra("command");
 				if (command.contains("updateTime")) {
 					SimpleDateFormat dateFormat = new SimpleDateFormat(
 							"dd-MM-yyyy HH:mm");
 					long time = intent.getLongExtra("time", 0);
-					Log.i("NoteEdit", "time is: " + dateFormat.format(time));
+				//debughelper	Log.i("NoteEdit", "time is: " + dateFormat.format(time));
 
 					savePopulateManager.saveTime(time, "true");
 					layoutManager.displayAlarmInfo();
