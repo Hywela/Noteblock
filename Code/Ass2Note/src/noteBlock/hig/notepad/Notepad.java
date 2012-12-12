@@ -140,25 +140,35 @@ public class Notepad extends ListActivity {
 		switch (item.getItemId()) {
 		case DELETE_ID:
 			AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-			mDbHelper.deleteNote(info.id);
-			cancelNotification(info.id); // If the note is still on the panel,
-											// remove it.
 
+			Log.i("notepad","Trying to delete a note");
 			String alarmType = "";
+
+			// If no more notes with positionReminder exists in the DB, stop the positionalarm:
+			if (!validNotes()) alarmType = alarmType.concat("position");
+			
 			
 			// TODO: Sjekk: dersom notatet er den som har alarmen på tid, fjern alarmen og legg den til neste notat.
 			long closestTime[] = mDbHelper.getClosestTime();
 			if(closestTime[1] == info.id) alarmType = "time";
 			
-			// If no more valid notes exists in the DB, stop the alarm:
-			if (!validNotes()) alarmType = alarmType.concat("position");
+
+			mDbHelper.deleteNote(info.id);
+			cancelNotification(info.id); // If the note is still on the panel,
+											// remove it.
 			
-			if(!alarmType.contains("time") || alarmType.contains("position")){
+			closestTime = mDbHelper.getClosestTime();
+			
+			if(alarmType.contains("time") || alarmType.contains("position")){
+				Log.i("notepad","trying to start alarmmanager");
 				Intent i = new Intent(Notepad.this, AlarmManagerService.class);
 				i.putExtra("alarmType", alarmType);
+				i.putExtra("time", closestTime[0]);
+				i.putExtra("rowId", closestTime[1]);
 				i.putExtra("COMMAND", "Stop Alarm");
 				startService(i);
 			}
+
 
 			fillData();
 			return true;

@@ -344,10 +344,11 @@ Log.i("noteedit", "trying to destroy");
 
 	private void stopTimeAlarm(long time) {
 		if (time > 0) {
+			long closestTime[] = mDbHelper.getClosestTime();
 			Intent i = new Intent(this, AlarmManagerService.class);
 			i.putExtra("alarmType", "time");
-			i.putExtra("time", time);
-			i.putExtra("rowId", mRowId);
+			i.putExtra("time", closestTime[0]);
+			i.putExtra("rowId", closestTime[1]);
 			i.putExtra("COMMAND", "Stop Alarm");
 			startService(i);
 		}
