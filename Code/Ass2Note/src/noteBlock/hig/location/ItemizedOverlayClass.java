@@ -204,8 +204,6 @@ public class ItemizedOverlayClass extends ItemizedOverlay<OverlayItem> {
 		 */
 		try {
 			addresses = geo.getFromLocation(latitude / 1E6, longitude / 1E6, 1);
-			System.out.println("addresses: " + addresses);
-
 		} catch (Exception e) {
 			e.printStackTrace(); // getFromLocation() may sometimes fail
 			snippet = ""; // Set default value to snippet.

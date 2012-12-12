@@ -253,11 +253,15 @@ Log.i("noteedit", "trying to destroy");
 			switch (resultCode) {
 			// A new location was selected:
 			case Activity.RESULT_OK: {
-				// Fetch the new data:
+				String snippet = data.getStringExtra("snippet");
+				
+				if(snippet.trim().matches("")) snippet = getString(R.string.alarm);
+				
+				// Fetch and save the new data:
 				savePopulateManager.savePosition(
 						data.getStringExtra("latitude"),
 						data.getStringExtra("longitude"),
-						data.getStringExtra("snippet"), "true");
+						snippet, "true");
 
 				layoutManager.displayAlarmInfo();
 				break;
