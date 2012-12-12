@@ -12,6 +12,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -151,9 +152,14 @@ public class NoteEditLayoutManager{
 			else
 				setPositionInfo(false, savePopulate.getSnippet());
 			
-			if(savePopulate.getTimeReminder().contains("true")) 
-				setTimeInfo(true, savePopulate.getTime());
-			else setTimeInfo(false, savePopulate.getTime());
+			Log.i("cake-test. ", "time is: " + savePopulate.getTime());
+			
+			if(savePopulate.getTime()!=0){
+				if(savePopulate.getTimeReminder().contains("true")) 
+					setTimeInfo(true, savePopulate.getTime());
+				else setTimeInfo(false, savePopulate.getTime());
+			}
+			
 		}
 	}
 	
