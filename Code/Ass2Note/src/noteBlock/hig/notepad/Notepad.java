@@ -191,9 +191,10 @@ public class Notepad extends ListActivity {
 		super.onActivityResult(requestCode, resultCode, intent);
 		Log.i("Notepad", "onActivityresult");
 
+		// TODO: This can be called elsewhere.
+		startLocationAlarm();
+
 		if (resultCode == RESULT_OK && requestCode == ACTIVITY_GPS) {
-			// TODO: This can be called elsewhere.
-			startLocationAlarm();
 			
 			if (intent.hasExtra("longitude")) {
 				longi = intent.getExtras().getDouble("longitude");
@@ -204,14 +205,9 @@ public class Notepad extends ListActivity {
 		}
 		
 		if(intent!=null && intent.getBooleanExtra("deleteNote", false)){
-			Log.i("Notepad", "onactivity intent notn ull");
-			
-			Log.i("Notepad" , "rowiD is : " + intent.getLongExtra("rowId", 4444));
-			
 			mDbHelper.deleteNote(intent.getLongExtra("rowId", 4444));
 		}
 		fillData();
-		
 	}
 
 	@Override

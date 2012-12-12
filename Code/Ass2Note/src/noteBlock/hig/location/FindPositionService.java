@@ -361,7 +361,7 @@ public class FindPositionService extends Service {
 			
 			// If the gpsListener couldnt find the user's location:
 			if (gpsListener != null) {
-				Log.i("FindPositionService", "Timertask maybe called from gpsListener");
+				Log.i("FindPositionService", "Timertask. gpsListener is not null");
 				mLocationManager.removeUpdates(gpsListener);
 				gpsChecked = true;
 				
@@ -372,13 +372,16 @@ public class FindPositionService extends Service {
 				}
 			}
 
+			// The user's location was not found by networkListener:
 			if (networkListener != null) {
-				Log.i("FindPositionService", "Timertask maybe called from gpsListener");
+				Log.i("FindPositionService", "Timertask. networkListener is not null");
 				mLocationManager.removeUpdates(networkListener);
 				networkChecked = true;
 				
-				// If the listeners couldn't find the user's location at all:
+				// If the gpsListener could not find the user's location either
 				if(gpsChecked && gpsLocation==null) returnEmptyMessage();
+				
+				// If the gpsListener found the user's location:
 				else if(gpsChecked && gpsLocation!=null){
 					sendLocationMessage(gpsLocation.getLatitude() * 1000000,
 							gpsLocation.getLongitude() * 1000000);
