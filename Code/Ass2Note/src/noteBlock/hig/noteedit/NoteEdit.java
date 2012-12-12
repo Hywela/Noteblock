@@ -26,6 +26,13 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+
+/**
+ * This is a activity thats called from the {@link Notepad}
+ * It Extends FragmentActivity so we can have orientation on the date input
+ * @author Kristoffer Benum , and Solveig Sørheim
+ *
+ */
 public class NoteEdit extends FragmentActivity {
 	private static final int MAPSINTENT_ID = 1;
 	private NotesDbAdapter mDbHelper;

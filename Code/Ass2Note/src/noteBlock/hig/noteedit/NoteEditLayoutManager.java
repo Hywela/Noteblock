@@ -1,3 +1,7 @@
+/**
+ *  NoteEditLayoutManager is a helper class  
+ */
+
 package noteBlock.hig.noteedit;
 
 import java.text.SimpleDateFormat;
@@ -16,7 +20,11 @@ import android.widget.ToggleButton;
 
 
 
-
+/**
+ * 
+ * @author Kristoffer Benum, and Solveig Sørheim
+ *
+ */
 public class NoteEditLayoutManager{
 	private NoteEdit noteEdit;
 	private Long mRowId;

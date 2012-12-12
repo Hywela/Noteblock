@@ -1,5 +1,3 @@
-
-
 package noteBlock.hig.notepad;
 
 import java.util.ArrayList;
@@ -9,7 +7,6 @@ import noteBlock.hig.alarm.AlarmManagerService;
 import noteBlock.hig.noteedit.NoteEdit;
 import android.app.ListActivity;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -27,7 +24,13 @@ import android.widget.SimpleCursorAdapter;
 
 
 
-
+/**
+ * 
+ * @author Kristoffer Benum, and Solveig Sørheim
+ * This and the notesDbAdapter , NoteEdit is based on the Android Notepad 
+ * Turtorial so some code might be the same.
+ *
+ */
 public class Notepad extends ListActivity {
 	private static final int ACTIVITY_CREATE = 0;
 	private static final int ACTIVITY_EDIT = 1;
@@ -74,7 +77,9 @@ public class Notepad extends ListActivity {
 		startActivityForResult(i, ACTIVITY_EDIT);
 	}
 
-	
+	/**
+	 * Filles the date into the list view 
+	 */
 	private void fillData() {
 		Cursor notesCursor = mDbHelper.fetchAllNotes();
 		startManagingCursor(notesCursor);
@@ -96,6 +101,9 @@ public class Notepad extends ListActivity {
 
 	}
 
+	/**
+	 * Menu
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
@@ -104,6 +112,9 @@ public class Notepad extends ListActivity {
 		return true;
 	}
 
+	/**
+	 * Menu
+	 */
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
@@ -113,6 +124,10 @@ public class Notepad extends ListActivity {
 		return super.onMenuItemSelected(featureId, item);
 	}
 
+	/**
+	 * Hold down finger over the note this pops up
+	 * for deleting the note
+	 */
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
@@ -151,11 +166,17 @@ public class Notepad extends ListActivity {
 		return super.onContextItemSelected(item);
 	}
 
+	/**
+	 * Calls the NoteEdit.class with the intent for Creating the note
+	 */
 	private void createNote() {
 		Intent i = new Intent(this, NoteEdit.class);
 		startActivityForResult(i, ACTIVITY_CREATE);
 	}
 
+	/**
+	 * When a note is clicked in the listview
+	 */
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 		super.onListItemClick(l, v, position, id);
@@ -199,6 +220,10 @@ public class Notepad extends ListActivity {
 		System.out.println("onstart notepad");
 		super.onStart();
 	}
+	
+	/**
+	 * THis is a extra button for that listens to the click to make a note
+	 */
 	protected void onButtonClick() {
 		Button onButtonClick = (Button) findViewById(R.id.button_new_note);
 		onButtonClick.setOnClickListener(new View.OnClickListener() {
@@ -276,3 +301,4 @@ public class Notepad extends ListActivity {
 	}
 	
 }
+

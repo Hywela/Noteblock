@@ -1,4 +1,7 @@
-
+/**
+ * The NotesDbAdapter is the database that creat, close manipulate the notes
+ * 
+ */
 
 package noteBlock.hig.notepad;
 
@@ -17,24 +20,17 @@ import android.util.Log;
 
 /**
  * Simple notes database access helper class. Defines the basic CRUD operations
- * for the notepad example, and gives the ability to list all notes as well as
- * retrieve or modify a specific note.
- * 
- * This has been improved from the first version of this tutorial through the
- * addition of better error handling and also using returning a Cursor instead
- * of using a collection of inner classes (which is less scalable and not
- * recommended).
  */
 public class NotesDbAdapter {
-	public static final String KEY_TEST = "date_created";
+	public static final String KEY_TEST = "date_created"; // curently not used 
     public static final String KEY_TITLE = "title";
     public static final String KEY_BODY = "body";
     public static final String KEY_TIME = "time";
     public static final String KEY_LATI = "latitude";
     public static final String KEY_LONG = "longitude";
-    public static final String KEY_POSITION_REMINDER = "positionReminder";
+    public static final String KEY_POSITION_REMINDER = "positionReminder";// true or false
     public static final String KEY_SNIPPET = "snippet";
-    public static final String KEY_TIME_REMINDER = "timeReminder";
+    public static final String KEY_TIME_REMINDER = "timeReminder";	// true or false
     
     public static final String KEY_ROWID = "_id";
  
@@ -44,7 +40,7 @@ public class NotesDbAdapter {
 
     /**
      * Database creation sql statement
-     */	//String, String ,String, String, String
+     */	
     private static final String DATABASE_CREATE =
         "create table notes (_id integer primary key autoincrement, date_created TIMESTAMP NOT NULL DEFAULT current_timestamp, "
         + "title text not null, body text not null," 
@@ -117,6 +113,12 @@ public class NotesDbAdapter {
      * 
      * @param title the title of the note
      * @param body the body of the note
+     * @param time input in the note
+     * @param latitude input in the note
+     * @param longitude input in the note
+     * @param postion reminder on  or off 
+     * @param postion reminder on  or off
+     * @param snippet
      * @return rowId or -1 if failed
      */		// Puts the intial values into the database
     public long createNote(String title, String body,  long time, 
@@ -190,6 +192,7 @@ public class NotesDbAdapter {
      * @param rowId id of note to update
      * @param title value to set note title to
      * @param body value to set note body to
+     * etc...
      * @return true if the note was successfully updated, false otherwise
      */				// Updates the note with the values
     public boolean updateNote(long rowId, String title, String body, long time,
@@ -220,19 +223,19 @@ public class NotesDbAdapter {
 		
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
-    
+    // Updates the postion and sets the reminder on or off
     public boolean updatePositionNotification(long rowId, String positionNotification){
     	ContentValues args = new ContentValues();
     	args.put(KEY_POSITION_REMINDER, positionNotification);
     	return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
-    
+    // Set the reminder on or off
     public boolean updateTimeNotification(long rowId, String timeNotification){
     	ContentValues args = new ContentValues();
     	args.put(KEY_TIME_REMINDER, timeNotification);
     	return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
-    
+    // gets the closest time to the current date
     public long getClosestTime()[] {
 		Cursor notesCursor = fetchAllNotes();
 		// SimpleDateFormat dateFormat = new

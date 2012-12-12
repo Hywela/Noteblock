@@ -10,6 +10,11 @@ import android.util.Log;
 import android.widget.EditText;
 
 	
+/**
+ * This is a mainly class for the NoteEdit activity 
+ * This calss basicly helps with saving and updating the notes in the database
+ *  Creation is also apart of it (the note)
+ */
 public class NoteEditSavePopulate {
 	private NoteEdit noteEdit;
 	private NotesDbAdapter mDbHelper;
@@ -126,6 +131,13 @@ public class NoteEditSavePopulate {
 		}
 	}
 
+	/**
+	 * Saves the postion 
+	 * @param lati
+	 * @param longi
+	 * @param snipp
+	 * @param posReminder
+	 */
 	public void savePosition(String lati, String longi, String snipp,
 			String posReminder) {
 		System.out.println("savepos");
@@ -136,18 +148,31 @@ public class NoteEditSavePopulate {
 		saveState();
 	}
 
+	/**
+	 * Updates the postion
+	 * @param posReminder
+	 */
 	public void updatePositionNotify(String posReminder) {
 		System.out.println("updatepos");
 		positionReminder = posReminder;
 		mDbHelper.updatePositionNotification(mRowId, positionReminder);
 	}
 
+	/**
+	 * Updates the time reminder 
+	 * @param timReminder
+	 */
 	public void updateTimeNotification(String timReminder) {
 		System.out.println("updatetime");
 		timeReminder = timReminder;
 		mDbHelper.updateTimeNotification(mRowId, timReminder);
 	}
 
+	/**
+	 * 
+	 * @param tim Time gotten from user input
+	 * @param timReminder true or false
+	 */
 	public void saveTime(long tim, String timReminder) {
 		System.out.println("savetime");
 		time = tim;
