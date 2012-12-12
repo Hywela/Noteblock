@@ -35,4 +35,5 @@
    	<string name="start_google_maps">Start Google Maps</string>
    	<string name="noGpsNetwork">You need either gps or network connection for the position-alarm to work.</string>
    	<string name="stoppedAlarm">The alarm has stopped.</string>
+   	<string name="noTitleSet">No title set</string>
 </resources>

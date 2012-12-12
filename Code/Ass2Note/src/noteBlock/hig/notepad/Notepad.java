@@ -180,12 +180,25 @@ public class Notepad extends ListActivity {
 			if (intent.hasExtra("latitude")) {
 				lati = intent.getExtras().getDouble("latitude");
 			}
-		} else{
-		//	mDbHelper.deleteNote(rowId)
-			fillData();
 		}
+		
+		if(intent!=null && intent.getBooleanExtra("deleteNote", false)){
+			Log.i("Notepad", "onactivity intent notn ull");
+			
+			Log.i("Notepad" , "rowiD is : " + intent.getLongExtra("rowId", 4444));
+			
+			mDbHelper.deleteNote(intent.getLongExtra("rowId", 4444));
+		}
+		fillData();
+		
 	}
 
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		System.out.println("onstart notepad");
+		super.onStart();
+	}
 	protected void onButtonClick() {
 		Button onButtonClick = (Button) findViewById(R.id.button_new_note);
 		onButtonClick.setOnClickListener(new View.OnClickListener() {

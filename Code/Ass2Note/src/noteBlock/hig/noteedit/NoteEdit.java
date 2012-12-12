@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,6 +53,10 @@ public class NoteEdit extends FragmentActivity {
 
 		savePopulateManager = new NoteEditSavePopulate(this, mDbHelper, mRowId);
 		savePopulateManager.populateFields();
+		if(savePopulateManager.getRowId() == null){
+			savePopulateManager.saveState();
+		}
+		
 		layoutManager = new NoteEditLayoutManager(this, mRowId,
 				savePopulateManager);
 		initiateAlarmButtons = new InitiateAlarmButtons(this, layoutManager);
@@ -78,6 +83,27 @@ public class NoteEdit extends FragmentActivity {
 			Log.i("NoteEdit", e.getMessage());
 		}
 	}
+	
+	@Override
+	public void onBackPressed() {
+
+		Intent i = new Intent();
+		i.putExtra("rowId", savePopulateManager.getRowId());
+		
+		Log.i("NoteEdit", "onBackPressed. Savepop rowid is: " + savePopulateManager.getRowId());
+		Log.i("NoteEdit", "onBackPressed. noty rowid is: " + mRowId);
+		
+		if(savePopulateManager.emptyNote()) 
+			{ i.putExtra("deleteNote", true); }
+		
+		if(savePopulateManager.noTitle()){
+			savePopulateManager.setTitle(getString(R.string.NoTitleSet));
+		}
+		
+		setResult(Activity.RESULT_CANCELED, i);
+		
+		super.onBackPressed();
+	}
 
 	@Override
 	protected void onDestroy() {
@@ -89,15 +115,13 @@ public class NoteEdit extends FragmentActivity {
 
 		initiateAlarmButtons.dimiss();
 
+		
+Log.i("noteedit", "trying to destroy");
+
+		
+		
 		savePopulateManager.closeDB();
 		mDbHelper.close();
-
-
-		if(savePopulateManager.deadNote()){
-			Intent i = new Intent();
-			i.putExtra("rowId", mRowId);
-			setResult(Activity.RESULT_CANCELED, i);
-		}
 	}
 
 	@Override
@@ -116,6 +140,7 @@ public class NoteEdit extends FragmentActivity {
 			mRowId = extras != null ? extras.getLong(NotesDbAdapter.KEY_ROWID)
 					: null;
 		}
+		
 	}
 
 	private void initiateButtons() {
@@ -129,16 +154,20 @@ public class NoteEdit extends FragmentActivity {
 			// ON click CONFIRM
 			public void onClick(View view) {
 				
-				if(savePopulateManager.getTitle() != null && savePopulateManager.getTitle()!= ""){
+				if(!savePopulateManager.getTitle().trim().matches("")){
+					Log.i("NoteEdit ", "title was not null");
 					setResult(RESULT_OK);
 					finish();
 				}else if(savePopulateManager.noTitle()){
+					Log.i("NoteEdit ", "title is null but info is written");
 					alertToast("Please enter a title");
 					EditText mTitleText = (EditText) findViewById(R.id.title);
 					mTitleText.requestFocus();
 				}else{
 					Intent i = new Intent();
+					Log.i("NoteEdit ", "title is null and everything else too");
 					i.putExtra("rowId", mRowId);
+					i.putExtra("deleteNote", true);
 					setResult(Activity.RESULT_CANCELED, i);
 					finish();
 				}
@@ -314,8 +343,9 @@ public class NoteEdit extends FragmentActivity {
 	}
 
 	private void alertToast(String message) {
-		Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG)
-				.show();
+		Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
+		toast.setGravity(Gravity.CENTER, 0, 0);
+		toast.show();
 	}
 
 	private void alertGPSConnection() {

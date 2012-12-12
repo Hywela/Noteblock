@@ -62,6 +62,10 @@ public class NoteEditSavePopulate {
 	public String getTimeReminder() {
 		return timeReminder;
 	}
+	
+	public Long getRowId(){
+		return mRowId;
+	}
 
 	public void populateFields() {
 		if (mRowId != null) {
@@ -105,6 +109,7 @@ public class NoteEditSavePopulate {
 		Log.i("NoteEditSave", "timereminder is: "+ timeReminder);
 		if (mRowId == null) {
 			
+			Log.i("NoteEditSavePopulate", "Savestate. mRowId is null.");
 			
 			long id = mDbHelper.createNote(mTitleText.getText().toString(),
 					mBodyText.getText().toString(), time, longitude, latitude,
@@ -113,6 +118,7 @@ public class NoteEditSavePopulate {
 			if (id > 0) {
 				mRowId = id;
 			}
+			Log.i("Savepopul", "savestate. id is: " + mRowId);
 		} else {
 			mDbHelper.updateNote(mRowId, mTitleText.getText().toString(),
 					mBodyText.getText().toString(), time, longitude, latitude,
@@ -154,21 +160,23 @@ public class NoteEditSavePopulate {
 	}
 	
 	public boolean noTitle(){
-		if ((getTitle()== "" || getTitle()==null)
-		&& ((getBody() != "" || getBody() !=null)
-			|| getLatitude() !="lat" 
-			|| getTime()!=0))
+		if (getTitle().trim().matches("")
+		&& (!getBody().trim().matches("") || getLatitude() !="lat" || getTime()!=0))
 			return true;
 		return false;
 	}
 	
-	public boolean deadNote(){
-		if ((getTitle()== "" || getTitle()==null)
-		&& ((getBody() == "" || getBody() ==null)
-			|| getLatitude() =="lat" 
-			|| getTime()==0))
-			return true;
+	public void setTitle(String title){
+		mTitleText.setText(title);
+	}
+	
+	public boolean emptyNote(){
 		
+		if (getTitle().trim().matches("") && getBody().trim().matches("") && getLatitude().contains("lat") && getTime()==0){
+			Log.i("savepopulate" , "the note is empty");
+			return true;
+		}
+		Log.i("savepopulate" , "the note is not empty");
 		return false;
 	}
 }
