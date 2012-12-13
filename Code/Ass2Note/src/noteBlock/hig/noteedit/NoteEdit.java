@@ -97,8 +97,8 @@ public class NoteEdit extends FragmentActivity {
 		Intent i = new Intent();
 		i.putExtra("rowId", savePopulateManager.getRowId());
 		
-		Log.i("NoteEdit", "onBackPressed. Savepop rowid is: " + savePopulateManager.getRowId());
-		Log.i("NoteEdit", "onBackPressed. noty rowid is: " + mRowId);
+//		Log.i("NoteEdit", "onBackPressed. Savepop rowid is: " + savePopulateManager.getRowId());
+//		Log.i("NoteEdit", "onBackPressed. noty rowid is: " + mRowId);
 		
 		if(savePopulateManager.emptyNote()) 
 			{ i.putExtra("deleteNote", true); }
@@ -123,7 +123,7 @@ public class NoteEdit extends FragmentActivity {
 		initiateAlarmButtons.dimiss();
 
 		
-Log.i("noteedit", "trying to destroy");
+//Log.i("noteedit", "trying to destroy");
 
 		
 		
@@ -162,17 +162,17 @@ Log.i("noteedit", "trying to destroy");
 			public void onClick(View view) {
 				
 				if(!savePopulateManager.getTitle().trim().matches("")){
-					Log.i("NoteEdit ", "title was not null");
+//					Log.i("NoteEdit ", "title was not null");
 					setResult(RESULT_OK);
 					finish();
 				}else if(savePopulateManager.noTitle()){
-					Log.i("NoteEdit ", "title is null but info is written");
+//					Log.i("NoteEdit ", "title is null but info is written");
 					alertToast("Please enter a title");
 					EditText mTitleText = (EditText) findViewById(R.id.title);
 					mTitleText.requestFocus();
 				}else{
 					Intent i = new Intent();
-					Log.i("NoteEdit ", "title is null and everything else too");
+//					Log.i("NoteEdit ", "title is null and everything else too");
 					i.putExtra("rowId", mRowId);
 					i.putExtra("deleteNote", true);
 					setResult(Activity.RESULT_CANCELED, i);
@@ -282,14 +282,14 @@ Log.i("noteedit", "trying to destroy");
 				checkConnection(intent);
 
 			} else if (fromCaller.contains("InitiateAlarmButtons")) {
-				Log.i("NoteEdit", "receiver called from InitiateAlarmButtons.");
+//				Log.i("NoteEdit", "receiver called from InitiateAlarmButtons.");
 
 				String command = intent.getStringExtra("command");
 				if (command.contains("updateTime")) {
 					SimpleDateFormat dateFormat = new SimpleDateFormat(
 							"dd-MM-yyyy HH:mm");
 					long time = intent.getLongExtra("time", 0);
-					Log.i("NoteEdit", "time is: " + dateFormat.format(time));
+//					Log.i("NoteEdit", "time is: " + dateFormat.format(time));
 
 					savePopulateManager.saveTime(time, "true");
 					layoutManager.displayAlarmInfo();

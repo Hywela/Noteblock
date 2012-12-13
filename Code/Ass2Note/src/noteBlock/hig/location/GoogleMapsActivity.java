@@ -95,7 +95,7 @@ public class GoogleMapsActivity extends MapActivity {
 	 * @return
 	 */
 	public boolean startFindPositionService() {
-		Log.i("GoogleMapsActivity", "startfindpositionservice.");
+//		Log.i("GoogleMapsActivity", "startfindpositionservice.");
 		
 		// If the user's preferred notification position was not stored in the DB:
 		if (latitude == null     	|| longitude == null 
@@ -172,7 +172,7 @@ public class GoogleMapsActivity extends MapActivity {
 	 */
 	private Handler handler = new Handler() {
 		public void handleMessage(Message message) {
-			Log.i("GoogleMapsActivity",	"Handler called from FindPositionService");
+//			Log.i("GoogleMapsActivity",	"Handler called from FindPositionService");
 			
 			// Get the data from FindPositionService.
 			Bundle data = message.getData();

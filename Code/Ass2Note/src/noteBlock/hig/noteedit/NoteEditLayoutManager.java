@@ -152,7 +152,7 @@ public class NoteEditLayoutManager{
 			else
 				setPositionInfo(false, savePopulate.getSnippet());
 			
-			Log.i("cake-test. ", "time is: " + savePopulate.getTime());
+//			Log.i("cake-test. ", "time is: " + savePopulate.getTime());
 			
 			if(savePopulate.getTime()!=0){
 				if(savePopulate.getTimeReminder().contains("true")) 

@@ -48,7 +48,7 @@ public class Notepad extends ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		Log.i("Notepad", " oncreated");
+//		Log.i("Notepad", " oncreated");
 		setContentView(R.layout.noteblock_activity);
 		mDbHelper = new NotesDbAdapter(this);
 		mDbHelper.open();
@@ -59,7 +59,7 @@ public class Notepad extends ListActivity {
 		// If the user pressed the notification-panel, display the proper note:
 		Intent u = getIntent();
 		if (u.hasExtra("notificationSuccess")) {
-			Log.i("Notepad", "Special intent notificationSuccess");
+//			Log.i("Notepad", "Special intent notificationSuccess");
 			Long key = Long.parseLong(u.getStringExtra("notificationSuccess"));
 			startNoteEdit(key);
 		}
@@ -141,7 +141,7 @@ public class Notepad extends ListActivity {
 		case DELETE_ID:
 			AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
 
-			Log.i("notepad","Trying to delete a note");
+//			Log.i("notepad","Trying to delete a note");
 			String alarmType = "";
 
 			// If no more notes with positionReminder exists in the DB, stop the positionalarm:
@@ -160,7 +160,7 @@ public class Notepad extends ListActivity {
 			closestTime = mDbHelper.getClosestTime();
 			
 			if(alarmType.contains("time") || alarmType.contains("position")){
-				Log.i("notepad","trying to start alarmmanager");
+//				Log.i("notepad","trying to start alarmmanager");
 				Intent i = new Intent(Notepad.this, AlarmManagerService.class);
 				i.putExtra("alarmType", alarmType);
 				i.putExtra("time", closestTime[0]);
@@ -199,7 +199,7 @@ public class Notepad extends ListActivity {
 	protected void onActivityResult(int requestCode, int resultCode,
 			Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		Log.i("Notepad", "onActivityresult");
+//		Log.i("Notepad", "onActivityresult");
 
 		// TODO: This can be called elsewhere.
 		startLocationAlarm();
@@ -245,7 +245,7 @@ public class Notepad extends ListActivity {
 	 * if there exist at least one valid note in the DB.
 	 */
 	public void startLocationAlarm() {
-		Log.i("Notepad", "starting AlarmManagerservice");
+//		Log.i("Notepad", "starting AlarmManagerservice");
 		// TODO: Rename validNotes..
 		// If there exist at least one valid note in the database:
 		if (validNotes()) {
@@ -254,7 +254,7 @@ public class Notepad extends ListActivity {
 			i.putExtra("COMMAND", "Start Alarm");
 			startService(i);
 		} else {
-			Log.i("Notepad", "startAlarmManagerService: No valid notes");
+//			Log.i("Notepad", "startAlarmManagerService: No valid notes");
 		}
 	}
 
@@ -271,7 +271,7 @@ public class Notepad extends ListActivity {
 
 		// If at least one note is stored in the DB:
 		if (allNotes != null) {
-			Log.i("Notepad", "validNotes: Maybe valid notes:");
+//			Log.i("Notepad", "validNotes: Maybe valid notes:");
 			// Create a list that will contain all positionNotifications:
 			ArrayList<String> validNotes = new ArrayList<String>();
 
@@ -283,7 +283,7 @@ public class Notepad extends ListActivity {
 			if (validNotes.contains("true"))
 				return true;
 		}
-		Log.i("Notepad", "validNotes: no valid notes");
+//		Log.i("Notepad", "validNotes: no valid notes");
 		return false;
 	}
 
@@ -295,7 +295,7 @@ public class Notepad extends ListActivity {
 	 * @param id
 	 */
 	private void cancelNotification(Long id) {
-		Log.i("Notepad", "cancelNotification: removing notification from panel");
+//		Log.i("Notepad", "cancelNotification: removing notification from panel");
 		int noteId = Integer.parseInt(String.valueOf(id));
 		
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

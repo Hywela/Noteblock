@@ -27,6 +27,12 @@ import android.os.Messenger;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+/**
+ * This is a service that compares the user's location with all the notes's
+ * location, and if the distance is less than 100 meters, the user will
+ * be notified.
+ * @author Kristoffer Benum , and Solveig Sørheim
+ */
 public class LocationAlarmService extends Service {
 	// MAX distance in meters to when the user will be notified.
 	private static final int NOTIFICATION_DISTANCE = 100;
@@ -132,8 +138,8 @@ public class LocationAlarmService extends Service {
 		// If no more notes with positionReminder exist, tell the alarm to stop.
 		if (!doesValidLocationExist()) stopAlarmManager();
 
-		mDbHelper.close(); // Close the database connection.
-		stopSelf(); // Stop this service.
+		mDbHelper.close(); 	// Close the database connection.
+		stopSelf(); 		// Stop this service.
 	}
 
 	/**
@@ -142,7 +148,7 @@ public class LocationAlarmService extends Service {
 	 * meters, notify the user.
 	 */
 	private void comparePositions() {
-		Log.i("LocationALarmService", "Started comparePositions");
+//		Log.i("LocationALarmService", "Started comparePositions");
 
 		// Loop through all the notes:
 		for (int number = 0; number < noteLatitudeList.size(); number++) {
@@ -151,9 +157,6 @@ public class LocationAlarmService extends Service {
 			if (!noteLatitudeList.get(number).toString().contains("lat")
 					&& enablePositionList.get(number).toString()
 							.contains("true")) {
-
-				System.out.println("notelati first: "
-						+ noteLatitudeList.get(number));
 
 				// Fetch and transform the doubles to the proper format:
 				double noteLati = Double.parseDouble(noteLatitudeList.get(
@@ -165,31 +168,26 @@ public class LocationAlarmService extends Service {
 				 * Find the distance between the note and the user's location,
 				 * and store the result in results:
 				 */
-				System.out.println("userlati: " + userLatitude);
-				System.out.println("notelati: " + noteLati);
-
 				float results[] = new float[2];
 				Location.distanceBetween(userLatitude, userLongitude, noteLati,
 						noteLongi, results);
-				Log.i("LocationAlarmService", "Distance in meters: "
-						+ results[0]);
+//				Log.i("LocationAlarmService", "Distance in meters: " + results[0]);
 
 				// If the distance is less than 100 meters, alert user:
 				if (results[0] <= NOTIFICATION_DISTANCE) {
-					System.out.println("NOOOOTIFICATION ALERT!!");
 					notifyDatabase(number); // Update the DB.
 					notifyUser(number); // Notify the user.
 					notifyUserWithSound();
 				} else
 					Log.i("LocationAlarmService", "user is still too far away");
 			} else
-				Log.i("LocationAlarmService",
-						"comparePositions, found invalid value");
+				Log.e("LocationAlarmService","comparePositions, found invalid value");
 		} // End for
 	}
 
 	/**
-	 * Method for
+	 * Method for updating a specific note in the database, and setting the
+	 * positionReminder to false.
 	 * 
 	 * @param number
 	 */
@@ -204,12 +202,6 @@ public class LocationAlarmService extends Service {
 
 		// Update the current lists:
 		fetchAllLocations();
-
-		// TODO. find out why this is commented out:
-		/*
-		 * // If no more valid notes exist, tell the alarm to stop.
-		 * if(!doesValidLocationExist()) stopAlarmManager();
-		 */
 	}
 
 	/**
@@ -217,7 +209,7 @@ public class LocationAlarmService extends Service {
 	 * associated with location.
 	 */
 	private void stopAlarmManager() {
-		Log.i("LocationAlarmService", "stopAlarmManager stopping alarm");
+//		Log.i("LocationAlarmService", "stopAlarmManager stopping alarm");
 		Intent i = new Intent(LocationAlarmService.this,
 				AlarmManagerService.class);
 		i.putExtra("COMMAND", "Stop Alarm");
@@ -225,6 +217,9 @@ public class LocationAlarmService extends Service {
 		startService(i);
 	}
 
+	/**
+	 * Method for letting the phone make a notification-sound.
+	 */
 	private void notifyUserWithSound() {
 		try {
 			Uri notification = RingtoneManager
@@ -237,10 +232,9 @@ public class LocationAlarmService extends Service {
 	}
 
 	/**
-	 * Method for notifying the user with (lights, vibration, sound and) a note
-	 * on the panel. TODO: Add lights, vibration, sound?
+	 * Method for notifying the user of a specific note. 
+	 * @param number is the rowId of the note.
 	 */
-
 	public void notifyUser(int number) {
 		String title = getString(R.string.notification_title);
 		String content = getString(R.string.position_notification_content)
@@ -258,10 +252,10 @@ public class LocationAlarmService extends Service {
 	 * @return true when a valid location does exist, false otherwise.
 	 */
 	public boolean doesValidLocationExist() {
-		Log.i("LocationAlarmService", "doesValidLocationExist");
+//		Log.i("LocationAlarmService", "doesValidLocationExist");
 
 		if (enablePositionList.contains("true")) {
-			Log.i("LocationAlarmService", "contained true");
+//			Log.i("LocationAlarmService", "contained true");
 			return true;
 		}
 		return false;
@@ -272,7 +266,7 @@ public class LocationAlarmService extends Service {
 	 * information inside their own lists for other methods to use.
 	 */
 	public void fetchAllLocations() {
-		Log.i("LocationAlarmService", "fetchAllLocations");
+//		Log.i("LocationAlarmService", "fetchAllLocations");
 
 		// Empty the lists so they contain only the most recent values:
 		if (!noteKeyList.isEmpty()) {
@@ -299,18 +293,26 @@ public class LocationAlarmService extends Service {
 		}
 	}
 
+	/**
+	 * Method for starting the ConnectionService so it can find out whether
+	 * the user has internet or gps access.
+	 */
 	private void connectionEnabled() {
-		Log.i("LAS", "connectionEnabled");
+//		Log.i("LAS", "connectionEnabled");
 		Intent intent = new Intent(LocationAlarmService.this,
 				ConnectionService.class);
 		intent.putExtra("fromActivity", "LocationAlarmService");
 		startService(intent);
 	}
 
+	/**
+	 * A broadcastReceiver that receives broadcasts from ConnectionService.
+	 * It starts FindPositionService for finding the user's locationl.
+	 */
 	BroadcastReceiver LASReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.i("LocationAlarmService", "receiver called");
+//			Log.i("LocationAlarmService", "receiver called");
 			boolean gpsEnabled = intent.getBooleanExtra("gpsEnabled", false);
 			boolean networkEnabled = intent.getBooleanExtra("networkEnabled",
 					false);
@@ -328,7 +330,7 @@ public class LocationAlarmService extends Service {
 	 */
 	private void startFindPositionService(boolean gpsEnabled,
 			boolean networkEnabled) {
-		Log.i("LocationAlarmService", "StartfindpositionService");
+//		Log.i("LocationAlarmService", "StartfindpositionService");
 
 		// Call FindPositionService for fetching the user's current position:
 		positionServiceIntent = new Intent(LocationAlarmService.this,
@@ -341,6 +343,13 @@ public class LocationAlarmService extends Service {
 		startService(positionServiceIntent);
 	}
 
+	/**
+	 * Method for displaying a notification on the phone's panel. It displays
+	 * the title and content of the caller's choice.
+	 * @param title
+	 * @param content
+	 * @param requestCode
+	 */
 	private void notifyUser(String title, String content, int requestCode) {
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
 				LocationAlarmService.this).setSmallIcon(R.drawable.ic_launcher)

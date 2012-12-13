@@ -219,7 +219,7 @@ public class NotesDbAdapter {
         args.put(KEY_TIME, time);
         args.put(KEY_TIME_REMINDER, timeReminder);
 
-		Log.i("NoteDBAD", "updateTime: timereminder is: "+ timeReminder);
+//		Log.i("NoteDBAD", "updateTime: timereminder is: "+ timeReminder);
 		
         return mDb.update(DATABASE_TABLE, args, KEY_ROWID + "=" + rowId, null) > 0;
     }
@@ -260,7 +260,7 @@ public class NotesDbAdapter {
 			}
 
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-			Log.i("NoteEdit", "getclosestTime: time is: " + dateFormat.format(timeInDb));
+//			Log.i("NoteEdit", "getclosestTime: time is: " + dateFormat.format(timeInDb));
 		} // - End while()
 		
 		long clTime[] = {closestTime, timeId};

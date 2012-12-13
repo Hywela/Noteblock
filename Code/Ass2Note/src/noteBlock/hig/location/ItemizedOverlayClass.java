@@ -197,7 +197,7 @@ public class ItemizedOverlayClass extends ItemizedOverlay<OverlayItem> {
 		Geocoder geo = new Geocoder(context, Locale.getDefault());
 		List<Address> addresses = null;
 
-		if(Geocoder.isPresent()) Log.i("ItemizedOverlay", "service is present");
+//		if(Geocoder.isPresent()) Log.i("ItemizedOverlay", "service is present");
 		/*
 		 * Create a new list and give it the address values from the preferred
 		 * position.
@@ -211,7 +211,7 @@ public class ItemizedOverlayClass extends ItemizedOverlay<OverlayItem> {
 
 		// If no address data was found:
 		if (addresses == null || addresses.isEmpty()) {
-			Log.i("ItemizedOverlay", "waiting for location");
+//			Log.i("ItemizedOverlay", "waiting for location");
 		}
 		// If address data was found:
 		else {

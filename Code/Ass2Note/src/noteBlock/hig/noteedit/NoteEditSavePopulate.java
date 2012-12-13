@@ -103,8 +103,8 @@ public class NoteEditSavePopulate {
 			
 
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-			Log.i("NoteEditPopulate", "time is: "+ dateFormat.format(time));
-			Log.i("NoteEditPopulate", "timereminder is: "+ timeReminder);
+//			Log.i("NoteEditPopulate", "time is: "+ dateFormat.format(time));
+//			Log.i("NoteEditPopulate", "timereminder is: "+ timeReminder);
 		}
 	}
 
@@ -112,11 +112,11 @@ public class NoteEditSavePopulate {
 	public void saveState() {
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-		Log.i("NoteEditSave", "time is: "+ dateFormat.format(time));
-		Log.i("NoteEditSave", "timereminder is: "+ timeReminder);
+//		Log.i("NoteEditSave", "time is: "+ dateFormat.format(time));
+//		Log.i("NoteEditSave", "timereminder is: "+ timeReminder);
 		if (mRowId == null) {
 			
-			Log.i("NoteEditSavePopulate", "Savestate. mRowId is null.");
+//			Log.i("NoteEditSavePopulate", "Savestate. mRowId is null.");
 			
 			long id = mDbHelper.createNote(mTitleText.getText().toString(),
 					mBodyText.getText().toString(), time, longitude, latitude,
@@ -125,7 +125,7 @@ public class NoteEditSavePopulate {
 			if (id > 0) {
 				mRowId = id;
 			}
-			Log.i("Savepopul", "savestate. id is: " + mRowId);
+//			Log.i("Savepopul", "savestate. id is: " + mRowId);
 		} else {
 			mDbHelper.updateNote(mRowId, mTitleText.getText().toString(),
 					mBodyText.getText().toString(), time, longitude, latitude,
@@ -200,10 +200,10 @@ public class NoteEditSavePopulate {
 	public boolean emptyNote(){
 		
 		if (getTitle().trim().matches("") && getBody().trim().matches("") && getLatitude().contains("lat") && getTime()==0){
-			Log.i("savepopulate" , "the note is empty");
+//			Log.i("savepopulate" , "the note is empty");
 			return true;
 		}
-		Log.i("savepopulate" , "the note is not empty");
+//		Log.i("savepopulate" , "the note is not empty");
 		return false;
 	}
 }
