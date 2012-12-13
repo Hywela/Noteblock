@@ -26,7 +26,8 @@ import android.widget.SimpleCursorAdapter;
 
 /**
  * 
- * @author Kristoffer Benum, and Solveig Sørheim
+ * @author Kristoffer Benum, and Solveig Sørheim. 
+ * The main view its from this Activity everything happens
  * This and the notesDbAdapter , NoteEdit is based on the Android Notepad 
  * Turtorial so some code might be the same.
  *
