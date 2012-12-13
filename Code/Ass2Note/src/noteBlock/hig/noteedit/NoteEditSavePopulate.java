@@ -6,7 +6,6 @@ import noteBlock.hig.R;
 import noteBlock.hig.notepad.NotesDbAdapter;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 import android.widget.EditText;
 
 	

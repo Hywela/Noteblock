@@ -89,6 +89,7 @@ public final class R {
         public static final int activity_wait=0x7f080003;
     }
     public static final class string {
+        public static final int NoTitleSet=0x7f060024;
         public static final int alarm=0x7f060013;
         public static final int app_name=0x7f060000;
         public static final int body=0x7f060008;
@@ -105,6 +106,7 @@ public final class R {
         public static final int network_alert=0x7f06001c;
         public static final int new_button=0x7f060010;
         public static final int noGpsNetwork=0x7f060021;
+        public static final int noTitleSet=0x7f060023;
         public static final int no_alarm_has_been_set=0x7f06001e;
         public static final int no_maps_alert=0x7f06001f;
         public static final int no_notes=0x7f060004;
