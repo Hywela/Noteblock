@@ -33,7 +33,9 @@ public class NoteEditSavePopulate {
 		mRowId = rowId;
 		
 		mTitleText = (EditText) noteEdit.findViewById(R.id.title);
+		mTitleText.setHorizontallyScrolling(true);
 		mBodyText = (EditText) noteEdit.findViewById(R.id.body);
+		
 	}
 
 	public String getTitle(){
