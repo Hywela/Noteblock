@@ -5,6 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+/**
+ * This is a broadcastReceiver whose main purpose is to fetch all alarms from
+ * AlarmManagerService, and decide what to do with these alarms.
+ * @author Kristoffer Benum , and Solveig Sørheim
+ *
+ */
 public class AlarmReceiver extends BroadcastReceiver {
 
 	/**
@@ -13,7 +19,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.i("AlarmReceiver", "Received alarm");
+//		Log.i("AlarmReceiver", "Received alarm");
 		String alarmType = intent.getStringExtra("alarmType");
 		
 		// If the alarm trigger was position based:
