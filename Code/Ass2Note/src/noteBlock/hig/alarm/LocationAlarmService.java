@@ -51,7 +51,6 @@ public class LocationAlarmService extends Service {
 
 	public LocationAlarmService() {
 		super();
-//		Log.i("LocationAlarmService", "created service");
 	}
 
 	/**
@@ -61,7 +60,6 @@ public class LocationAlarmService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-//		Log.i("LocationAlarmService", "oncreate called");
 
 		IntentFilter intentFilter = new IntentFilter(
 				"com.example.ass2note.alarm.LocationAlarmService.LASReceiver");
@@ -86,18 +84,6 @@ public class LocationAlarmService extends Service {
 	}
 
 	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-//		Log.i("LocationAlarmService", "onstart called");
-		return super.onStartCommand(intent, flags, startId);
-	}
-
-	@Override
-	public void onDestroy() {
-		unregisterReceiver(LASReceiver);
-		super.onDestroy();
-	}
-
-	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
@@ -109,7 +95,6 @@ public class LocationAlarmService extends Service {
 	 */
 	private Handler handy = new Handler() {
 		public void handleMessage(Message message) {
-//			Log.i("LocationAlarmService", "Handler handy called");
 			Bundle data = message.getData();
 
 			stopService(positionServiceIntent); // Stop findPositionService.
@@ -119,7 +104,7 @@ public class LocationAlarmService extends Service {
 				userLatitude = data.getDouble("LATITUDE") / 1E6;
 				userLongitude = data.getDouble("LONGITUDE") / 1E6;
 				comparePositions();
-				// If no location was found:
+			// If no location was found:
 			} else {
 				notifyUser(getString(R.string.stoppedAlarm),
 						getString(R.string.noGpsNetwork), 4444);
@@ -133,8 +118,6 @@ public class LocationAlarmService extends Service {
 	 * Method for closing the database and killing this LocationAlarmService.
 	 */
 	private void stopMe() {
-//		Log.i("LocationAlarmService", "stopService");
-
 		// If no more notes with positionReminder exist, tell the alarm to stop.
 		if (!doesValidLocationExist()) stopAlarmManager();
 
@@ -148,8 +131,6 @@ public class LocationAlarmService extends Service {
 	 * meters, notify the user.
 	 */
 	private void comparePositions() {
-//		Log.i("LocationALarmService", "Started comparePositions");
-
 		// Loop through all the notes:
 		for (int number = 0; number < noteLatitudeList.size(); number++) {
 
@@ -164,14 +145,11 @@ public class LocationAlarmService extends Service {
 				double noteLongi = Double.parseDouble(noteLongitudeList.get(
 						number).toString()) / 1E6;
 
-				/*
-				 * Find the distance between the note and the user's location,
-				 * and store the result in results:
-				 */
+				/* Find the distance between the note and the user's location,
+				 * and store the result in results: */
 				float results[] = new float[2];
 				Location.distanceBetween(userLatitude, userLongitude, noteLati,
 						noteLongi, results);
-//				Log.i("LocationAlarmService", "Distance in meters: " + results[0]);
 
 				// If the distance is less than 100 meters, alert user:
 				if (results[0] <= NOTIFICATION_DISTANCE) {
@@ -188,12 +166,9 @@ public class LocationAlarmService extends Service {
 	/**
 	 * Method for updating a specific note in the database, and setting the
 	 * positionReminder to false.
-	 * 
-	 * @param number
+	 * @param number is the rowId to the specific note.
 	 */
 	public void notifyDatabase(int number) {
-		Log.i("LocationAlarmService", "trying to notify database");
-
 		// Get the ID of the note that will be changed.
 		Long key = Long.parseLong(noteKeyList.get(number).toString());
 
@@ -209,7 +184,6 @@ public class LocationAlarmService extends Service {
 	 * associated with location.
 	 */
 	private void stopAlarmManager() {
-//		Log.i("LocationAlarmService", "stopAlarmManager stopping alarm");
 		Intent i = new Intent(LocationAlarmService.this,
 				AlarmManagerService.class);
 		i.putExtra("COMMAND", "Stop Alarm");
@@ -228,6 +202,7 @@ public class LocationAlarmService extends Service {
 					notification);
 			r.play();
 		} catch (Exception e) {
+			Log.e("LocationAlarmService", e.getMessage());
 		}
 	}
 
@@ -252,12 +227,9 @@ public class LocationAlarmService extends Service {
 	 * @return true when a valid location does exist, false otherwise.
 	 */
 	public boolean doesValidLocationExist() {
-//		Log.i("LocationAlarmService", "doesValidLocationExist");
-
-		if (enablePositionList.contains("true")) {
-//			Log.i("LocationAlarmService", "contained true");
+		if (enablePositionList.contains("true")) 
 			return true;
-		}
+		
 		return false;
 	}
 
@@ -266,8 +238,6 @@ public class LocationAlarmService extends Service {
 	 * information inside their own lists for other methods to use.
 	 */
 	public void fetchAllLocations() {
-//		Log.i("LocationAlarmService", "fetchAllLocations");
-
 		// Empty the lists so they contain only the most recent values:
 		if (!noteKeyList.isEmpty()) {
 			noteLatitudeList.clear();
@@ -290,7 +260,7 @@ public class LocationAlarmService extends Service {
 				titleList.add(allNotes.getString(1));
 				enablePositionList.add(allNotes.getString(6));
 			}
-		}
+		} // End if.
 	}
 
 	/**
@@ -298,7 +268,6 @@ public class LocationAlarmService extends Service {
 	 * the user has internet or gps access.
 	 */
 	private void connectionEnabled() {
-//		Log.i("LAS", "connectionEnabled");
 		Intent intent = new Intent(LocationAlarmService.this,
 				ConnectionService.class);
 		intent.putExtra("fromActivity", "LocationAlarmService");
@@ -312,7 +281,6 @@ public class LocationAlarmService extends Service {
 	BroadcastReceiver LASReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-//			Log.i("LocationAlarmService", "receiver called");
 			boolean gpsEnabled = intent.getBooleanExtra("gpsEnabled", false);
 			boolean networkEnabled = intent.getBooleanExtra("networkEnabled",
 					false);
@@ -320,7 +288,6 @@ public class LocationAlarmService extends Service {
 			// Start service to find the user's current position.
 			startFindPositionService(gpsEnabled, networkEnabled);
 		}
-
 	};
 
 	/**
@@ -330,8 +297,6 @@ public class LocationAlarmService extends Service {
 	 */
 	private void startFindPositionService(boolean gpsEnabled,
 			boolean networkEnabled) {
-//		Log.i("LocationAlarmService", "StartfindpositionService");
-
 		// Call FindPositionService for fetching the user's current position:
 		positionServiceIntent = new Intent(LocationAlarmService.this,
 				FindPositionService.class);

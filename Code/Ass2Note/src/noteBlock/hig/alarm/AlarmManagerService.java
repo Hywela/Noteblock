@@ -13,7 +13,6 @@ import android.util.Log;
  * This is a service that manages the two alarms, time and position. It starts
  * and stops these alarms.
  * @author Kristoffer Benum , and Solveig Sørheim
- *
  */
 public class AlarmManagerService extends Service {
 	// Interval between position reminder checks.
@@ -28,11 +27,9 @@ public class AlarmManagerService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-//		Log.i("AlarmManagerService", "onCreate");
-
 		context = this.getApplicationContext();
-		alarmManager = (AlarmManager) context
-				.getSystemService(Context.ALARM_SERVICE);
+		alarmManager = (AlarmManager) context.
+				getSystemService(Context.ALARM_SERVICE);
 		alarmReceiverIntent = new Intent(context, AlarmReceiver.class);
 	}
 
@@ -43,8 +40,6 @@ public class AlarmManagerService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-//		Log.i("AlarmManagerService", "onStart");
-
 		// Get the sent information sent by the caller:
 		String alarmType = intent.getStringExtra("alarmType");
 		String command = intent.getStringExtra("COMMAND");
@@ -53,7 +48,6 @@ public class AlarmManagerService extends Service {
 		if (alarmType.contains("time"))		timeAlarm(command, intent);
 		if (alarmType.contains("position"))	positionAlarm(command);
 
-//		Log.i("AlarmManagerService", "Stopping self");
 		stopSelf();
 		return super.onStartCommand(intent, flags, startId);
 	}
@@ -78,11 +72,11 @@ public class AlarmManagerService extends Service {
 		if (command.contains("Start Alarm")) {
 			alarmManager.set(AlarmManager.RTC_WAKEUP, time, pi);
 		} else if (command.contains("Stop Alarm")) {
-			Log.i("AlarmManagerService", "command = stop alarm");
 			pi.cancel(); 					// Cancel the pendingIntent.
 			alarmManager.cancel(pi); 		// Cancel the alarm.
-			if (time != 0) alarmManager.set(AlarmManager.RTC_WAKEUP, time, pi);
 			
+			// If more times with a timeReminder exist, start a new alarm.
+			if (time != 0) alarmManager.set(AlarmManager.RTC_WAKEUP, time, pi);
 		} else
 			Log.e("AlarmManagerService", "Command contained unknown value");
 	}

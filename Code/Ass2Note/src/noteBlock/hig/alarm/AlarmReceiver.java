@@ -19,7 +19,6 @@ public class AlarmReceiver extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-//		Log.i("AlarmReceiver", "Received alarm");
 		String alarmType = intent.getStringExtra("alarmType");
 		
 		// If the alarm trigger was position based:

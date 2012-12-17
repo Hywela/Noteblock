@@ -13,6 +13,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 /**
  * This is a service that notifies the user of a specific note based on which
@@ -57,7 +58,6 @@ public class TimeAlarmService extends IntentService {
 	 */
 	private void startTimeAlarm() {
 		long closestTime[] = mDbHelper.getClosestTime();
-		// Log.i("TimeAlarmService", "closestTIme is: " + closestTime);
 		if (closestTime[0] > 0) {
 			Intent i = new Intent(this, AlarmManagerService.class);
 			i.putExtra("alarmType", "time");
@@ -69,10 +69,12 @@ public class TimeAlarmService extends IntentService {
 	}
 
 	/**
-	 * Method for fething the current note's title from the database.
+	 * Method for fetching the current note's title from the database.
 	 */
 	private void getNotificationInfo() {
 		Cursor note = mDbHelper.fetchNote(rowId);
+		
+		// Make sure no leaks occur.
 		if (note.moveToFirst()) {
 			title = note.getString(note
 					.getColumnIndexOrThrow(NotesDbAdapter.KEY_TITLE));
@@ -90,6 +92,7 @@ public class TimeAlarmService extends IntentService {
 					notification);
 			r.play();
 		} catch (Exception e) {
+			Log.e("TimeAlarmService", e.getMessage());
 		}
 	}
 
@@ -107,30 +110,24 @@ public class TimeAlarmService extends IntentService {
 		mBuilder.setVibrate(vibraPattern);
 		mBuilder.setLights(0xff00ff00, 300, 1000);
 
-		/*
-		 * Set the notification on the panel to remove itself when the user
-		 * presses it.
-		 */
+		/* Set the notification on the panel to remove itself when the user
+		 * presses it. */
 		mBuilder.setAutoCancel(true);
 		Intent notifyIntent = new Intent(this, Notepad.class);
 		notifyIntent.setAction(String.valueOf(rowId));
 		notifyIntent.putExtra("notificationSuccess", String.valueOf(rowId));
-		PendingIntent intent = PendingIntent.getActivity(this, 0, notifyIntent,
-				0);
-		mBuilder.setContentIntent(intent);
+		PendingIntent pi = PendingIntent.getActivity(this, 0, notifyIntent,	0);
+		mBuilder.setContentIntent(pi);
 
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-		mNotificationManager.notify(Integer.parseInt(String.valueOf(rowId)),
-				mBuilder.build());
+		mNotificationManager.notify(Integer.parseInt(String.valueOf(rowId)), mBuilder.build());
 	}
 
 	/**
 	 * Method for setting the timeReminder of the specific note to false.
 	 */
 	public void notifyDatabase() {
-		// Log.i("TimeAlarmService", "trying to notify database. rowId: "+
-		// rowId);
 		mDbHelper.updateTimeNotification(rowId, "false");
 	}
 }
